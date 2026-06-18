@@ -10,11 +10,9 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-
     data = request.json
 
-    message = f"""
-Whale Scanner反応
+    message = f"""Whale Scanner反応
 
 銘柄:
 {data}
@@ -25,20 +23,29 @@ Whale Scanner反応
     line_token = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
 
     headers = {
-        "Authorization": f"Bearer {line_token}"
+        "Authorization": f"Bearer {line_token}",
+        "Content-Type": "application/json"
     }
 
     payload = {
-        "message": message
+        "messages": [
+            {
+                "type": "text",
+                "text": message
+            }
+        ]
     }
 
-    requests.post(
+    response = requests.post(
         "https://api.line.me/v2/bot/message/broadcast",
         headers=headers,
         json=payload
     )
 
-    return {"status": "ok"}
+    print("LINE status:", response.status_code)
+    print("LINE response:", response.text)
+
+    return {"status": "ok", "line_status": response.status_code}
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
