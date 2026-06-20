@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "AI Stock Reporter Running - TGS Lite"
+    return "AI Stock Reporter Running"
 
 
 def to_float(value, default=0.0):
@@ -45,97 +45,165 @@ def send_line(message):
     print("LINE response:", response.text)
 
 
-def make_action(score):
-    if score >= 90:
-        return "S", "買い候補", "120万円"
-    elif score >= 80:
-        return "A", "買い候補", "60万円"
-    elif score >= 70:
-        return "B", "監視", "0円"
-    elif score >= 60:
-        return "C", "監視", "0円"
-    elif score >= 40:
-        return "D", "見送り", "0円"
-    else:
-        return "E", "見送り", "0円"
+def calculate_score(data):
+    score = 0
+    plus = []
+    minus = []
 
-
-def make_comment(score, grade, data):
+    macd_4h = data.get("macd_4h", "")
     macd_d = data.get("macd_d", "")
     macd_w = data.get("macd_w", "")
+
     ma_d_status = data.get("ma_d_status", "")
     ma_w_status = data.get("ma_w_status", "")
 
     rsi_d = to_float(data.get("rsi_d"))
     rsi_w = to_float(data.get("rsi_w"))
+    volume_ratio = to_float(data.get("volume_ratio"))
+    ma_d_diff = to_float(data.get("ma_d_diff"))
 
-    if grade in ["S", "A"]:
-        return "日足・週足の条件が強く、TGS上は買い候補です。損切り-15%前提で確認。"
+    if macd_4h == "GC":
+        score += 10
+        plus.append("4H MACD GC +10")
 
-    if grade in ["B", "C"]:
-        return "一部条件は良いですが、A評価未満のため監視です。追加確認が必要です。"
+    if macd_d == "GC":
+        score += 15
+        plus.append("日足MACD GC +15")
+
+    if macd_w == "GC":
+        score += 15
+        plus.append("週足MACD GC +15")
+
+    if ma_d_status == "above":
+        score += 15
+        plus.append("日足200MA上 +15")
+
+    if ma_w_status == "above":
+        score += 15
+        plus.append("週足200MA上 +15")
+
+    if 40 <= rsi_d <= 70:
+        score += 5
+        plus.append("日足RSI良好 +5")
+
+    if 40 <= rsi_w <= 75:
+        score += 5
+        plus.append("週足RSI良好 +5")
+
+    if volume_ratio >= 2.0:
+        score += 10
+        plus.append("出来高2倍以上 +10")
+    elif volume_ratio >= 1.5:
+        score += 5
+        plus.append("出来高1.5倍以上 +5")
 
     if ma_d_status == "below":
-        return "日足200MA下のため弱い判定です。新規買いは見送り優先です。"
+        score -= 25
+        minus.append("日足200MA下 -25")
 
-    if macd_d == "DC" and macd_w == "DC":
-        return "日足・週足MACDが弱く、トレンド不足です。"
+    if ma_w_status == "below":
+        score -= 30
+        minus.append("週足200MA下 -30")
 
-    if rsi_d >= 80 or rsi_w >= 80:
-        return "RSI過熱のため、高値掴みに注意です。"
+    if volume_ratio == 0:
+        score -= 10
+        minus.append("出来高取得なし/0 -10")
 
-    return "TGS条件が不足しているため、現時点では見送りです。"
+    if rsi_d >= 80:
+        score -= 10
+        minus.append("日足RSI80超 -10")
+
+    if rsi_w >= 80:
+        score -= 10
+        minus.append("週足RSI80超 -10")
+
+    if rsi_d <= 30:
+        score -= 10
+        minus.append("日足RSI30以下 -10")
+
+    if ma_d_diff >= 100:
+        score -= 30
+        minus.append("日足200MA乖離100%以上 -30")
+    elif ma_d_diff >= 60:
+        score -= 15
+        minus.append("日足200MA乖離60%以上 -15")
+    elif ma_d_diff >= 40:
+        score -= 5
+        minus.append("日足200MA乖離40%以上 -5")
+
+    score = max(0, min(100, score))
+
+    if score >= 90:
+        grade = "S"
+        action = "買い候補"
+        capital = "120万円"
+    elif score >= 80:
+        grade = "A"
+        action = "買い候補"
+        capital = "60万円"
+    elif score >= 70:
+        grade = "B"
+        action = "監視"
+        capital = "0円"
+    elif score >= 60:
+        grade = "C"
+        action = "監視"
+        capital = "0円"
+    elif score >= 40:
+        grade = "D"
+        action = "見送り"
+        capital = "0円"
+    else:
+        grade = "E"
+        action = "見送り"
+        capital = "0円"
+
+    return score, grade, action, capital, plus, minus
+
+
+def make_comment(grade, data):
+    ma_d_status = data.get("ma_d_status", "")
+    volume_ratio = to_float(data.get("volume_ratio"))
+
+    if grade in ["S", "A"]:
+        return "TGS条件を満たす買い候補です。損切り-15%前提で検討。"
+
+    if grade in ["B", "C"]:
+        return "条件は悪くありませんが、A評価未満のため監視です。"
+
+    if ma_d_status == "below" and volume_ratio == 0:
+        return "MACDは良好でも、日足200MA下・出来高不足のため見送りです。"
+
+    return "弱い条件が多いため、現時点では見送りです。"
 
 
 def make_message(data):
+    score, grade, action, capital, plus, minus = calculate_score(data)
+
     ticker = data.get("ticker", "不明")
     price = data.get("price", "不明")
     timeframe = data.get("timeframe", "不明")
 
-    score = int(to_float(data.get("score")))
-    grade_from_tv = data.get("grade", "")
+    plus_text = "\n".join([f"・{p}" for p in plus]) if plus else "・なし"
+    minus_text = "\n".join([f"・{m}" for m in minus]) if minus else "・なし"
+    comment = make_comment(grade, data)
 
-    grade, action, capital = make_action(score)
-
-    # TradingView側のgradeがあれば参考表示
-    if grade_from_tv and grade_from_tv != grade:
-        grade_note = f"TV評価:{grade_from_tv} / Python評価:{grade}"
-    else:
-        grade_note = grade
-
-    rsi_d = data.get("rsi_d", "不明")
-    rsi_w = data.get("rsi_w", "不明")
-    macd_d = data.get("macd_d", "不明")
-    macd_w = data.get("macd_w", "不明")
-    ma_d_status = data.get("ma_d_status", "不明")
-    ma_d_diff = data.get("ma_d_diff", "不明")
-    ma_w_status = data.get("ma_w_status", "不明")
-    ma_w_diff = data.get("ma_w_diff", "不明")
-
-    comment = make_comment(score, grade, data)
-
-    return f"""【TGS Lite評価】
+    return f"""【TGS Ver3.1】
 
 銘柄: {ticker}
 価格: {price}
 時間足: {timeframe}
 
 総合点: {score}
-評価: {grade_note}
+評価: {grade}
 対応: {action}
 推奨資金: {capital}
 
-【日足】
-RSI: {rsi_d}
-MACD: {macd_d}
-200MA: {ma_d_status}
-乖離率: {ma_d_diff}%
+【加点】
+{plus_text}
 
-【週足】
-RSI: {rsi_w}
-MACD: {macd_w}
-200MA: {ma_w_status}
-乖離率: {ma_w_diff}%
+【減点】
+{minus_text}
 
 損切り目安: -15%
 
@@ -151,12 +219,12 @@ def webhook():
 
     try:
         message = make_message(data)
-        print("TGS Lite message:", message)
+        print("TGS message:", message)
         send_line(message)
-        return {"status": "ok", "message": "TGS Lite sent"}
+        return {"status": "ok", "message": "TGS Ver3.1 sent"}
 
     except Exception as e:
-        error_message = f"""TGS Lite エラー
+        error_message = f"""TGS Ver3.1 エラー
 
 受信データ:
 {data}
