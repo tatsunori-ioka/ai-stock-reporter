@@ -1,42 +1,3 @@
-from flask import Flask, request
-import requests
-import os
-from openai import OpenAI
-
-app = Flask(__name__)
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-@app.route("/")
-def home():
-    return "AI Stock Reporter Running"
-
-def send_line(message):
-    line_token = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
-
-    headers = {
-        "Authorization": f"Bearer {line_token}",
-        "Content-Type": "application/json"
-    }
-
-    payload = {
-        "messages": [
-            {
-                "type": "text",
-                "text": message
-            }
-        ]
-    }
-
-    response = requests.post(
-        "https://api.line.me/v2/bot/message/broadcast",
-        headers=headers,
-        json=payload
-    )
-
-    print("LINE status:", response.status_code)
-    print("LINE response:", response.text)
-
 def analyze_with_ai(data):
     ticker = data.get("ticker", "不明")
     price = data.get("price", "不明")
@@ -44,74 +5,100 @@ def analyze_with_ai(data):
     signal = data.get("signal", "WhaleScanner")
 
     prompt = f"""
-あなたは日本株と暗号資産のテクニカル分析アシスタントです。
-ユーザーはテクニカル中心で、週足・日足・4時間足、200MA、MACD、RSI、出来高、Whale Scannerを重視します。
-PER、PBR、決算短信は今回は評価対象にしません。
+あなたはTGS Ver1.5専用の株式分析アシスタントです。
+これは投資助言ではなく、ユーザー本人の最終判断を補助するためのテクニカル分析です。
 
-以下のWhale Scanner反応を、100点満点で簡易評価してください。
-
+【受信データ】
 銘柄: {ticker}
 価格: {price}
 時間足: {timeframe}
 シグナル: {signal}
 
-評価ルール:
-- Whale反応: 10点
-- 週足判定: 25点
-- 日足判定: 20点
-- 4時間判定: 10点
-- MACD: 15点
-- RSI: 10点
-- 出来高: 10点
+【TGS Ver1.5 基本点】
+週足200MA: 20点
+Whale Scanner: 25点
+MACD: 20点
+RSI: 10点
+出来高: 10点
+一目均衡表: 10点
+テーマ性: 5点
 
-ただし、TradingViewから詳細数値が来ていない場合は、断定せず「要確認」としてください。
-最後に、以下の形式で短く出力してください。
+【減点】
+決算2週間以内: -10点
+上場1年未満: -10点
+ストップ高連発: -10点
+信用買い残過多: -5点
+1か月+50%以上急騰: -5点
+RSI80超: -10点
+RSI90超: -20点
+週足200MA乖離+40%以上: -5点
+週足200MA乖離+60%以上: -15点
+週足200MA乖離+100%以上: -30点
 
-【AI評価】
+【評価】
+S: 90点以上
+A: 80〜89点
+B: 70〜79点
+C: 60〜69点
+D: 40〜59点
+E: 39点以下
+
+【資金配分】
+S評価: 120万円
+A評価: 60万円
+B以下: 買わない・監視のみ
+
+【重要ルール】
+TradingViewから詳細数値が来ていない項目は、断定せず「要確認」とすること。
+Whale Scanner反応だけでS評価にしないこと。
+過熱・決算・200MA乖離が不明な場合は、必ず確認事項に入れること。
+
+以下の形式で短く出力してください。
+
+【TGS AI評価】
 銘柄:
 価格:
 時間足:
+シグナル:
+
 総合点:
 評価:
-理由:
-確認すべき点:
-対応:
-損切り目安:
+
+【加点理由】
+・
+・
+
+【減点理由】
+・
+
+【確認すべき点】
+・週足200MAとの位置
+・200MA乖離率
+・RSI
+・MACD
+・出来高
+・決算日
+・時価総額
+
+【対応】
+買い / 監視 / 見送り
+
+【推奨資金】
+S:120万円 / A:60万円 / B以下:0円
+
+【損切り】
+-15%
+
+【コメント】
 """
 
     response = client.chat.completions.create(
         model="gpt-4.1-mini",
         messages=[
-            {"role": "system", "content": "投資助言ではなく、テクニカル確認用の分析補助として簡潔に回答してください。"},
+            {"role": "system", "content": "TGS Ver1.5に基づき、簡潔に分析してください。投資助言ではなく分析補助として回答してください。"},
             {"role": "user", "content": prompt}
         ],
-        temperature=0.3
+        temperature=0.2
     )
 
     return response.choices[0].message.content
-
-@app.route("/webhook", methods=["POST"])
-def webhook():
-    data = request.json
-
-    print("TradingView data:", data)
-
-    try:
-        ai_message = analyze_with_ai(data)
-        send_line(ai_message)
-        return {"status": "ok", "message": "AI analysis sent"}
-    except Exception as e:
-        error_message = f"""AI分析エラー
-
-受信データ:
-{data}
-
-エラー:
-{str(e)}
-"""
-        print(error_message)
-        send_line(error_message)
-        return {"status": "error", "error": str(e)}
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
