@@ -190,35 +190,29 @@ def make_message(data):
 【減点】
 {minus_text}
 
+comment = "MACDは良好ですが、日足200MA下・出来高不足のため見送りです。" if grade in ["D", "E"] else \
+          "条件は悪くありませんが、A評価未満のため監視です。" if grade in ["B", "C"] else \
+          "TGS条件を満たす買い候補です。損切り-15%を前提に検討です。"
+
+return f"""【TGS Ver3.1】
+
+銘柄: {ticker}
+価格: {price}
+時間足: {timeframe}
+
+総合点: {score}
+評価: {grade}
+対応: {action}
+推奨資金: {capital}
+
+【加点】
+{plus_text}
+
+【減点】
+{minus_text}
+
 損切り目安: -15%
+
+コメント:
+{comment}
 """
-
-
-@app.route("/webhook", methods=["POST"])
-def webhook():
-    data = request.json
-    print("TradingView data:", data)
-
-    try:
-        message = make_message(data)
-        print("TGS message:", message)
-        send_line(message)
-        return {"status": "ok", "message": "TGS Ver3.1 sent"}
-
-    except Exception as e:
-        error_message = f"""TGS Ver3.1 エラー
-
-受信データ:
-{data}
-
-エラー:
-{str(e)}
-"""
-        print(error_message)
-        send_line(error_message)
-        return {"status": "error", "error": str(e)}, 500
-
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
