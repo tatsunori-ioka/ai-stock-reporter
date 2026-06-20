@@ -45,53 +45,68 @@ def analyze_with_ai(data):
     ticker = data.get("ticker", "不明")
     price = data.get("price", "不明")
     timeframe = data.get("timeframe", "不明")
-
-    tgs_signal = data.get("tgs_signal", "NONE")
-    rsi = data.get("rsi", "不明")
-    macd_status = data.get("macd_status", "不明")
-    volume_ratio = data.get("volume_ratio", "不明")
-    price_change_pct = data.get("price_change_pct", "不明")
-    ma200_status = data.get("ma200_status", "不明")
-    ma200_diff = data.get("ma200_diff", "不明")
+    tgs_signal = data.get("tgs_signal", "WATCH")
 
     prompt = f"""
-あなたはTGS Ver2.0専用のテクニカル分析アシスタントです。
+あなたはTGS Ver2.0 MTF専用のテクニカル分析アシスタントです。
 投資助言ではなく、ユーザー本人の最終判断を補助する分析です。
 
 【受信データ】
 銘柄: {ticker}
 価格: {price}
-時間足: {timeframe}
+発報時間足: {timeframe}
 TGSシグナル: {tgs_signal}
-RSI: {rsi}
-MACD状態: {macd_status}
-出来高倍率: {volume_ratio}
-価格変化率: {price_change_pct}
-200MA位置: {ma200_status}
-200MA乖離率: {ma200_diff}
 
-【採点ルール】
-TGS BUY: +25
-TGS SELL: 0
-MACD GC: +20
-MACD DC: 0
-RSI 40〜60: +10
-RSI 30〜40: +8
-RSI 60〜70: +6
-RSI 70〜80: +3
-RSI 80超: -10
-出来高倍率2倍以上: +10
-出来高倍率1.5倍以上: +7
-出来高倍率1倍以上: +5
-200MA上: +20
-200MA下: 0
-200MA乖離5〜25%: +10
-200MA乖離25〜40%: +5
-200MA乖離40%以上: -5
-200MA乖離60%以上: -15
-200MA乖離100%以上: -30
+RSI現在足: {data.get("rsi_now", "不明")}
+RSI4時間: {data.get("rsi_4h", "不明")}
+RSI日足: {data.get("rsi_d", "不明")}
+RSI週足: {data.get("rsi_w", "不明")}
 
-【評価】
+MACD現在足: {data.get("macd_now", "不明")}
+MACD4時間: {data.get("macd_4h", "不明")}
+MACD日足: {data.get("macd_d", "不明")}
+MACD週足: {data.get("macd_w", "不明")}
+
+出来高倍率: {data.get("volume_ratio", "不明")}
+価格変化率: {data.get("price_change_pct", "不明")}
+
+200MA現在足位置: {data.get("ma_now_status", "不明")}
+200MA現在足乖離: {data.get("ma_now_diff", "不明")}
+200MA4時間位置: {data.get("ma_4h_status", "不明")}
+200MA4時間乖離: {data.get("ma_4h_diff", "不明")}
+200MA日足位置: {data.get("ma_d_status", "不明")}
+200MA日足乖離: {data.get("ma_d_diff", "不明")}
+200MA週足位置: {data.get("ma_w_status", "不明")}
+200MA週足乖離: {data.get("ma_w_diff", "不明")}
+
+トレンド強判定: {data.get("trend_strong", "不明")}
+出来高強判定: {data.get("volume_strong", "不明")}
+RSI良好判定: {data.get("rsi_good", "不明")}
+
+【TGS Ver2.0 MTF 採点ルール】
+基本点100点:
+・TGS BUY: +20
+・4時間MACD GC: +10
+・日足MACD GC: +15
+・週足MACD GC: +15
+・日足200MA上: +15
+・週足200MA上: +15
+・出来高倍率1.5倍以上: +5
+・出来高倍率2.0倍以上: +10
+・日足RSI40〜70: +5
+・週足RSI40〜75: +5
+
+減点:
+・TGS SELL: -20
+・日足RSI80超: -10
+・週足RSI80超: -10
+・日足200MA乖離40%以上: -5
+・日足200MA乖離60%以上: -15
+・日足200MA乖離100%以上: -30
+・週足200MA下: -20
+・日足MACD DCかつ週足MACD DC: -20
+
+評価:
 S: 90点以上
 A: 80〜89点
 B: 70〜79点
@@ -99,17 +114,17 @@ C: 60〜69点
 D: 40〜59点
 E: 39点以下
 
-【資金配分】
+資金配分:
 S: 120万円
 A: 60万円
 B以下: 0円、監視のみ
 
 以下の形式で短く出力してください。
 
-【TGS評価】
+【TGS MTF評価】
 銘柄:
 価格:
-時間足:
+発報時間足:
 総合点:
 評価:
 
@@ -136,7 +151,7 @@ B以下: 0円、監視のみ
         messages=[
             {
                 "role": "system",
-                "content": "TGS Ver2.0に基づき、簡潔に採点してください。数値がある場合は必ず点数化してください。"
+                "content": "TGS Ver2.0 MTFに基づき、簡潔に採点してください。数値がある場合は必ず点数化してください。"
             },
             {
                 "role": "user",
@@ -164,11 +179,11 @@ def webhook():
 
         return {
             "status": "ok",
-            "message": "TGS AI analysis sent"
+            "message": "TGS MTF AI analysis sent"
         }
 
     except Exception as e:
-        error_message = f"""TGS AI分析エラー
+        error_message = f"""TGS MTF AI分析エラー
 
 受信データ:
 {data}
