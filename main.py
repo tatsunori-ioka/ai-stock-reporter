@@ -4,13 +4,19 @@ import os
 from openai import OpenAI
 
 app = Flask(__name__)
-
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 @app.route("/")
 def home():
     return "AI Stock Reporter Running"
+
+
+def to_float(value, default=0.0):
+    try:
+        return float(value)
+    except Exception:
+        return default
 
 
 def send_line(message):
@@ -22,12 +28,7 @@ def send_line(message):
     }
 
     payload = {
-        "messages": [
-            {
-                "type": "text",
-                "text": message
-            }
-        ]
+        "messages": [{"type": "text", "text": message}]
     }
 
     response = requests.post(
@@ -41,128 +42,202 @@ def send_line(message):
     print("LINE response:", response.text)
 
 
-def analyze_with_ai(data):
-    ticker = data.get("ticker", "不明")
-    price = data.get("price", "不明")
-    timeframe = data.get("timeframe", "不明")
+def calculate_tgs_score(data):
+    score = 0
+    reasons = []
+    penalties = []
+
     tgs_signal = data.get("tgs_signal", "WATCH")
 
+    macd_4h = data.get("macd_4h", "")
+    macd_d = data.get("macd_d", "")
+    macd_w = data.get("macd_w", "")
+
+    ma_d_status = data.get("ma_d_status", "")
+    ma_w_status = data.get("ma_w_status", "")
+
+    rsi_d = to_float(data.get("rsi_d"))
+    rsi_w = to_float(data.get("rsi_w"))
+    volume_ratio = to_float(data.get("volume_ratio"))
+    ma_d_diff = to_float(data.get("ma_d_diff"))
+
+    if tgs_signal == "BUY":
+        score += 20
+        reasons.append("TGS BUY +20")
+    elif tgs_signal == "SELL":
+        score -= 20
+        penalties.append("TGS SELL -20")
+
+    if macd_4h == "GC":
+        score += 10
+        reasons.append("4時間MACD GC +10")
+
+    if macd_d == "GC":
+        score += 15
+        reasons.append("日足MACD GC +15")
+
+    if macd_w == "GC":
+        score += 15
+        reasons.append("週足MACD GC +15")
+
+    if ma_d_status == "above":
+        score += 15
+        reasons.append("日足200MA上 +15")
+
+    if ma_w_status == "above":
+        score += 15
+        reasons.append("週足200MA上 +15")
+    else:
+        score -= 20
+        penalties.append("週足200MA下 -20")
+
+    if volume_ratio >= 2.0:
+        score += 10
+        reasons.append("出来高倍率2.0倍以上 +10")
+    elif volume_ratio >= 1.5:
+        score += 5
+        reasons.append("出来高倍率1.5倍以上 +5")
+
+    if 40 <= rsi_d <= 70:
+        score += 5
+        reasons.append("日足RSI40〜70 +5")
+
+    if 40 <= rsi_w <= 75:
+        score += 5
+        reasons.append("週足RSI40〜75 +5")
+
+    if rsi_d >= 80:
+        score -= 10
+        penalties.append("日足RSI80超 -10")
+
+    if rsi_w >= 80:
+        score -= 10
+        penalties.append("週足RSI80超 -10")
+
+    if ma_d_diff >= 100:
+        score -= 30
+        penalties.append("日足200MA乖離100%以上 -30")
+    elif ma_d_diff >= 60:
+        score -= 15
+        penalties.append("日足200MA乖離60%以上 -15")
+    elif ma_d_diff >= 40:
+        score -= 5
+        penalties.append("日足200MA乖離40%以上 -5")
+
+    if macd_d == "DC" and macd_w == "DC":
+        score -= 20
+        penalties.append("日足MACD DCかつ週足MACD DC -20")
+
+    score = max(0, min(100, score))
+
+    if score >= 90:
+        grade = "S"
+        action = "買い候補"
+        capital = "120万円"
+    elif score >= 80:
+        grade = "A"
+        action = "買い候補"
+        capital = "60万円"
+    elif score >= 70:
+        grade = "B"
+        action = "監視"
+        capital = "0円"
+    elif score >= 60:
+        grade = "C"
+        action = "監視"
+        capital = "0円"
+    elif score >= 40:
+        grade = "D"
+        action = "見送り"
+        capital = "0円"
+    else:
+        grade = "E"
+        action = "見送り"
+        capital = "0円"
+
+    return score, grade, action, capital, reasons, penalties
+
+
+def make_ai_comment(data, score, grade, action):
     prompt = f"""
-あなたはTGS Ver2.0 MTF専用のテクニカル分析アシスタントです。
-投資助言ではなく、ユーザー本人の最終判断を補助する分析です。
+以下のTGS固定採点結果に対して、短くコメントしてください。
+投資助言ではなく、テクニカル確認用の補助コメントです。
 
-【受信データ】
-銘柄: {ticker}
-価格: {price}
-発報時間足: {timeframe}
-TGSシグナル: {tgs_signal}
+銘柄: {data.get("ticker")}
+価格: {data.get("price")}
+時間足: {data.get("timeframe")}
+点数: {score}
+評価: {grade}
+対応: {action}
 
-RSI現在足: {data.get("rsi_now", "不明")}
-RSI4時間: {data.get("rsi_4h", "不明")}
-RSI日足: {data.get("rsi_d", "不明")}
-RSI週足: {data.get("rsi_w", "不明")}
+RSI日足: {data.get("rsi_d")}
+RSI週足: {data.get("rsi_w")}
+MACD4時間: {data.get("macd_4h")}
+MACD日足: {data.get("macd_d")}
+MACD週足: {data.get("macd_w")}
+出来高倍率: {data.get("volume_ratio")}
+日足200MA位置: {data.get("ma_d_status")}
+週足200MA位置: {data.get("ma_w_status")}
+日足200MA乖離: {data.get("ma_d_diff")}
 
-MACD現在足: {data.get("macd_now", "不明")}
-MACD4時間: {data.get("macd_4h", "不明")}
-MACD日足: {data.get("macd_d", "不明")}
-MACD週足: {data.get("macd_w", "不明")}
-
-出来高倍率: {data.get("volume_ratio", "不明")}
-価格変化率: {data.get("price_change_pct", "不明")}
-
-200MA現在足位置: {data.get("ma_now_status", "不明")}
-200MA現在足乖離: {data.get("ma_now_diff", "不明")}
-200MA4時間位置: {data.get("ma_4h_status", "不明")}
-200MA4時間乖離: {data.get("ma_4h_diff", "不明")}
-200MA日足位置: {data.get("ma_d_status", "不明")}
-200MA日足乖離: {data.get("ma_d_diff", "不明")}
-200MA週足位置: {data.get("ma_w_status", "不明")}
-200MA週足乖離: {data.get("ma_w_diff", "不明")}
-
-トレンド強判定: {data.get("trend_strong", "不明")}
-出来高強判定: {data.get("volume_strong", "不明")}
-RSI良好判定: {data.get("rsi_good", "不明")}
-
-【TGS Ver2.0 MTF 採点ルール】
-基本点100点:
-・TGS BUY: +20
-・4時間MACD GC: +10
-・日足MACD GC: +15
-・週足MACD GC: +15
-・日足200MA上: +15
-・週足200MA上: +15
-・出来高倍率1.5倍以上: +5
-・出来高倍率2.0倍以上: +10
-・日足RSI40〜70: +5
-・週足RSI40〜75: +5
-
-減点:
-・TGS SELL: -20
-・日足RSI80超: -10
-・週足RSI80超: -10
-・日足200MA乖離40%以上: -5
-・日足200MA乖離60%以上: -15
-・日足200MA乖離100%以上: -30
-・週足200MA下: -20
-・日足MACD DCかつ週足MACD DC: -20
-
-評価:
-S: 90点以上
-A: 80〜89点
-B: 70〜79点
-C: 60〜69点
-D: 40〜59点
-E: 39点以下
-
-資金配分:
-S: 120万円
-A: 60万円
-B以下: 0円、監視のみ
-
-以下の形式で短く出力してください。
-
-【TGS MTF評価】
-銘柄:
-価格:
-発報時間足:
-総合点:
-評価:
-
-【加点理由】
-・
-
-【減点理由】
-・
-
-【対応】
-買い / 監視 / 見送り
-
-【推奨資金】
-円
-
-【損切り目安】
-価格の-15%
-
-【コメント】
+50文字〜100文字程度で、なぜ買い/監視/見送りなのか説明してください。
 """
 
     response = client.chat.completions.create(
         model="gpt-4.1-mini",
         messages=[
-            {
-                "role": "system",
-                "content": "TGS Ver2.0 MTFに基づき、簡潔に採点してください。数値がある場合は必ず点数化してください。"
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
+            {"role": "system", "content": "簡潔なテクニカルコメントだけを返してください。"},
+            {"role": "user", "content": prompt}
         ],
         temperature=0.2,
-        timeout=30
+        timeout=20
     )
 
     return response.choices[0].message.content
+
+
+def analyze_with_ai(data):
+    score, grade, action, capital, reasons, penalties = calculate_tgs_score(data)
+
+    ticker = data.get("ticker", "不明")
+    price = data.get("price", "不明")
+    timeframe = data.get("timeframe", "不明")
+
+    try:
+        comment = make_ai_comment(data, score, grade, action)
+    except Exception as e:
+        comment = f"AIコメント生成エラー: {str(e)}"
+
+    reasons_text = "\n".join([f"・{r}" for r in reasons]) if reasons else "・なし"
+    penalties_text = "\n".join([f"・{p}" for p in penalties]) if penalties else "・なし"
+
+    message = f"""【TGS Ver2.1 固定採点】
+
+銘柄: {ticker}
+価格: {price}
+時間足: {timeframe}
+
+総合点: {score}
+評価: {grade}
+対応: {action}
+
+【加点理由】
+{reasons_text}
+
+【減点理由】
+{penalties_text}
+
+【推奨資金】
+{capital}
+
+【損切り目安】
+価格の-15%
+
+【AIコメント】
+{comment}
+"""
+
+    return message
 
 
 @app.route("/webhook", methods=["POST"])
@@ -172,18 +247,15 @@ def webhook():
     print("TradingView data:", data)
 
     try:
-        ai_message = analyze_with_ai(data)
-        print("AI message:", ai_message)
+        message = analyze_with_ai(data)
+        print("TGS message:", message)
 
-        send_line(ai_message)
+        send_line(message)
 
-        return {
-            "status": "ok",
-            "message": "TGS MTF AI analysis sent"
-        }
+        return {"status": "ok", "message": "TGS Ver2.1 sent"}
 
     except Exception as e:
-        error_message = f"""TGS MTF AI分析エラー
+        error_message = f"""TGS Ver2.1 エラー
 
 受信データ:
 {data}
@@ -198,10 +270,7 @@ def webhook():
         except Exception as line_error:
             print("LINE error:", str(line_error))
 
-        return {
-            "status": "error",
-            "error": str(e)
-        }, 500
+        return {"status": "error", "error": str(e)}, 500
 
 
 if __name__ == "__main__":
