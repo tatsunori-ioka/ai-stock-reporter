@@ -62,18 +62,17 @@ def calculate_score(data):
     volume_ratio = to_float(data.get("volume_ratio"))
     ma_d_diff = to_float(data.get("ma_d_diff"))
 
-    # 加点
     if macd_4h == "GC":
         score += 10
         plus.append("4H MACD GC +10")
 
     if macd_d == "GC":
         score += 15
-        plus.append("日足 MACD GC +15")
+        plus.append("日足MACD GC +15")
 
     if macd_w == "GC":
         score += 15
-        plus.append("週足 MACD GC +15")
+        plus.append("週足MACD GC +15")
 
     if ma_d_status == "above":
         score += 15
@@ -98,7 +97,6 @@ def calculate_score(data):
         score += 5
         plus.append("出来高1.5倍以上 +5")
 
-    # 減点
     if ma_d_status == "below":
         score -= 25
         minus.append("日足200MA下 -25")
@@ -163,6 +161,22 @@ def calculate_score(data):
     return score, grade, action, capital, plus, minus
 
 
+def make_comment(grade, data):
+    ma_d_status = data.get("ma_d_status", "")
+    volume_ratio = to_float(data.get("volume_ratio"))
+
+    if grade in ["S", "A"]:
+        return "TGS条件を満たす買い候補です。損切り-15%前提で検討。"
+
+    if grade in ["B", "C"]:
+        return "条件は悪くありませんが、A評価未満のため監視です。"
+
+    if ma_d_status == "below" and volume_ratio == 0:
+        return "MACDは良好でも、日足200MA下・出来高不足のため見送りです。"
+
+    return "弱い条件が多いため、現時点では見送りです。"
+
+
 def make_message(data):
     score, grade, action, capital, plus, minus = calculate_score(data)
 
@@ -172,29 +186,9 @@ def make_message(data):
 
     plus_text = "\n".join([f"・{p}" for p in plus]) if plus else "・なし"
     minus_text = "\n".join([f"・{m}" for m in minus]) if minus else "・なし"
+    comment = make_comment(grade, data)
 
     return f"""【TGS Ver3.1】
-
-銘柄: {ticker}
-価格: {price}
-時間足: {timeframe}
-
-総合点: {score}
-評価: {grade}
-対応: {action}
-推奨資金: {capital}
-
-【加点】
-{plus_text}
-
-【減点】
-{minus_text}
-
-comment = "MACDは良好ですが、日足200MA下・出来高不足のため見送りです。" if grade in ["D", "E"] else \
-          "条件は悪くありませんが、A評価未満のため監視です。" if grade in ["B", "C"] else \
-          "TGS条件を満たす買い候補です。損切り-15%を前提に検討です。"
-
-return f"""【TGS Ver3.1】
 
 銘柄: {ticker}
 価格: {price}
@@ -216,3 +210,33 @@ return f"""【TGS Ver3.1】
 コメント:
 {comment}
 """
+
+
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    data = request.json
+    print("TradingView data:", data)
+
+    try:
+        message = make_message(data)
+        print("TGS message:", message)
+        send_line(message)
+        return {"status": "ok", "message": "TGS Ver3.1 sent"}
+
+    except Exception as e:
+        error_message = f"""TGS Ver3.1 エラー
+
+受信データ:
+{data}
+
+エラー:
+{str(e)}
+"""
+        print(error_message)
+        send_line(error_message)
+        return {"status": "error", "error": str(e)}, 500
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
