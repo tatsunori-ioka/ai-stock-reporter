@@ -20,6 +20,10 @@ def to_float(value, default=0.0):
 def send_line(message):
     line_token = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
 
+    if not line_token:
+        print("LINE token is missing")
+        return
+
     headers = {
         "Authorization": f"Bearer {line_token}",
         "Content-Type": "application/json"
@@ -57,6 +61,9 @@ def calculate_score(data):
     ma_d_status = data.get("ma_d_status", "")
     ma_w_status = data.get("ma_w_status", "")
 
+    rsi_d_available = str(data.get("rsi_d_available", "true")).lower() == "true"
+    rsi_w_available = str(data.get("rsi_w_available", "true")).lower() == "true"
+
     rsi_d = to_float(data.get("rsi_d"))
     rsi_w = to_float(data.get("rsi_w"))
     volume_ratio = to_float(data.get("volume_ratio"))
@@ -82,11 +89,11 @@ def calculate_score(data):
         score += 15
         plus.append("週足200MA上 +15")
 
-    if 40 <= rsi_d <= 70:
+    if rsi_d_available and 40 <= rsi_d <= 70:
         score += 5
         plus.append("日足RSI良好 +5")
 
-    if 40 <= rsi_w <= 75:
+    if rsi_w_available and 40 <= rsi_w <= 75:
         score += 5
         plus.append("週足RSI良好 +5")
 
@@ -109,17 +116,21 @@ def calculate_score(data):
         score -= 10
         minus.append("出来高取得なし/0 -10")
 
-    if rsi_d >= 80:
+    if rsi_d_available and rsi_d >= 80:
         score -= 10
         minus.append("日足RSI80超 -10")
 
-    if rsi_w >= 80:
+    if rsi_w_available and rsi_w >= 80:
         score -= 10
         minus.append("週足RSI80超 -10")
 
-    if rsi_d <= 30:
+    if rsi_d_available and rsi_d <= 30:
         score -= 10
         minus.append("日足RSI30以下 -10")
+
+    if rsi_w_available and rsi_w <= 30:
+        score -= 10
+        minus.append("週足RSI30以下 -10")
 
     if ma_d_diff >= 100:
         score -= 30
@@ -218,10 +229,27 @@ def webhook():
     print("TradingView data:", data)
 
     try:
+        score, grade, action, capital, plus, minus = calculate_score(data)
+
+        if score < 60:
+            print(f"Skip LINE: score {score} < 60")
+            return {
+                "status": "skipped",
+                "reason": "score below 60",
+                "score": score,
+                "ticker": data.get("ticker", "不明")
+            }
+
         message = make_message(data)
         print("TGS message:", message)
         send_line(message)
-        return {"status": "ok", "message": "TGS Ver3.1 sent"}
+
+        return {
+            "status": "ok",
+            "message": "TGS Ver3.1 sent",
+            "score": score,
+            "ticker": data.get("ticker", "不明")
+        }
 
     except Exception as e:
         error_message = f"""TGS Ver3.1 エラー
