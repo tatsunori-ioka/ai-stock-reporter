@@ -1,6 +1,9 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import requests
 import os
+
+from stable_webhook_core import process_stable_webhook
+
 
 app = Flask(__name__)
 
@@ -263,6 +266,14 @@ def webhook():
         print(error_message)
         send_line(error_message)
         return {"status": "error", "error": str(e)}, 500
+
+
+@app.route("/webhook/tradingview/stable-v1", methods=["POST"])
+def tradingview_stable_v1():
+    payload = request.get_json(force=True)
+    result = process_stable_webhook(payload, send_line_enabled=True)
+    status = 200 if result["accepted"] else 202
+    return jsonify({"ok": result["accepted"], **result}), status
 
 
 if __name__ == "__main__":
