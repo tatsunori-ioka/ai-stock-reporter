@@ -20,7 +20,7 @@ BASE_DIR = Path(os.getenv("STABLE_DATA_DIR", "/data"))
 if not BASE_DIR.exists():
     BASE_DIR = Path(os.getenv("STABLE_DATA_DIR_FALLBACK", "outputs"))
 
-METADATA_PATH = Path(os.getenv("STABLE_METADATA_PATH", "results/nikkei225/nikkei225_metadata.csv"))
+METADATA_PATH = Path(os.getenv("STABLE_METADATA_PATH", "stable_universe_metadata.csv"))
 ALERT_LOG_PATH = Path(os.getenv("STABLE_ALERT_LOG_PATH", str(BASE_DIR / "stable_scanner_alert_log.csv")))
 PAPER_PENDING_PATH = Path(os.getenv("STABLE_PAPER_PENDING_PATH", str(BASE_DIR / "stable_paper_pending_orders.csv")))
 
