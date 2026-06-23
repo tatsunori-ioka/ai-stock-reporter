@@ -14,7 +14,7 @@ JST = timezone(timedelta(hours=9))
 RULE_VERSION = "stable-1.0"
 SIGNAL_TYPE = "tgs_stable_v1_signal"
 THRESHOLD = 90
-LINE_PUSH_ENDPOINT = "https://api.line.me/v2/bot/message/push"
+LINE_BROADCAST_ENDPOINT = "https://api.line.me/v2/bot/message/broadcast"
 
 BASE_DIR = Path(os.getenv("STABLE_DATA_DIR", "/data"))
 if not BASE_DIR.exists():
@@ -233,14 +233,11 @@ def build_line_message(payload: dict[str, Any], validation: dict[str, Any]) -> s
 
 def send_line(message: str) -> tuple[bool, str]:
     token = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
-    to = os.getenv("LINE_USER_ID") or os.getenv("LINE_GROUP_ID")
     if not token:
         return False, "LINE_CHANNEL_ACCESS_TOKEN_not_set"
-    if not to:
-        return False, "LINE_USER_ID_or_LINE_GROUP_ID_not_set"
-    payload = {"to": to, "messages": [{"type": "text", "text": message}]}
+    payload = {"messages": [{"type": "text", "text": message}]}
     request = urllib.request.Request(
-        LINE_PUSH_ENDPOINT,
+        LINE_BROADCAST_ENDPOINT,
         data=json.dumps(payload).encode("utf-8"),
         headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
         method="POST",
