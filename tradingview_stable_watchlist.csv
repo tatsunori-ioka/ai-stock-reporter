@@ -1,0 +1,16 @@
+symbol,ticker,code,name,sector,market_cap,market_cap_bucket
+TSE:6273,6273.T,6273,SMC Corporation,Machinery,4681979920384,Large
+TSE:6301,6301.T,6301,Komatsu Ltd.,Machinery,5855319687168,Large
+TSE:6367,6367.T,6367,"Daikin Industries , Ltd.",Machinery,6653625237504,Large
+TSE:7011,7011.T,7011,"Mitsubishi Heavy Industries , Ltd.",Machinery,13135058567168,Large
+TSE:5801,5801.T,5801,"The Furukawa Electric Co., Ltd.",Nonferrous metals,4080288923648,Large
+TSE:5802,5802.T,5802,"Sumitomo Electric Industries , Ltd.",Nonferrous metals,10528918339584,Large
+TSE:5803,5803.T,5803,Fujikura Ltd.,Nonferrous metals,10200516919296,Large
+TSE:8801,8801.T,8801,"Mitsui Fudosan Co., Ltd",Real estate,3979065950208,Large
+TSE:8802,8802.T,8802,"Mitsubishi Estate Co., Ltd.",Real estate,4804578377728,Large
+TSE:8001,8001.T,8001,Itochu Corp.,Trading companies,12913863557120,Large
+TSE:8002,8002.T,8002,Marubeni Corp.,Trading companies,8032771112960,Large
+TSE:8015,8015.T,8015,Toyota Tsusho Corp.,Trading companies,6515194331136,Large
+TSE:8031,8031.T,8031,"Mitsui & Co. , Ltd.",Trading companies,13431218372608,Large
+TSE:8053,8053.T,8053,Sumitomo Corp.,Trading companies,7755101896704,Large
+TSE:8058,8058.T,8058,Mitsubishi Corp.,Trading companies,16875847155712,Large

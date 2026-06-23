@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.tgs.stable.paper.daily</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter/stable_paper_daily.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter</string>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>18</integer>
+    <key>Minute</key>
+    <integer>10</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>/tmp/tgs_stable_paper_daily.out</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/tgs_stable_paper_daily.err</string>
+</dict>
+</plist>

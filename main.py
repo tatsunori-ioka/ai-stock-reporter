@@ -3,6 +3,7 @@ import requests
 import os
 
 from stable_webhook_core import process_stable_webhook
+from stable_paper_daily import parse_date, run_daily
 
 
 app = Flask(__name__)
@@ -276,6 +277,22 @@ def tradingview_stable_v1():
     print("Stable result:", result)
     status = 200 if result["accepted"] else 202
     return jsonify({"ok": result["accepted"], **result}), status
+
+
+@app.route("/tasks/stable-paper-daily", methods=["POST"])
+def stable_paper_daily_task():
+    expected_token = os.getenv("STABLE_TASK_TOKEN")
+    provided_token = request.headers.get("X-Stable-Task-Token", "")
+    if not expected_token:
+        return jsonify({"ok": False, "reason": "STABLE_TASK_TOKEN_not_set"}), 500
+    if provided_token != expected_token:
+        return jsonify({"ok": False, "reason": "unauthorized"}), 401
+
+    payload = request.get_json(silent=True) or {}
+    as_of = parse_date(str(payload.get("as_of", ""))) if payload.get("as_of") else None
+    result = run_daily(as_of)
+    print("Stable paper daily result:", result)
+    return jsonify(result), 200
 
 
 if __name__ == "__main__":
