@@ -272,6 +272,8 @@ def webhook():
 def tradingview_stable_v1():
     payload = request.get_json(force=True)
     result = process_stable_webhook(payload, send_line_enabled=True)
+    print("Stable payload:", payload)
+    print("Stable result:", result)
     status = 200 if result["accepted"] else 202
     return jsonify({"ok": result["accepted"], **result}), status
 
