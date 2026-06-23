@@ -8,10 +8,10 @@
   <array>
     <string>/bin/zsh</string>
     <string>-lc</string>
-    <string>STABLE_DATA_DIR=/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger /usr/bin/python3 stable_paper_daily.py</string>
+    <string>STABLE_DATA_DIR="/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger" /usr/bin/python3 stable_paper_daily.py</string>
   </array>
   <key>WorkingDirectory</key>
-  <string>/Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter</string>
+  <string>/Users/iokatatsunori/Library/Application Support/TGSStablePaper/app</string>
   <key>StartCalendarInterval</key>
   <array>
     <dict>
@@ -56,8 +56,8 @@
     </dict>
   </array>
   <key>StandardOutPath</key>
-  <string>/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger/launchd.out</string>
+  <string>/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger/launchd.out</string>
   <key>StandardErrorPath</key>
-  <string>/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger/launchd.err</string>
+  <string>/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger/launchd.err</string>
 </dict>
 </plist>

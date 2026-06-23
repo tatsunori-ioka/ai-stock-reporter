@@ -8,7 +8,12 @@ from pathlib import Path
 from typing import Any
 
 
-BASE_DIR = Path(os.getenv("STABLE_DATA_DIR", "/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger"))
+BASE_DIR = Path(
+    os.getenv(
+        "STABLE_DATA_DIR",
+        "/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger",
+    )
+)
 PENDING_PATH = Path(os.getenv("STABLE_PAPER_PENDING_PATH", str(BASE_DIR / "stable_paper_pending_orders.csv")))
 METADATA_PATH = Path(os.getenv("STABLE_METADATA_PATH", "stable_universe_metadata.csv"))
 
@@ -73,6 +78,63 @@ def next_pending_id(rows: list[dict[str, str]]) -> str:
     return f"PO{max(numbers, default=0) + 1:06d}"
 
 
+def add_pending_order(
+    ticker: str,
+    signal_date: str,
+    score: str = "120",
+    daily_rsi: str = "",
+    volume_ratio: str = "",
+    pending_path: Path = PENDING_PATH,
+    metadata_path: Path = METADATA_PATH,
+) -> dict[str, Any]:
+    ticker = normalize_ticker(ticker)
+    metadata_rows = read_rows(metadata_path)
+    metadata: dict[str, dict[str, str]] = {}
+    for row in metadata_rows:
+        row_ticker = normalize_ticker(row.get("ticker", ""))
+        if row_ticker:
+            metadata[row_ticker] = row
+    meta = metadata.get(ticker, {})
+    rows = read_rows(pending_path)
+
+    for row in rows:
+        if row.get("ticker") == ticker and row.get("signal_date") == signal_date:
+            return {
+                "ok": True,
+                "created": False,
+                "reason": "already_pending",
+                "pending_order_id": row.get("pending_order_id", ""),
+                "ticker": ticker,
+                "signal_date": signal_date,
+                "paper_trading_only": True,
+            }
+
+    pending = {
+        "pending_order_id": next_pending_id(rows),
+        "signal_date": signal_date,
+        "ticker": ticker,
+        "name": meta.get("name", ""),
+        "sector": meta.get("sector", ""),
+        "tgs_score": score,
+        "daily_rsi": daily_rsi,
+        "volume_ratio": volume_ratio,
+        "planned_entry": "next_trading_day_open",
+        "status": "pending",
+    }
+    rows.append(pending)
+    write_rows(pending_path, PENDING_COLUMNS, rows)
+    return {
+        "ok": True,
+        "created": True,
+        "reason": "created",
+        "pending_order_id": pending["pending_order_id"],
+        "ticker": ticker,
+        "signal_date": signal_date,
+        "ledger": str(pending_path),
+        "paper_trading_only": True,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Add a TGS Stable Ver1.0 pending paper order.")
     parser.add_argument("--ticker", required=True, help="Ticker such as 8058.T or 8058.")
@@ -82,31 +144,17 @@ def main() -> None:
     parser.add_argument("--volume-ratio", default="", help="Volume ratio from LINE notification.")
     args = parser.parse_args()
 
-    ticker = normalize_ticker(args.ticker)
-    metadata = load_metadata()
-    meta = metadata.get(ticker, {})
-    rows = read_rows(PENDING_PATH)
-
-    for row in rows:
-        if row.get("ticker") == ticker and row.get("signal_date") == args.signal_date:
-            print(f"Already pending: {ticker} {args.signal_date} {row.get('pending_order_id')}")
-            return
-
-    pending = {
-        "pending_order_id": next_pending_id(rows),
-        "signal_date": args.signal_date,
-        "ticker": ticker,
-        "name": meta.get("name", ""),
-        "sector": meta.get("sector", ""),
-        "tgs_score": args.score,
-        "daily_rsi": args.daily_rsi,
-        "volume_ratio": args.volume_ratio,
-        "planned_entry": "next_trading_day_open",
-        "status": "pending",
-    }
-    rows.append(pending)
-    write_rows(PENDING_PATH, PENDING_COLUMNS, rows)
-    print(f"Added pending order: {pending['pending_order_id']} {ticker} {args.signal_date}")
+    result = add_pending_order(
+        args.ticker,
+        args.signal_date,
+        score=args.score,
+        daily_rsi=args.daily_rsi,
+        volume_ratio=args.volume_ratio,
+    )
+    if result["created"]:
+        print(f"Added pending order: {result['pending_order_id']} {result['ticker']} {result['signal_date']}")
+    else:
+        print(f"Already pending: {result['ticker']} {result['signal_date']} {result['pending_order_id']}")
     print(f"Ledger: {PENDING_PATH}")
     print("Paper trading only. No real order was sent.")
 

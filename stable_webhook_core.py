@@ -15,6 +15,8 @@ RULE_VERSION = "stable-1.0"
 SIGNAL_TYPE = "tgs_stable_v1_signal"
 THRESHOLD = 90
 LINE_BROADCAST_ENDPOINT = "https://api.line.me/v2/bot/message/broadcast"
+MAC_PENDING_WEBHOOK_URL = os.getenv("STABLE_MAC_PENDING_WEBHOOK_URL", "")
+MAC_PENDING_WEBHOOK_TOKEN = os.getenv("STABLE_MAC_PENDING_WEBHOOK_TOKEN", "")
 
 BASE_DIR = Path(os.getenv("STABLE_DATA_DIR", "/data"))
 if not BASE_DIR.exists():
@@ -44,6 +46,8 @@ ALERT_LOG_COLUMNS = [
     "validation_reason",
     "line_sent",
     "line_error",
+    "mac_pending_sent",
+    "mac_pending_error",
     "paper_pending_created",
     "paper_pending_id",
     "dedup_key",
@@ -251,6 +255,37 @@ def send_line(message: str) -> tuple[bool, str]:
     return True, ""
 
 
+def forward_to_mac_pending(payload: dict[str, Any], validation: dict[str, Any]) -> tuple[bool, str]:
+    if not MAC_PENDING_WEBHOOK_URL:
+        return False, "STABLE_MAC_PENDING_WEBHOOK_URL_not_set"
+    body = {
+        "ticker": validation["ticker"],
+        "signal_date": validation["signal_date"],
+        "stable_score": validation["stable_score_recomputed"],
+        "daily_rsi": payload.get("daily_rsi", ""),
+        "volume_ratio": payload.get("volume_ratio", ""),
+        "source": "render_stable_webhook",
+        "paper_trading_only": True,
+    }
+    headers = {"Content-Type": "application/json"}
+    if MAC_PENDING_WEBHOOK_TOKEN:
+        headers["X-Stable-Pending-Token"] = MAC_PENDING_WEBHOOK_TOKEN
+    request = urllib.request.Request(
+        MAC_PENDING_WEBHOOK_URL,
+        data=json.dumps(body).encode("utf-8"),
+        headers=headers,
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            response_body = response.read().decode("utf-8")
+            if response.status >= 300:
+                return False, f"mac_pending_http_{response.status}:{response_body}"
+    except urllib.error.URLError as exc:
+        return False, str(exc)
+    return True, ""
+
+
 def append_pending(payload: dict[str, Any], validation: dict[str, Any]) -> tuple[bool, str]:
     ticker = validation["ticker"]
     date_text = validation["signal_date"]
@@ -282,11 +317,14 @@ def process_stable_webhook(payload: dict[str, Any], send_line_enabled: bool = Tr
     validation = validate_payload(payload)
     line_sent = False
     line_error = ""
+    mac_pending_sent = False
+    mac_pending_error = ""
     pending_created = False
     pending_id = ""
 
     if validation["accepted"]:
         pending_created, pending_id = append_pending(payload, validation)
+        mac_pending_sent, mac_pending_error = forward_to_mac_pending(payload, validation)
         if send_line_enabled:
             line_sent, line_error = send_line(build_line_message(payload, validation))
         else:
@@ -307,6 +345,8 @@ def process_stable_webhook(payload: dict[str, Any], send_line_enabled: bool = Tr
             "validation_reason": validation["reason"],
             "line_sent": line_sent,
             "line_error": line_error,
+            "mac_pending_sent": mac_pending_sent,
+            "mac_pending_error": mac_pending_error,
             "paper_pending_created": pending_created,
             "paper_pending_id": pending_id,
             "dedup_key": validation["dedup_key"],
@@ -324,5 +364,7 @@ def process_stable_webhook(payload: dict[str, Any], send_line_enabled: bool = Tr
         "line_error": line_error,
         "paper_pending_created": pending_created,
         "paper_pending_id": pending_id,
+        "mac_pending_sent": mac_pending_sent,
+        "mac_pending_error": mac_pending_error,
         "dedup_key": validation["dedup_key"],
     }

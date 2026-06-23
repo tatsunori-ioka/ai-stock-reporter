@@ -37,7 +37,7 @@ The rule is frozen. Do not change it in paper-trading automation.
 Official local ledger:
 
 ```text
-/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger
+/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger
 ```
 
 CSV files:
@@ -50,23 +50,73 @@ CSV files:
 - `stable_paper_daily_YYYY-MM-DD.csv`
 - `launchd.out`
 - `launchd.err`
+- `pending_server.out`
+- `pending_server.err`
 
-## Add LINE Signal To Pending
+Runtime app directory:
 
-When LINE sends a Stable signal, add it to the Mac ledger.
+```text
+/Users/iokatatsunori/Library/Application Support/TGSStablePaper/app
+```
+
+## Automatic Pending Registration
+
+When Render accepts a Stable Ver1.0 signal, it can forward the accepted signal to the Mac local pending server.
+
+Mac local endpoint:
+
+```text
+http://127.0.0.1:8765/stable/pending
+```
+
+Local pending server:
+
+```text
+com.tgs.stable.pending.server.plist
+```
+
+The server only appends to `stable_paper_pending_orders.csv`. It never sends buy or sell orders.
+
+Render cannot reach `127.0.0.1` on your Mac directly. Use a secure tunnel such as ngrok, Cloudflare Tunnel, or Tailscale Funnel, then set these Render environment variables:
+
+```text
+STABLE_MAC_PENDING_WEBHOOK_URL=https://YOUR_TUNNEL_DOMAIN/stable/pending
+STABLE_MAC_PENDING_WEBHOOK_TOKEN=<same token as local_pending.env>
+```
+
+Local token file:
+
+```text
+/Users/iokatatsunori/Library/Application Support/TGSStablePaper/local_pending.env
+```
+
+Do not paste this token into chat.
+
+After setup, a valid Render webhook response should include:
+
+```json
+{
+  "accepted": true,
+  "mac_pending_sent": true
+}
+```
+
+## Manual Pending Fallback
+
+Manual add is only a fallback when the tunnel or Mac server is unavailable.
 
 Minimum command:
 
 ```bash
-cd /Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter
-STABLE_DATA_DIR=/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger \
+cd "/Users/iokatatsunori/Library/Application Support/TGSStablePaper/app"
+STABLE_DATA_DIR="/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger" \
 python3 stable_add_pending.py --ticker 8058.T --signal-date 2026-06-24
 ```
 
 With optional values from LINE:
 
 ```bash
-STABLE_DATA_DIR=/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger \
+STABLE_DATA_DIR="/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger" \
 python3 stable_add_pending.py \
   --ticker 8058.T \
   --signal-date 2026-06-24 \
@@ -80,8 +130,8 @@ This only creates a pending paper order. No real order is sent.
 ## Manual Daily Run
 
 ```bash
-cd /Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter
-STABLE_DATA_DIR=/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger \
+cd "/Users/iokatatsunori/Library/Application Support/TGSStablePaper/app"
+STABLE_DATA_DIR="/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger" \
 python3 stable_paper_daily.py
 ```
 
@@ -102,7 +152,7 @@ Install:
 
 ```bash
 mkdir -p ~/Library/LaunchAgents
-cp /Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter/com.tgs.stable.paper.daily.plist ~/Library/LaunchAgents/
+cp "/Users/iokatatsunori/Library/Application Support/TGSStablePaper/app/com.tgs.stable.paper.daily.plist" ~/Library/LaunchAgents/
 launchctl unload ~/Library/LaunchAgents/com.tgs.stable.paper.daily.plist 2>/dev/null || true
 launchctl load ~/Library/LaunchAgents/com.tgs.stable.paper.daily.plist
 ```
@@ -111,8 +161,8 @@ Check:
 
 ```bash
 launchctl list | grep com.tgs.stable.paper.daily
-cat /Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger/launchd.out
-cat /Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger/launchd.err
+cat "/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger/launchd.out"
+cat "/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger/launchd.err"
 ```
 
 Holiday note:

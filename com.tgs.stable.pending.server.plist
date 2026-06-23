@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.tgs.stable.pending.server</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>source "/Users/iokatatsunori/Library/Application Support/TGSStablePaper/local_pending.env"; STABLE_DATA_DIR="/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger" /usr/bin/python3 stable_local_pending_server.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/iokatatsunori/Library/Application Support/TGSStablePaper/app</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger/pending_server.out</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger/pending_server.err</string>
+</dict>
+</plist>
