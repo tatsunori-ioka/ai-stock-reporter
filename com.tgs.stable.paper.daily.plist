@@ -6,21 +6,58 @@
   <string>com.tgs.stable.paper.daily</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/usr/bin/python3</string>
-    <string>/Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter/stable_paper_daily.py</string>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>STABLE_DATA_DIR=/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger /usr/bin/python3 stable_paper_daily.py</string>
   </array>
   <key>WorkingDirectory</key>
   <string>/Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter</string>
   <key>StartCalendarInterval</key>
-  <dict>
-    <key>Hour</key>
-    <integer>18</integer>
-    <key>Minute</key>
-    <integer>10</integer>
-  </dict>
+  <array>
+    <dict>
+      <key>Weekday</key>
+      <integer>1</integer>
+      <key>Hour</key>
+      <integer>18</integer>
+      <key>Minute</key>
+      <integer>10</integer>
+    </dict>
+    <dict>
+      <key>Weekday</key>
+      <integer>2</integer>
+      <key>Hour</key>
+      <integer>18</integer>
+      <key>Minute</key>
+      <integer>10</integer>
+    </dict>
+    <dict>
+      <key>Weekday</key>
+      <integer>3</integer>
+      <key>Hour</key>
+      <integer>18</integer>
+      <key>Minute</key>
+      <integer>10</integer>
+    </dict>
+    <dict>
+      <key>Weekday</key>
+      <integer>4</integer>
+      <key>Hour</key>
+      <integer>18</integer>
+      <key>Minute</key>
+      <integer>10</integer>
+    </dict>
+    <dict>
+      <key>Weekday</key>
+      <integer>5</integer>
+      <key>Hour</key>
+      <integer>18</integer>
+      <key>Minute</key>
+      <integer>10</integer>
+    </dict>
+  </array>
   <key>StandardOutPath</key>
-  <string>/tmp/tgs_stable_paper_daily.out</string>
+  <string>/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger/launchd.out</string>
   <key>StandardErrorPath</key>
-  <string>/tmp/tgs_stable_paper_daily.err</string>
+  <string>/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger/launchd.err</string>
 </dict>
 </plist>

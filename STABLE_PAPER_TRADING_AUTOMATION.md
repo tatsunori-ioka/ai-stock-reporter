@@ -2,22 +2,43 @@
 
 This automation is record-only. It never sends real buy or sell orders.
 
+## Production Split
+
+Render Free does not support Persistent Disks, so Render is not used as the official paper-trading ledger.
+
+Render remains responsible for:
+
+- TradingView webhook receive
+- Stable Ver1.0 validation
+- LINE notification
+
+Mac is responsible for the official paper-trading ledger:
+
+- pending orders
+- positions
+- trade history
+- account
+- daily log
+
 ## Fixed Rule
 
 - Stable Score >= 90
 - Large cap
 - Strong sector
+- Entry assumption: next trading day open after accepted signal
 - Stop loss: -10%
 - Take profit: +30%
 - Max holding: 60 trading days
-- Entry assumption: next trading day open after an accepted webhook signal
 
-## Files
+The rule is frozen. Do not change it in paper-trading automation.
 
-Default data directory:
+## Mac Ledger Directory
 
-- Render with persistent disk: `/data`
-- Fallback/local: `outputs`
+Official local ledger:
+
+```text
+/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger
+```
 
 CSV files:
 
@@ -27,129 +48,101 @@ CSV files:
 - `stable_paper_account.csv`
 - `stable_paper_daily_log.csv`
 - `stable_paper_daily_YYYY-MM-DD.csv`
+- `launchd.out`
+- `launchd.err`
 
-## Render Option
+## Add LINE Signal To Pending
 
-Recommended only if the Render service has a persistent disk mounted at `/data`.
-Without a persistent disk, CSV state can be lost when the service restarts.
+When LINE sends a Stable signal, add it to the Mac ledger.
 
-Endpoint:
-
-```text
-POST /tasks/stable-paper-daily
-```
-
-Required security:
-
-```text
-STABLE_TASK_TOKEN=<long random token>
-```
-
-Call the endpoint with:
+Minimum command:
 
 ```bash
-curl -X POST "https://ai-stock-reporter.onrender.com/tasks/stable-paper-daily" \
-  -H "Content-Type: application/json" \
-  -H "X-Stable-Task-Token: <STABLE_TASK_TOKEN>" \
-  -d '{}'
+cd /Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter
+STABLE_DATA_DIR=/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger \
+python3 stable_add_pending.py --ticker 8058.T --signal-date 2026-06-24
+```
+
+With optional values from LINE:
+
+```bash
+STABLE_DATA_DIR=/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger \
+python3 stable_add_pending.py \
+  --ticker 8058.T \
+  --signal-date 2026-06-24 \
+  --score 120 \
+  --daily-rsi 55 \
+  --volume-ratio 2.0
+```
+
+This only creates a pending paper order. No real order is sent.
+
+## Manual Daily Run
+
+```bash
+cd /Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter
+STABLE_DATA_DIR=/Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger \
+python3 stable_paper_daily.py
+```
+
+## Automatic Daily Run
+
+LaunchAgent file:
+
+```text
+com.tgs.stable.paper.daily.plist
 ```
 
 Schedule:
 
-- Use Render Cron Job if available, or cron-job.org.
-- Time: every Tokyo business day at 18:10 JST.
-- HTTP method: POST.
-
-## Mac Option
-
-Safer if there is no Render persistent disk. The CSV ledger stays on the Mac.
-
-Manual run:
-
-```bash
-cd /Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter
-python3 stable_paper_daily.py
-```
-
-LaunchAgent schedule example:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>Label</key>
-  <string>com.tgs.stable.paper.daily</string>
-  <key>ProgramArguments</key>
-  <array>
-    <string>/usr/bin/python3</string>
-    <string>/Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter/stable_paper_daily.py</string>
-  </array>
-  <key>WorkingDirectory</key>
-  <string>/Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter</string>
-  <key>StartCalendarInterval</key>
-  <dict>
-    <key>Hour</key>
-    <integer>18</integer>
-    <key>Minute</key>
-    <integer>10</integer>
-  </dict>
-  <key>StandardOutPath</key>
-  <string>/tmp/tgs_stable_paper_daily.out</string>
-  <key>StandardErrorPath</key>
-  <string>/tmp/tgs_stable_paper_daily.err</string>
-</dict>
-</plist>
-```
+- Monday to Friday
+- 18:10 JST
 
 Install:
 
 ```bash
 mkdir -p ~/Library/LaunchAgents
-cp com.tgs.stable.paper.daily.plist ~/Library/LaunchAgents/
+cp /Users/iokatatsunori/Documents/Codex/2026-06-22/tgs-growth-project-tgs-stable-15/work/ai-stock-reporter/com.tgs.stable.paper.daily.plist ~/Library/LaunchAgents/
+launchctl unload ~/Library/LaunchAgents/com.tgs.stable.paper.daily.plist 2>/dev/null || true
 launchctl load ~/Library/LaunchAgents/com.tgs.stable.paper.daily.plist
 ```
 
-## Render vs Mac
+Check:
 
-Render advantages:
+```bash
+launchctl list | grep com.tgs.stable.paper.daily
+cat /Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger/launchd.out
+cat /Users/iokatatsunori/Documents/Codex/tgs_stable_paper_ledger/launchd.err
+```
 
-- Runs even when the Mac is off.
-- Same environment as webhook.
-- Best if `/data` persistent disk is enabled.
+Holiday note:
 
-Render risks:
+`launchd` runs Monday to Friday. Japanese market holidays may still run, but if there is no valid market data the job keeps positions/pending safely unchanged.
 
-- CSV state is unsafe without persistent disk.
-- Free instances can sleep.
-- Requires an external scheduler or Render Cron Job.
+## Render Is Not Official Ledger
 
-Mac advantages:
+Render Free may write temporary CSVs to `outputs`, but those files are not durable.
 
-- CSV files are easy to inspect and back up.
-- No persistent disk issue.
-- Simple `launchd` schedule.
+Do not treat Render CSVs as the official paper-trading ledger unless the service is upgraded and a Persistent Disk is mounted.
 
-Mac risks:
+If Render is upgraded later:
 
-- Does not run if the Mac is off or asleep.
-- Needs local Python/yfinance setup.
+```text
+Persistent Disk Mount Path = /data
+```
 
-Recommendation:
-
-- Use Render if `/data` persistent disk is enabled.
-- Otherwise use Mac `launchd` until the ledger is moved to a database.
+Only then can Render become the official ledger.
 
 ## TradingView Watchlist
 
-Generate:
-
-```bash
-python3 generate_stable_watchlist.py
-```
-
-Output:
+Generated file:
 
 ```text
 tradingview_stable_watchlist.csv
+```
+
+Regenerate:
+
+```bash
+python3 generate_stable_watchlist.py
 ```
