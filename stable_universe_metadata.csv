@@ -1,0 +1,226 @@
+ticker,code,name,sector,market_cap,market_cap_bucket
+9202.T,9202,ANA Holdings Inc.,Air transport,1293584826368,Mid
+9201.T,9201,"Japan Airlines Co., Ltd.",Air transport,1200078979072,Mid
+543A.T,543A,Archion Corp.,Automotive,821461647360,Small
+7267.T,7267,"Honda Motor Co., Ltd.",Automotive,5502162436096,Large
+7202.T,7202,Isuzu Motors Ltd.,Automotive,1574116655104,Mid
+7261.T,7261,Mazda Motor Corp.,Automotive,694173302784,Small
+7211.T,7211,Mitsubishi Motors Corp.,Automotive,424659288064,Small
+7201.T,7201,"Nissan Motor Co., Ltd.",Automotive,1109402058752,Small
+7270.T,7270,Subaru Corp.,Automotive,1736701640704,Mid
+7269.T,7269,Suzuki Motor Corp.,Automotive,3686842236928,Large
+7203.T,7203,Toyota Motor Corp.,Automotive,32462245724160,Large
+7272.T,7272,"Yamaha Motor Company , Ltd.",Automotive,1205209661440,Mid
+8304.T,8304,"Aozora Bank , Ltd.",Banking,386152366080,Small
+8331.T,8331,"The Chiba Bank , Ltd.",Banking,1749369749504,Mid
+8354.T,8354,"Fukuoka Financial Group , Inc.",Banking,1341445898240,Mid
+8306.T,8306,"Mitsubishi UFJ Financial Group , Inc.",Banking,37585816649728,Large
+8411.T,8411,"Mizuho Financial Group , Inc.",Banking,19596274827264,Large
+8308.T,8308,"Resona Holdings , Inc.",Banking,5013820145664,Large
+5831.T,5831,Shizuoka Financial Group ( TYO : 5831 )(Holding company for Shizuoka Bank ),Banking,1608629354496,Mid
+8316.T,8316,"Sumitomo Mitsui Financial Group , Inc.",Banking,25330746130432,Large
+8309.T,8309,"Sumitomo Mitsui Trust Holdings , Inc.",Banking,4308675067904,Large
+7186.T,7186,Yokohama Financial Group,Banking,1975651270656,Mid
+3407.T,3407,Asahi Kasei Corp.,Chemicals,2465237827584,Mid
+4061.T,4061,"Denka Co., Ltd.",Chemicals,390743293952,Small
+4901.T,4901,Fujifilm Holdings Corp.,Chemicals,4022012215296,Large
+4452.T,4452,Kao Corp.,Chemicals,2745135529984,Mid
+3405.T,3405,"Kuraray Co., Ltd.",Chemicals,521244082176,Small
+4188.T,4188,Mitsubishi Chemical Holdings Corp.,Chemicals,1493722988544,Mid
+4183.T,4183,"Mitsui Chemicals , Inc.",Chemicals,777041477632,Small
+4021.T,4021,"Nissan Chemical Industries , Ltd.",Chemicals,1118601478144,Small
+6988.T,6988,Nitto Denko,Chemicals,2114985394176,Mid
+4004.T,4004,Resonac Corp.,Chemicals,3497506635776,Large
+4063.T,4063,"Shin-Etsu Chemical Co., Ltd.",Chemicals,13587723583488,Large
+4911.T,4911,"Shiseido Co., Ltd.",Chemicals,1000844754944,Small
+4005.T,4005,"Sumitomo Chemical Co., Ltd.",Chemicals,900680974336,Small
+4043.T,4043,Tokuyama Corporation,Chemicals,376704860160,Small
+4042.T,4042,Tosoh Corp.,Chemicals,913973116928,Small
+4208.T,4208,"Ube Industries , Ltd.",Chemicals,313001803776,Small
+9433.T,9433,KDDI Corp.,Communications,10033792286720,Large
+9432.T,9432,Nippon Telegraph & Telephone Corp.,Communications,11725001719808,Large
+9434.T,9434,SoftBank Corp.,Communications,9986682912768,Large
+9984.T,9984,SoftBank Group Corp.,Communications,41283003351040,Large
+1721.T,1721,Comsys Holdings Corp.,Construction,637868244992,Small
+1925.T,1925,"Daiwa House Industry Co., Ltd.",Construction,2658237677568,Mid
+1808.T,1808,Haseko Corp.,Construction,719303540736,Small
+1963.T,1963,JGC Corporation,Construction,633165119488,Small
+1812.T,1812,Kajima Corp.,Construction,2776212701184,Mid
+1802.T,1802,Obayashi Corp.,Construction,2203185840128,Mid
+1928.T,1928,"Sekisui House , Ltd.",Construction,2097050550272,Mid
+1803.T,1803,Shimizu Corp.,Construction,1722114899968,Mid
+1801.T,1801,Taisei Corp.,Construction,2418240389120,Mid
+6857.T,6857,Advantest Corp.,Electric machinery,23317255815168,Large
+6770.T,6770,"Alps Alpine Co., Ltd.",Electric machinery,423593803776,Small
+7751.T,7751,Canon Inc.,Electric machinery,3656264712192,Large
+6902.T,6902,Denso Corp.,Electric machinery,5093345198080,Large
+6954.T,6954,FANUC Corp.,Electric machinery,7427940941824,Large
+6504.T,6504,"Fuji Electric Co., Ltd.",Electric machinery,2176009502720,Mid
+6702.T,6702,Fujitsu Ltd.,Electric machinery,5530471366656,Large
+6501.T,6501,"Hitachi , Ltd.",Electric machinery,21872406167552,Large
+6861.T,6861,Keyence Corp.,Electric machinery,18914534752256,Large
+285A.T,285A,Kioxia Holdings Corp.,Electric machinery,59359564398592,Large
+6971.T,6971,Kyocera Corp.,Electric machinery,4837514149888,Large
+6920.T,6920,Lasertec,Electric machinery,5152867090432,Large
+6479.T,6479,"MinebeaMitsumi , Inc.",Electric machinery,2029663813632,Mid
+6503.T,6503,Mitsubishi Electric Corp.,Electric machinery,12653113114624,Large
+6981.T,6981,"Murata Manufacturing Co., Ltd.",Electric machinery,22298560036864,Large
+6701.T,6701,NEC Corp.,Electric machinery,4976443129856,Large
+6594.T,6594,Nidec,Electric machinery,3162669056000,Mid
+6645.T,6645,Omron Corp.,Electric machinery,1199635955712,Mid
+6752.T,6752,Panasonic Corp.,Electric machinery,10256976445440,Large
+6723.T,6723,Renesas Electronics,Electric machinery,9145860227072,Large
+7752.T,7752,"Ricoh Co., Ltd.",Electric machinery,829480632320,Small
+6963.T,6963,"Rohm Co., Ltd.",Electric machinery,2193451253760,Mid
+7735.T,7735,SCREEN Holdings,Electric machinery,3216383934464,Mid
+6724.T,6724,Seiko Epson Corp.,Electric machinery,882778439680,Small
+6753.T,6753,Sharp Corporation,Electric machinery,379844427776,Small
+6758.T,6758,Sony Corp.,Electric machinery,18747446263808,Large
+6526.T,6526,Socionext Inc.,Electric machinery,474999652352,Small
+6976.T,6976,"Taiyo Yuden Co., Ltd.",Electric machinery,2194637586432,Mid
+6762.T,6762,TDK Corp.,Electric machinery,7712199933952,Large
+8035.T,8035,Tokyo Electron Ltd.,Electric machinery,35387720335360,Large
+6506.T,6506,"Yaskawa Electric Corporation , Limited",Electric machinery,1985461616640,Mid
+6841.T,6841,Yokogawa Electric Corp.,Electric machinery,1438591352832,Mid
+9502.T,9502,"Chubu Electric Power Co., Inc.",Electric power,2162314051584,Mid
+9503.T,9503,"The Kansai Electric Power Co., Inc.",Electric power,2606351515648,Mid
+9501.T,9501,"Tokyo Electric Power Company Holdings, Incorporated",Electric power,765290217472,Small
+1332.T,1332,Nissui Corporation,Fishery,382274142208,Small
+2802.T,2802,"Ajinomoto Co., Inc.",Foods,5888127533056,Large
+2502.T,2502,"Asahi Group Holdings , Ltd.",Foods,2208929153024,Mid
+2914.T,2914,Japan Tobacco Inc.,Foods,10594643083264,Large
+2801.T,2801,Kikkoman Corp.,Foods,1445862572032,Mid
+2503.T,2503,"Kirin Holdings Co, Ltd",Foods,2246343917568,Mid
+2269.T,2269,"Meiji Holdings Company, Limited",Foods,970002792448,Small
+2282.T,2282,NH Foods Ltd.,Foods,553409839104,Small
+2871.T,2871,Nichirei Corp.,Foods,511259312128,Small
+2002.T,2002,Nisshin Seifun Group Inc.,Foods,538816839680,Small
+2501.T,2501,Sapporo Holdings Ltd.,Foods,733681811456,Small
+9532.T,9532,"Osaka Gas Co., Ltd.",Gas,2078492590080,Mid
+9531.T,9531,"Tokyo Gas Co., Ltd.",Gas,2061624410112,Mid
+5201.T,5201,AGC Inc.,Glass & ceramics,1603785588736,Mid
+5333.T,5333,"NGK Insulators , Ltd.",Glass & ceramics,2165094219776,Mid
+5214.T,5214,"Nippon Electric Glass Co., Ltd.",Glass & ceramics,506870530048,Small
+5233.T,5233,Taiheiyo Cement Corp.,Glass & ceramics,432575545344,Small
+5301.T,5301,"Tokai Carbon Co., Ltd.",Glass & ceramics,371607535616,Small
+5332.T,5332,Toto Ltd.,Glass & ceramics,1531538702336,Mid
+8750.T,8750,"Dai-ichi Life Insurance Company, Limited",Insurance,6605944913920,Large
+8725.T,8725,"MS&AD Insurance Group , Inc.",Insurance,6728241381376,Large
+8630.T,8630,"Sompo Holdings , Inc.",Insurance,5762991521792,Large
+8795.T,8795,"T&D Holdings , Inc.",Insurance,2391651385344,Mid
+8766.T,8766,"Tokio Marine Holdings , Inc.",Insurance,13951534366720,Large
+9147.T,9147,Nippon Express Holdings Inc. ( TYO : 9147 )(Holding company for Nippon Express ),Land transport,1253652561920,Mid
+9064.T,9064,"Yamato Holdings Co., Ltd.",Land transport,556400771072,Small
+6113.T,6113,Amada Co. Ltd.,Machinery,966377406464,Small
+6367.T,6367,"Daikin Industries , Ltd.",Machinery,6653625237504,Large
+6361.T,6361,Ebara Corp.,Machinery,3093716795392,Mid
+6305.T,6305,"Hitachi Construction Machinery Co., Ltd.",Machinery,1151753125888,Small
+7004.T,7004,Kanadevia Corp.,Machinery,240065036288,Small
+7013.T,7013,IHI Corp.,Machinery,2985945989120,Mid
+5631.T,5631,"The Japan Steel Works , Ltd.",Machinery,600884772864,Small
+6473.T,6473,JTEKT Corp.,Machinery,662766878720,Small
+6301.T,6301,Komatsu Ltd.,Machinery,5855319687168,Large
+6326.T,6326,Kubota Corp.,Machinery,3227783004160,Mid
+7011.T,7011,"Mitsubishi Heavy Industries , Ltd.",Machinery,13135058567168,Large
+6471.T,6471,NSK Ltd.,Machinery,595992969216,Small
+6472.T,6472,NTN Corp.,Machinery,263544635392,Small
+6103.T,6103,"Okuma Holdings , Inc.",Machinery,269615185920,Small
+6302.T,6302,"Sumitomo Heavy Industries , Ltd.",Machinery,663998169088,Small
+6273.T,6273,SMC Corporation,Machinery,4681979920384,Large
+9107.T,9107,"Kawasaki Kisen Kaisha , Ltd.",Marine transport,1595161575424,Mid
+9104.T,9104,"Mitsui O.S.K. Lines , Ltd.",Marine transport,1817992101888,Mid
+9101.T,9101,Nippon Yusen K.K.,Marine transport,2099702530048,Mid
+1605.T,1605,Inpex Corp.,Mining,4007230439424,Large
+5714.T,5714,"Dowa Holdings Co., Ltd.",Nonferrous metals,571963998208,Small
+5803.T,5803,Fujikura Ltd.,Nonferrous metals,10200516919296,Large
+5801.T,5801,"The Furukawa Electric Co., Ltd.",Nonferrous metals,4080288923648,Large
+5711.T,5711,Mitsubishi Materials Corp.,Nonferrous metals,638882021376,Small
+5706.T,5706,"Mitsui Mining & Smelting Co., Ltd.",Nonferrous metals,3028247379968,Mid
+3436.T,3436,SUMCO Corp.,Nonferrous metals,1476139548672,Mid
+5802.T,5802,"Sumitomo Electric Industries , Ltd.",Nonferrous metals,10528918339584,Large
+5713.T,5713,"Sumitomo Metal Mining Co., Ltd.",Nonferrous metals,2373330927616,Mid
+8253.T,8253,"Credit Saison Co., Ltd.",Other financial services,632377507840,Small
+8697.T,8697,Japan Exchange Group Inc.,Other financial services,2215184433152,Mid
+8591.T,8591,Orix Co.,Other financial services,7113330917376,Large
+7832.T,7832,"Bandai Namco Holdings , Inc.",Other manufacturing,2337137491968,Mid
+7912.T,7912,"Dai Nippon Printing Co., Ltd.",Other manufacturing,1213001891840,Mid
+7911.T,7911,"Toppan Printing Co., Ltd.",Other manufacturing,1416860270592,Mid
+7951.T,7951,Yamaha Corporation,Other manufacturing,498843156480,Small
+5020.T,5020,Eneos Holdings,Petroleum,3363606102016,Large
+5019.T,5019,"Idemitsu Kosan Co., Ltd",Petroleum,1508783161344,Mid
+4503.T,4503,Astellas Pharma Inc.,Pharmaceuticals,3900078555136,Large
+4519.T,4519,"Chugai Pharmaceutical Co., Ltd.",Pharmaceuticals,12379429535744,Large
+4568.T,4568,"Daiichi Sankyo Company, Limited",Pharmaceuticals,4611910926336,Large
+4523.T,4523,"Eisai Co. , Ltd.",Pharmaceuticals,1101002571776,Small
+4151.T,4151,"Kyowa Hakko Kirin Co., Ltd.",Pharmaceuticals,1323898241024,Mid
+4578.T,4578,"Otsuka Holdings Co., Ltd.",Pharmaceuticals,5582115307520,Large
+4506.T,4506,"Sumitomo Dainippon Pharma Co., Ltd.",Pharmaceuticals,651357650944,Small
+4507.T,4507,"Shionogi & Co., Ltd.",Pharmaceuticals,2392942968832,Mid
+4502.T,4502,Takeda Pharmaceutical Company Limited,Pharmaceuticals,7859874562048,Large
+6146.T,6146,Disco Corporation Ltd.,Precision instruments,9597225009152,Large
+7741.T,7741,Hoya Corporation,Precision instruments,9023528108032,Large
+4902.T,4902,"Konica Minolta Holdings , Inc.",Precision instruments,276347518976,Small
+7731.T,7731,Nikon Corp.,Precision instruments,709234327552,Small
+7733.T,7733,Olympus Corp.,Precision instruments,1765838028800,Mid
+4543.T,4543,Terumo Corp.,Precision instruments,3310823931904,Large
+3861.T,3861,Oji Holdings Corporation,Pulp & paper,679217594368,Small
+9022.T,9022,Central Japan Railway Company,Railway/bus,3106681126912,Mid
+9020.T,9020,East Japan Railway Company,Railway/bus,3753023897600,Large
+9008.T,9008,Keio Corp.,Railway/bus,418880159744,Small
+9009.T,9009,"Keisei Electric Railway Co., Ltd.",Railway/bus,524917407744,Small
+9007.T,9007,"Odakyu Electric Railway Co., Ltd.",Railway/bus,563663601664,Small
+9001.T,9001,"Tobu Railway Co., Ltd.",Railway/bus,560979443712,Small
+9005.T,9005,Tokyu Corp.,Railway/bus,923887075328,Small
+9021.T,9021,West Japan Railway Company,Railway/bus,1187996237824,Mid
+8802.T,8802,"Mitsubishi Estate Co., Ltd.",Real estate,4804578377728,Large
+8801.T,8801,"Mitsui Fudosan Co., Ltd",Real estate,3979065950208,Large
+8830.T,8830,"Sumitomo Realty & Development Co., Ltd.",Real estate,3272372649984,Mid
+8804.T,8804,"Tokyo Tatemono Co., Ltd.",Real estate,686804238336,Small
+3289.T,3289,Tokyu Land Corp.,Real estate,915507118080,Small
+8267.T,8267,"Aeon Co., Ltd.",Retail,3609062014976,Large
+9983.T,9983,"Fast Retailing Co., Ltd.",Retail,25016645189632,Large
+3099.T,3099,Isetan Mitsukoshi Holdings Ltd.,Retail,1383591051264,Mid
+3086.T,3086,"J. Front Retailing Co., Ltd.",Retail,716475334656,Small
+8252.T,8252,"Marui Group Co., Ltd.",Retail,493955317760,Small
+7453.T,7453,"Muji Co., Ltd",Retail,1857899069440,Mid
+9843.T,9843,"Nitori Holdings Co., Ltd.",Retail,1319973683200,Mid
+7532.T,7532,Pan Pacific International Holdings Corp.,Retail,2440610185216,Mid
+3382.T,3382,"Seven & I Holdings Co. , Ltd.",Retail,4337985126400,Large
+8233.T,8233,"Takashimaya Co., Ltd.",Retail,691220971520,Small
+3092.T,3092,"ZOZO Co., Ltd",Retail,995307880448,Small
+5108.T,5108,Bridgestone Corp.,Rubber,4293731549184,Large
+5101.T,5101,"The Yokohama Rubber Co., Ltd.",Rubber,1220020404224,Mid
+8601.T,8601,Daiwa Securities Group Inc.,Securities,2254612201472,Mid
+8604.T,8604,"Nomura Holdings , Inc.",Securities,4198847741952,Large
+6532.T,6532,Baycurrent Inc.,Services,818106531840,Small
+4751.T,4751,CyberAgent Inc.,Services,666581729280,Small
+2432.T,2432,"Dena Co., Ltd.",Services,238201257984,Small
+4324.T,4324,Dentsu Inc.,Services,782652866560,Small
+6178.T,6178,"Japan Post Holdings Co., Ltd.",Services,6251071143936,Large
+9766.T,9766,Konami Corp.,Services,2400027410432,Mid
+4689.T,4689,LY Corporation,Services,2790241337344,Mid
+4385.T,4385,Mercari Inc.,Services,654396620800,Small
+2413.T,2413,M3 Inc. ( TYO : 2413 ) (Parent company for MDLinx ),Services,1138634129408,Small
+3659.T,3659,"Nexon Co., Ltd.",Services,1742442463232,Mid
+7974.T,7974,"Nintendo Co., Ltd.",Services,8069802622976,Large
+4307.T,4307,Nomura Research Institute Ltd.,Services,2385810554880,Mid
+4661.T,4661,"Oriental Land Co., Ltd.",Services,3807774769152,Large
+4755.T,4755,Rakuten Inc.,Services,1558535864320,Mid
+6098.T,6098,"Recruit Holdings Co., Ltd.",Services,15383136305152,Large
+9735.T,9735,"Secom Co., Ltd.",Services,2643533758464,Mid
+3697.T,3697,SHIFT Inc.,Services,158756323328,Small
+9602.T,9602,"Toho Co., Ltd.",Services,1025256652800,Small
+4704.T,4704,Trend Micro Inc.,Services,732666396672,Small
+7012.T,7012,"Kawasaki Heavy Industries , Ltd.",Shipbuilding,2710655205376,Mid
+5411.T,5411,"JFE Holdings , Inc.",Steel,1022271094784,Small
+5406.T,5406,"Kobe Steel , Ltd.",Steel,777460645888,Small
+5401.T,5401,Nippon Steel Corp.,Steel,2938744864768,Mid
+3401.T,3401,Teijin Ltd.,Textiles & apparel,310594600960,Small
+3402.T,3402,"Toray Industries , Inc.",Textiles & apparel,1707269685248,Mid
+8001.T,8001,Itochu Corp.,Trading companies,12913863557120,Large
+8002.T,8002,Marubeni Corp.,Trading companies,8032771112960,Large
+8058.T,8058,Mitsubishi Corp.,Trading companies,16875847155712,Large
+8031.T,8031,"Mitsui & Co. , Ltd.",Trading companies,13431218372608,Large
+2768.T,2768,Sojitz Corp.,Trading companies,1101887045632,Small
+8053.T,8053,Sumitomo Corp.,Trading companies,7755101896704,Large
+8015.T,8015,Toyota Tsusho Corp.,Trading companies,6515194331136,Large
