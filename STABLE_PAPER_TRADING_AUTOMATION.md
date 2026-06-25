@@ -34,11 +34,27 @@ The rule is frozen. Do not change it in paper-trading automation.
 
 ## Mac Ledger Directory
 
+Headquarters storage standard from 2026-06-25:
+
+```text
+Google Drive/TG AI Investment Lab/02_TGS/Stable_Ver1_0/Paper_Trading/
+```
+
+Dashboard copies only:
+
+```text
+Google Drive/TG AI Investment Lab/00_Dashboard/Stable_Ver1_0/
+```
+
+The dashboard folder must not be treated as the official ledger.
+
 Official local ledger:
 
 ```text
 /Users/iokatatsunori/Library/Application Support/TGSStablePaper/ledger
 ```
+
+Current note: Codex could not see a mounted Google Drive folder on 2026-06-25. Keep this local ledger active until the mounted Google Drive path is confirmed, then update launchd `STABLE_DATA_DIR` to the headquarters standard folder.
 
 CSV files:
 
