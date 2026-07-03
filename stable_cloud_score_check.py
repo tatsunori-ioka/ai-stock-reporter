@@ -68,6 +68,10 @@ SCORE_WEIGHTS = {
 
 REPORT_COLUMNS = [
     "date",
+    "run_date",
+    "requested_as_of",
+    "data_date",
+    "freshness_status",
     "ticker",
     "name",
     "weekly_above_200ma",
@@ -180,6 +184,8 @@ RUN_LOG_COLUMNS = [
     "mode",
     "status",
     "as_of",
+    "data_date",
+    "freshness_status",
     "rows_scored",
     "signal_count",
     "max_score_ticker",
@@ -241,8 +247,13 @@ LEDGER_TABS = {
 @dataclass(frozen=True)
 class ScoreSummary:
     as_of: str
+    run_date: str
+    requested_as_of: str
+    data_date: str
+    freshness_status: str
     rows_scored: int
     signal_count: int
+    raw_signal_count: int
     max_score_ticker: str
     max_score: float
     status: str
@@ -280,6 +291,10 @@ def parse_as_of(value: str) -> date:
 
 def now_jst() -> str:
     return datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def run_date_from_updated_at(updated_at: str) -> str:
+    return updated_at[:10]
 
 
 def run_id(updated_at: str) -> str:
@@ -405,6 +420,16 @@ def float_text(value: Any, digits: int = 6) -> str:
     return f"{float(value):.{digits}f}"
 
 
+def freshness_status(requested_as_of: date, data_date: date | None) -> str:
+    if data_date is None:
+        return "no_data"
+    if data_date == requested_as_of:
+        return "current"
+    if data_date < requested_as_of:
+        return "stale"
+    return "current"
+
+
 def build_score_rows(as_of: date, metadata_path: Path, updated_at: str) -> list[dict[str, Any]]:
     metadata = load_metadata(metadata_path)
     start = (as_of - timedelta(days=365 * 8)).isoformat()
@@ -434,13 +459,18 @@ def build_score_rows(as_of: date, metadata_path: Path, updated_at: str) -> list[
             continue
 
         signal = frame.iloc[-1]
-        signal_date = frame.index[-1].date().isoformat()
+        data_date = frame.index[-1].date()
+        signal_date = data_date.isoformat()
         score = int(signal["tgs_score"])
         volume_ma = signal.get("volume_30ma")
         volume_ratio = "" if pd.isna(volume_ma) or float(volume_ma) == 0 else float(signal["Volume"]) / float(volume_ma)
         rows.append(
             {
                 "date": signal_date,
+                "run_date": run_date_from_updated_at(updated_at),
+                "requested_as_of": as_of.isoformat(),
+                "data_date": signal_date,
+                "freshness_status": freshness_status(as_of, data_date),
                 "ticker": ticker,
                 "name": meta.get("name", ""),
                 "weekly_above_200ma": bool_text(signal["weekly_above_200ma"]),
@@ -465,6 +495,10 @@ def build_score_rows(as_of: date, metadata_path: Path, updated_at: str) -> list[
 def empty_score_row(as_of: date, ticker: str, meta: dict[str, str], updated_at: str, status: str) -> dict[str, Any]:
     return {
         "date": as_of.isoformat(),
+        "run_date": run_date_from_updated_at(updated_at),
+        "requested_as_of": as_of.isoformat(),
+        "data_date": "",
+        "freshness_status": "no_data",
         "ticker": ticker,
         "name": meta.get("name", ""),
         "weekly_above_200ma": "false",
@@ -493,19 +527,45 @@ def write_csv(path: Path, columns: list[str], rows: list[dict[str, Any]]) -> Non
             writer.writerow({column: row.get(column, "") for column in columns})
 
 
-def score_summary(rows: list[dict[str, Any]], source_file: str) -> ScoreSummary:
+def score_summary(rows: list[dict[str, Any]], source_file: str, requested_as_of: date, updated_at: str) -> ScoreSummary:
     scored = [row for row in rows if row.get("data_status") == "ok"]
     score_pairs = [(row, safe_float(row.get("stable_score")) or 0.0) for row in scored]
-    signal_count = sum(1 for _, score in score_pairs if score >= SCORE_THRESHOLD)
+    raw_signal_count = sum(1 for _, score in score_pairs if score >= SCORE_THRESHOLD)
     max_row, max_score = max(score_pairs, key=lambda item: item[1], default=({}, 0.0))
     max_ticker = str(max_row.get("ticker", ""))
-    status = "signal_detected" if signal_count else "no_signal"
-    report_date = str(rows[0].get("date", "")) if rows else ""
-    note = f"max_score_ticker={max_ticker} max_score={format_number(max_score)}"
+    data_dates = sorted({str(row.get("data_date", "")) for row in scored if row.get("data_date")})
+    latest_data_date = data_dates[-1] if data_dates else ""
+    row_freshness = {str(row.get("freshness_status", "")) for row in rows}
+
+    if not scored or "no_data" in row_freshness:
+        summary_freshness = "no_data"
+        status = "data_unavailable"
+    elif "stale" in row_freshness:
+        summary_freshness = "stale"
+        status = "data_stale"
+    else:
+        summary_freshness = "current"
+        status = "signal_detected" if raw_signal_count else "no_signal"
+
+    signal_count = raw_signal_count if summary_freshness == "current" else 0
+    note = (
+        f"requested_as_of={requested_as_of.isoformat()} "
+        f"latest_data_date={latest_data_date or 'No Data'} "
+        f"freshness_status={summary_freshness} "
+        f"max_score_ticker={max_ticker} "
+        f"max_score={format_number(max_score)}"
+    )
+    if summary_freshness != "current":
+        note += f" raw_signal_count_from_latest_data={raw_signal_count}"
     return ScoreSummary(
-        as_of=report_date,
+        as_of=requested_as_of.isoformat(),
+        run_date=run_date_from_updated_at(updated_at),
+        requested_as_of=requested_as_of.isoformat(),
+        data_date=latest_data_date,
+        freshness_status=summary_freshness,
         rows_scored=len(scored),
         signal_count=signal_count,
+        raw_signal_count=raw_signal_count,
         max_score_ticker=max_ticker,
         max_score=max_score,
         status=status,
@@ -682,7 +742,8 @@ def append_row(service: Any, spreadsheet_id: str, sheet: str, columns: list[str]
 
 def ensure_ledger_tabs(service: Any, spreadsheet_id: str) -> None:
     for sheet, columns in LEDGER_TABS.items():
-        ensure_header(service, spreadsheet_id, sheet, columns, preserve_existing=True)
+        preserve_existing = sheet not in {"TGS_Daily_Score_Check", "TGS_Run_Log"}
+        ensure_header(service, spreadsheet_id, sheet, columns, preserve_existing=preserve_existing)
 
 
 def build_dashboard_tgs_row(summary: ScoreSummary, updated_at: str) -> dict[str, Any]:
@@ -711,6 +772,7 @@ def build_dashboard_home_rows(summary: ScoreSummary, updated_at: str) -> list[di
         home_row("TGS Latest Score Check Date", summary.as_of, "gray", updated_at, ""),
         home_row("TGS Signal Count", summary.signal_count, status_color(summary.status), updated_at, "stable_score >= 90"),
         home_row("TGS Max Score Ticker", summary.max_score_ticker or "No Data", "gray", updated_at, f"max_score={format_number(summary.max_score)}"),
+        home_row("TGS Data Freshness", summary.freshness_status, status_color(summary.status), updated_at, f"requested_as_of={summary.requested_as_of}; data_date={summary.data_date or 'No Data'}"),
         home_row("TGS Paper Open Positions", 0, "gray", updated_at, "Cloud Phase 1: score check only."),
         home_row("TGS Paper Equity", "No Data", "gray", updated_at, "Cloud Phase 1: pending/register not enabled."),
         home_row("TGS Last Updated", updated_at, "gray", updated_at, ""),
@@ -733,6 +795,10 @@ def status_color(status: str) -> str:
         return "yellow"
     if status == "no_signal":
         return "green"
+    if status == "data_stale":
+        return "yellow"
+    if status == "data_unavailable":
+        return "red"
     return "gray"
 
 
@@ -744,15 +810,22 @@ def build_dashboard_log_row(summary: ScoreSummary, updated_at: str, rid: str) ->
         "action": "daily_score_check",
         "status": "success",
         "rows_read": summary.rows_scored,
-        "rows_written": summary.rows_scored + 9,
+        "rows_written": summary.rows_scored + 10,
         "target_sheet": "TGS, Home, Log",
         "source_file": summary.source_file,
         "error_message": "",
         "project": "TGS",
         "event_type": "cloud_daily_score_check",
         "summary": "TGS Stable Cloud Daily Score Check",
-        "result": f"signal_count={summary.signal_count}; max_score={format_number(summary.max_score)}; status={summary.status}",
-        "next_action": "Review Signal" if summary.signal_count else "Monitor",
+        "result": (
+            f"signal_count={summary.signal_count}; "
+            f"raw_signal_count={summary.raw_signal_count}; "
+            f"max_score={format_number(summary.max_score)}; "
+            f"status={summary.status}; "
+            f"freshness_status={summary.freshness_status}; "
+            f"data_date={summary.data_date or 'No Data'}"
+        ),
+        "next_action": "Review Data Freshness" if summary.status in {"data_stale", "data_unavailable"} else ("Review Signal" if summary.signal_count else "Monitor"),
     }
 
 
@@ -773,6 +846,8 @@ def build_run_log_row(
         "mode": mode,
         "status": status,
         "as_of": summary.as_of,
+        "data_date": summary.data_date,
+        "freshness_status": summary.freshness_status,
         "rows_scored": summary.rows_scored,
         "signal_count": summary.signal_count,
         "max_score_ticker": summary.max_score_ticker,
@@ -799,7 +874,7 @@ def update_ledger_sheet(
         "TGS_Daily_Score_Check",
         REPORT_COLUMNS,
         rows,
-        ["date", "ticker"],
+        ["requested_as_of", "ticker"],
     )
     append_row(
         service,
@@ -861,17 +936,25 @@ def verify_sheet_state(service: Any, ledger_spreadsheet_id: str, dashboard_sprea
         score_values = read_values_optional(service, ledger_spreadsheet_id, "TGS_Daily_Score_Check", 1, len(REPORT_COLUMNS))
         run_values = read_values_optional(service, ledger_spreadsheet_id, "TGS_Run_Log", 1, len(RUN_LOG_COLUMNS))
         score_rows = values_to_rows(score_values[1:], REPORT_COLUMNS) if len(score_values) > 1 else []
-        latest_score_date = max((str(row.get("date", "")) for row in score_rows), default="")
-        latest_score_rows = [row for row in score_rows if str(row.get("date", "")) == latest_score_date]
+        latest_requested_as_of = max((str(row.get("requested_as_of") or row.get("date", "")) for row in score_rows), default="")
+        latest_score_rows = [
+            row for row in score_rows if str(row.get("requested_as_of") or row.get("date", "")) == latest_requested_as_of
+        ]
         result["ledger"] = {
             "title": ledger_meta.get("properties", {}).get("title", ""),
             "url": ledger_meta.get("spreadsheetUrl", ""),
             "required_tabs_present": all(tab in ledger_titles for tab in LEDGER_TABS),
             "missing_tabs": [tab for tab in LEDGER_TABS if tab not in ledger_titles],
             "daily_score_rows": len(score_rows),
-            "latest_score_date": latest_score_date,
+            "latest_requested_as_of": latest_requested_as_of,
+            "latest_data_date": max((str(row.get("data_date", "")) for row in latest_score_rows), default=""),
+            "latest_freshness_statuses": sorted({str(row.get("freshness_status", "")) for row in latest_score_rows}),
             "latest_score_row_count": len(latest_score_rows),
-            "latest_signal_count": sum(1 for row in latest_score_rows if (safe_float(row.get("stable_score")) or 0.0) >= SCORE_THRESHOLD),
+            "latest_signal_count": sum(
+                1
+                for row in latest_score_rows
+                if row.get("freshness_status") == "current" and (safe_float(row.get("stable_score")) or 0.0) >= SCORE_THRESHOLD
+            ),
             "latest_run_log_row": latest_row(run_values, RUN_LOG_COLUMNS),
         }
     if dashboard_spreadsheet_id:
@@ -887,7 +970,7 @@ def verify_sheet_state(service: Any, ledger_spreadsheet_id: str, dashboard_sprea
             "title": dashboard_meta.get("properties", {}).get("title", ""),
             "url": dashboard_meta.get("spreadsheetUrl", ""),
             "latest_tgs_row": latest_row(tgs_values, TGS_COLUMNS),
-            "latest_tgs_home_rows": [row for row in home_rows if row.get("section") == "TGS"][-7:],
+            "latest_tgs_home_rows": [row for row in home_rows if row.get("section") == "TGS"][-8:],
             "latest_log_row": latest_row(log_values, LOG_COLUMNS),
         }
     return result
@@ -945,7 +1028,7 @@ def main() -> int:
 
         rows = build_score_rows(as_of, args.metadata, updated_at)
         source_file = f"stable_daily_score_check_{as_of.strftime('%Y_%m_%d')}.csv"
-        summary = score_summary(rows, source_file)
+        summary = score_summary(rows, source_file, as_of, updated_at)
         dry_run_dir = write_dry_run(args, rows, summary, updated_at, rid)
         result: dict[str, Any] = {
             "ok": True,

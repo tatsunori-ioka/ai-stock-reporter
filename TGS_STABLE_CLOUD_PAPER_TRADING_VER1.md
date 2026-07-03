@@ -79,10 +79,12 @@ File:
 Schedule:
 
 ```text
-5 9 * * 1-5
+0 11 * * 1-5
 ```
 
-GitHub Actions cron uses UTC, so this is 18:05 JST Monday-Friday.
+GitHub Actions cron uses UTC, so this is 20:00 JST Monday-Friday.
+
+The schedule is intentionally later than the JP close because yfinance may lag. If the requested date and latest available price date differ, the job marks the run as `data_stale` instead of a formal `no_signal`.
 
 Manual run:
 
@@ -139,8 +141,23 @@ Google Sheets writes in Phase 1:
 - Append one run row into `TGS_Run_Log`
 - If Dashboard ID is configured:
   - Upsert one row into `TGS`
-  - Upsert seven rows into `Home`
+  - Upsert eight rows into `Home`
   - Append one row into `Log`
+
+Freshness guard columns:
+
+- `run_date`
+- `requested_as_of`
+- `data_date`
+- `freshness_status`
+
+Freshness statuses:
+
+- `current`: `requested_as_of` and `data_date` match.
+- `stale`: `data_date` is older than `requested_as_of`.
+- `no_data`: price data could not be obtained.
+
+When freshness is `stale`, Dashboard status is `data_stale`, not `no_signal`.
 
 ## Safety Boundaries
 

@@ -2,8 +2,9 @@ name: TGS Stable Cloud Paper Trading Ver1.0
 
 on:
   schedule:
-    # 18:05 JST, Monday-Friday. GitHub Actions cron uses UTC.
-    - cron: "5 9 * * 1-5"
+    # 20:00 JST, Monday-Friday. GitHub Actions cron uses UTC.
+    # yfinance may lag shortly after the JP close, so this avoids treating stale data as no_signal.
+    - cron: "0 11 * * 1-5"
   workflow_dispatch:
     inputs:
       as_of:

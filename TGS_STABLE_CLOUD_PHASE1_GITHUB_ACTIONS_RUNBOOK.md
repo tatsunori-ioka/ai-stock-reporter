@@ -71,10 +71,12 @@ File:
 Schedule:
 
 ```text
-5 9 * * 1-5
+0 11 * * 1-5
 ```
 
-This is 18:05 JST, Monday-Friday.
+This is 20:00 JST, Monday-Friday.
+
+The schedule is delayed from 18:05 JST because yfinance can lag shortly after the JP close. If data is still stale, the workflow records `data_stale` and does not treat the day as a formal `no_signal`.
 
 Manual trigger:
 
@@ -119,6 +121,16 @@ Check `payload.json`:
 "real_trading_enabled": false
 ```
 
+Check freshness fields:
+
+```json
+"requested_as_of": "YYYY-MM-DD"
+"data_date": "YYYY-MM-DD"
+"freshness_status": "current | stale | no_data"
+```
+
+If `freshness_status=stale`, expected Dashboard status is `data_stale`, not `no_signal`.
+
 ## 5. Execute Run
 
 After dry-run looks correct, run workflow again with:
@@ -138,7 +150,7 @@ Expected Google Sheets writes:
 - Dashboard `TGS`
   - 1 summary row inserted or updated
 - Dashboard `Home`
-  - 7 TGS rows inserted or updated
+  - 8 TGS rows inserted or updated
 - Dashboard `Log`
   - 1 log row appended
 
@@ -191,12 +203,17 @@ Required matching columns:
 - `volume_ratio`
 - `data_latest_date`
 - `data_status`
+- `requested_as_of`
+- `data_date`
+- `freshness_status`
 
 Acceptance:
 
 ```text
 mismatch_count = 0
 ```
+
+If the Mac version has not yet added the freshness columns, compare only the original score columns and separately confirm Cloud freshness fields.
 
 ## 8. Five-Trading-Day Parallel Monitoring
 
