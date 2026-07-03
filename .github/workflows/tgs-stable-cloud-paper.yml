@@ -1,0 +1,75 @@
+name: TGS Stable Cloud Paper Trading Ver1.0
+
+on:
+  schedule:
+    # 18:05 JST, Monday-Friday. GitHub Actions cron uses UTC.
+    - cron: "5 9 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      as_of:
+        description: "Optional score date in YYYY-MM-DD"
+        required: false
+        default: ""
+      dry_run:
+        description: "Run without writing Google Sheets"
+        required: true
+        type: boolean
+        default: true
+      skip_dashboard:
+        description: "Skip Dashboard summary update"
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  daily-score-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      GOOGLE_SHEETS_SPREADSHEET_ID: ${{ secrets.GOOGLE_SHEETS_SPREADSHEET_ID }}
+      GOOGLE_DASHBOARD_SPREADSHEET_ID: ${{ secrets.GOOGLE_DASHBOARD_SPREADSHEET_ID }}
+      WORKFLOW_AS_OF: ${{ github.event_name == 'workflow_dispatch' && inputs.as_of || '' }}
+      WORKFLOW_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+      WORKFLOW_SKIP_DASHBOARD: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_dashboard || false }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: requirements-cloud.txt
+
+      - name: Install cloud dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements-cloud.txt
+
+      - name: Run cloud daily score check
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=()
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            args+=(--execute)
+          elif [ "${WORKFLOW_DRY_RUN}" != "true" ]; then
+            args+=(--execute)
+          fi
+          if [ -n "${WORKFLOW_AS_OF}" ]; then
+            args+=(--as-of "${WORKFLOW_AS_OF}")
+          fi
+          if [ "${WORKFLOW_SKIP_DASHBOARD}" = "true" ]; then
+            args+=(--skip-dashboard)
+          fi
+          python stable_cloud_score_check.py "${args[@]}"
+
+      - name: Upload dry-run/result artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tgs-stable-cloud-score-check
+          path: outputs/cloud_score_check
+          if-no-files-found: ignore
