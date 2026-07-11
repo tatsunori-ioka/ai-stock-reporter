@@ -16,13 +16,15 @@ import json
 import os
 import sys
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
 import pandas as pd
 import yfinance as yf
+
+from stable_cloud_run_context import RunContext, resolve_run_context
 
 
 JST = ZoneInfo("Asia/Tokyo")
@@ -263,7 +265,23 @@ class ScoreSummary:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--as-of", default="", help="Score date in YYYY-MM-DD. Default: today in JST.")
+    parser.add_argument(
+        "--as-of",
+        default="",
+        help="Score date in YYYY-MM-DD. Required for workflow_dispatch; local default is today in JST.",
+    )
+    parser.add_argument(
+        "--trigger-event",
+        default="local",
+        help="Run trigger: schedule, workflow_dispatch, or local.",
+    )
+    parser.add_argument("--scheduled-cron", default="", help="Schedule event cron expression.")
+    parser.add_argument("--schedule-timezone", default="", help="Schedule event IANA timezone.")
+    parser.add_argument(
+        "--run-started-at",
+        default="",
+        help="ISO 8601 timezone-aware score-check start time. Default: current UTC for local use.",
+    )
     parser.add_argument("--execute", action="store_true", help="Write to Google Sheets. Default is dry-run only.")
     parser.add_argument("--init-only", action="store_true", help="Only create/verify ledger tabs and headers.")
     parser.add_argument("--out-dir", type=Path, default=Path("outputs/cloud_score_check"))
@@ -281,12 +299,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-dashboard", action="store_true", help="Do not update Dashboard tabs.")
     parser.add_argument("--verify-only", action="store_true", help="Read Google Sheets state without writing.")
     return parser.parse_args()
-
-
-def parse_as_of(value: str) -> date:
-    if value:
-        return date.fromisoformat(value[:10])
-    return datetime.now(JST).date()
 
 
 def now_jst() -> str:
@@ -423,11 +435,7 @@ def float_text(value: Any, digits: int = 6) -> str:
 def freshness_status(requested_as_of: date, data_date: date | None) -> str:
     if data_date is None:
         return "no_data"
-    if data_date == requested_as_of:
-        return "current"
-    if data_date < requested_as_of:
-        return "stale"
-    return "current"
+    return "current" if data_date == requested_as_of else "stale"
 
 
 def build_score_rows(as_of: date, metadata_path: Path, updated_at: str) -> list[dict[str, Any]]:
@@ -976,7 +984,14 @@ def verify_sheet_state(service: Any, ledger_spreadsheet_id: str, dashboard_sprea
     return result
 
 
-def write_dry_run(args: argparse.Namespace, rows: list[dict[str, Any]], summary: ScoreSummary, updated_at: str, rid: str) -> Path:
+def write_dry_run(
+    args: argparse.Namespace,
+    rows: list[dict[str, Any]],
+    summary: ScoreSummary,
+    run_context: RunContext,
+    updated_at: str,
+    rid: str,
+) -> Path:
     out_dir = args.out_dir / updated_at.replace("-", "").replace(":", "").replace(" ", "_")
     out_dir.mkdir(parents=True, exist_ok=True)
     write_csv(out_dir / summary.source_file, REPORT_COLUMNS, rows)
@@ -987,6 +1002,7 @@ def write_dry_run(args: argparse.Namespace, rows: list[dict[str, Any]], summary:
         "mode": "dry_run" if not args.execute else "execute",
         "run_id": rid,
         "updated_at": updated_at,
+        "run_context": run_context.log_fields(summary.data_date, summary.freshness_status),
         "summary": summary.__dict__,
         "rules": {
             "score_threshold": SCORE_THRESHOLD,
@@ -1004,7 +1020,6 @@ def write_dry_run(args: argparse.Namespace, rows: list[dict[str, Any]], summary:
 
 def main() -> int:
     args = parse_args()
-    as_of = parse_as_of(args.as_of)
     updated_at = now_jst()
     rid = run_id(updated_at)
     mode = "execute" if args.execute else "dry_run"
@@ -1026,15 +1041,36 @@ def main() -> int:
             print(json.dumps({"ok": True, "mode": "execute", "initialized_tabs": list(LEDGER_TABS)}, ensure_ascii=False, indent=2))
             return 0
 
+        run_started_at = args.run_started_at
+        if args.trigger_event == "local" and not run_started_at:
+            run_started_at = datetime.now(timezone.utc).isoformat()
+        run_context = resolve_run_context(
+            trigger_event=args.trigger_event,
+            as_of=args.as_of,
+            scheduled_cron=args.scheduled_cron,
+            schedule_timezone_name=args.schedule_timezone,
+            run_started_at=run_started_at,
+        )
+        as_of = run_context.requested_as_of
+        print(
+            json.dumps(
+                {"event": "run_context_resolved", **run_context.log_fields()},
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+
         rows = build_score_rows(as_of, args.metadata, updated_at)
         source_file = f"stable_daily_score_check_{as_of.strftime('%Y_%m_%d')}.csv"
         summary = score_summary(rows, source_file, as_of, updated_at)
-        dry_run_dir = write_dry_run(args, rows, summary, updated_at, rid)
+        run_context_log = run_context.log_fields(summary.data_date, summary.freshness_status)
+        dry_run_dir = write_dry_run(args, rows, summary, run_context, updated_at, rid)
         result: dict[str, Any] = {
             "ok": True,
             "mode": mode,
             "run_id": rid,
             "dry_run_dir": str(dry_run_dir),
+            "run_context": run_context_log,
             "summary": summary.__dict__,
             "pending_registration_enabled": False,
             "real_trading_enabled": False,

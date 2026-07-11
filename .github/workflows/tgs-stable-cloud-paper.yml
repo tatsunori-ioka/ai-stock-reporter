@@ -2,13 +2,14 @@ name: TGS Stable Cloud Paper Trading Ver1.0
 
 on:
   schedule:
-    # 20:00 JST, Monday-Friday. GitHub Actions cron uses UTC.
+    # 20:17 JST, Monday-Friday. The offset avoids the top-of-hour queue peak.
     # yfinance may lag shortly after the JP close, so this avoids treating stale data as no_signal.
-    - cron: "0 11 * * 1-5"
+    - cron: "17 20 * * 1-5"
+      timezone: "Asia/Tokyo"
   workflow_dispatch:
     inputs:
       as_of:
-        description: "Optional score date in YYYY-MM-DD"
+        description: "Required for execute/dry-run; not needed for init-only/verify-only"
         required: false
         default: ""
       dry_run:
@@ -32,7 +33,10 @@ jobs:
       GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
       GOOGLE_SHEETS_SPREADSHEET_ID: ${{ secrets.GOOGLE_SHEETS_SPREADSHEET_ID }}
       GOOGLE_DASHBOARD_SPREADSHEET_ID: ${{ secrets.GOOGLE_DASHBOARD_SPREADSHEET_ID }}
+      WORKFLOW_TRIGGER_EVENT: ${{ github.event_name }}
       WORKFLOW_AS_OF: ${{ github.event_name == 'workflow_dispatch' && inputs.as_of || '' }}
+      WORKFLOW_SCHEDULED_CRON: ${{ github.event_name == 'schedule' && github.event.schedule || '' }}
+      WORKFLOW_SCHEDULE_TIMEZONE: "Asia/Tokyo"
       WORKFLOW_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
       WORKFLOW_SKIP_DASHBOARD: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_dashboard || false }}
     steps:
@@ -53,9 +57,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          args=()
-          if [ "${{ github.event_name }}" = "schedule" ]; then
+          run_started_at="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          args=(--trigger-event "${WORKFLOW_TRIGGER_EVENT}" --run-started-at "${run_started_at}")
+          if [ "${WORKFLOW_TRIGGER_EVENT}" = "schedule" ]; then
             args+=(--execute)
+            args+=(--scheduled-cron "${WORKFLOW_SCHEDULED_CRON}")
+            args+=(--schedule-timezone "${WORKFLOW_SCHEDULE_TIMEZONE}")
           elif [ "${WORKFLOW_DRY_RUN}" != "true" ]; then
             args+=(--execute)
           fi
