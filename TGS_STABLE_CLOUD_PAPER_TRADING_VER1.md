@@ -79,19 +79,24 @@ File:
 Schedule:
 
 ```text
-0 11 * * 1-5
+17 20 * * 1-5
+timezone: Asia/Tokyo
 ```
 
-GitHub Actions cron uses UTC, so this is 20:00 JST Monday-Friday.
+This is 20:17 JST Monday-Friday. The minute offset avoids the top-of-hour GitHub Actions queue peak.
 
 The schedule is intentionally later than the JP close because yfinance may lag. If the requested date and latest available price date differ, the job marks the run as `data_stale` instead of a formal `no_signal`.
+
+Scheduled runs resolve `requested_as_of` from the latest scheduled weekday cutoff at or before the actual start time. They do not infer it from market data. This policy does not include a JPX holiday calendar, so a Japanese market holiday remains the target date and produces `stale` when `data_date` differs.
 
 Manual run:
 
 - `workflow_dispatch`
 - `dry_run=true` means no Google Sheets write.
 - `dry_run=false` writes to Google Sheets.
-- `as_of` can be set to a date such as `2026-07-03`.
+- `as_of` is required for dry-run/execute and must be a date such as `2026-07-03`.
+- `as_of` is not required for init-only/verify-only.
+- An empty manual score-run `as_of` fails in Python before market data or Google Sheets access.
 
 ## Local Commands
 
@@ -154,10 +159,13 @@ Freshness guard columns:
 Freshness statuses:
 
 - `current`: `requested_as_of` and `data_date` match.
-- `stale`: `data_date` is older than `requested_as_of`.
+- `stale`: `data_date` differs from `requested_as_of`.
 - `no_data`: price data could not be obtained.
 
 When freshness is `stale`, Dashboard status is `data_stale`, not `no_signal`.
+When freshness is `no_data`, Dashboard status is `data_unavailable`, not `no_signal`. Only `current` runs count as a formal signal or formal `no_signal` result.
+
+Run context is logged to GitHub Actions output and `payload.json`. It is not added to the Google Sheets schema in this phase.
 
 ## Safety Boundaries
 

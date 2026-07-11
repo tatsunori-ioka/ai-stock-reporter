@@ -71,12 +71,15 @@ File:
 Schedule:
 
 ```text
-0 11 * * 1-5
+17 20 * * 1-5
+timezone: Asia/Tokyo
 ```
 
-This is 20:00 JST, Monday-Friday.
+This is 20:17 JST, Monday-Friday. The non-zero minute avoids the top-of-hour GitHub Actions queue peak.
 
 The schedule is delayed from 18:05 JST because yfinance can lag shortly after the JP close. If data is still stale, the workflow records `data_stale` and does not treat the day as a formal `no_signal`.
+
+Scheduled score dates use the latest scheduled cutoff at or before the actual score-check start time. For example, a Monday 20:17 run that starts Tuesday at 03:30 JST still uses Monday as `requested_as_of`. This is a weekday cutoff policy, not a JPX calendar: Japanese market holidays remain target dates and are expected to become `stale` when `data_date` differs.
 
 Manual trigger:
 
@@ -88,7 +91,7 @@ Inputs:
 
 | Input | First run | Execute run |
 |---|---|---|
-| `as_of` | latest trading date, e.g. `2026-07-03` | same date |
+| `as_of` | Required for score runs, e.g. `2026-07-03` | Required; use the same date |
 | `dry_run` | `true` | `false` |
 | `skip_dashboard` | `false` | `false` |
 
@@ -130,6 +133,10 @@ Check freshness fields:
 ```
 
 If `freshness_status=stale`, expected Dashboard status is `data_stale`, not `no_signal`.
+
+If `freshness_status=no_data`, expected Dashboard status is `data_unavailable`, not `no_signal`. Only `freshness_status=current` can produce a formal signal or formal `no_signal` result.
+
+The Actions log and `payload.json` include `trigger_event`, `scheduled_cron`, `schedule_timezone`, `run_started_at_jst`, `requested_as_of`, `requested_as_of_source`, `schedule_resolution_policy`, `data_date`, and `freshness_status`. The scheduled source is `scheduled_cutoff` and its policy is `latest_prior_cutoff`.
 
 ## 5. Execute Run
 
@@ -179,6 +186,8 @@ Expected:
 - `latest_score_row_count = 15`
 - `latest_run_log_row.status = success`
 - Dashboard latest TGS/Home/Log values reflect the execute run
+
+`--verify-only` reads existing Sheets state and does not score a date, so `as_of` is not required. `--init-only` also keeps its existing date-independent behavior. The workflow input remains optional at the UI schema level for these modes, while dry-run and execute score modes require an explicit manual `as_of`; an empty value fails in Python before market data or Sheets access.
 
 ## 7. Mac版との一致確認
 
