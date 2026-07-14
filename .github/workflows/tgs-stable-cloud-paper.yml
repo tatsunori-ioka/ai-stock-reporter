@@ -1,4 +1,9 @@
 name: TGS Stable Cloud Paper Trading Ver1.0
+run-name: >-
+  TGS Stable Cloud Phase1 |
+  origin=${{ github.event_name == 'workflow_dispatch' && inputs.trigger_origin || 'github_schedule' }} |
+  as_of=${{ github.event_name == 'workflow_dispatch' && inputs.as_of || 'scheduled_cutoff' }} |
+  dispatch_key=${{ github.event_name == 'workflow_dispatch' && inputs.dispatch_key || 'none' }}
 
 on:
   schedule:
@@ -11,6 +16,20 @@ on:
       as_of:
         description: "Required for execute/dry-run; not needed for init-only/verify-only"
         required: false
+        type: string
+        default: ""
+      trigger_origin:
+        description: "Invocation source; Cloudflare uses cloudflare_cron"
+        required: true
+        type: choice
+        options:
+          - manual_ui
+          - cloudflare_cron
+        default: manual_ui
+      dispatch_key:
+        description: "Required for cloudflare_cron; optional for manual_ui"
+        required: false
+        type: string
         default: ""
       dry_run:
         description: "Run without writing Google Sheets"
@@ -34,6 +53,8 @@ jobs:
       GOOGLE_SHEETS_SPREADSHEET_ID: ${{ secrets.GOOGLE_SHEETS_SPREADSHEET_ID }}
       GOOGLE_DASHBOARD_SPREADSHEET_ID: ${{ secrets.GOOGLE_DASHBOARD_SPREADSHEET_ID }}
       WORKFLOW_TRIGGER_EVENT: ${{ github.event_name }}
+      WORKFLOW_TRIGGER_ORIGIN: ${{ github.event_name == 'workflow_dispatch' && inputs.trigger_origin || 'github_schedule' }}
+      WORKFLOW_DISPATCH_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.dispatch_key || '' }}
       WORKFLOW_AS_OF: ${{ github.event_name == 'workflow_dispatch' && inputs.as_of || '' }}
       WORKFLOW_SCHEDULED_CRON: ${{ github.event_name == 'schedule' && github.event.schedule || '' }}
       WORKFLOW_SCHEDULE_TIMEZONE: "Asia/Tokyo"
@@ -58,7 +79,14 @@ jobs:
         run: |
           set -euo pipefail
           run_started_at="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-          args=(--trigger-event "${WORKFLOW_TRIGGER_EVENT}" --run-started-at "${run_started_at}")
+          printf 'trigger_origin=%s\n' "${WORKFLOW_TRIGGER_ORIGIN}"
+          printf 'dispatch_key=%s\n' "${WORKFLOW_DISPATCH_KEY}"
+          args=(
+            --trigger-event "${WORKFLOW_TRIGGER_EVENT}"
+            --trigger-origin "${WORKFLOW_TRIGGER_ORIGIN}"
+            --dispatch-key "${WORKFLOW_DISPATCH_KEY}"
+            --run-started-at "${run_started_at}"
+          )
           if [ "${WORKFLOW_TRIGGER_EVENT}" = "schedule" ]; then
             args+=(--execute)
             args+=(--scheduled-cron "${WORKFLOW_SCHEDULED_CRON}")
