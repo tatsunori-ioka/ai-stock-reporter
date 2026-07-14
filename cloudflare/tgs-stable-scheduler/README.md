@@ -49,8 +49,14 @@ Run only after the Stage 1 workflow changes exist on `main` and an authorized
 token has been supplied outside source control:
 
 ```bash
-GITHUB_ACTIONS_TOKEN='...' \
-  pnpm smoke:dispatch --as-of 2026-07-14
+printf 'GitHub token: '
+IFS= read -rs GITHUB_ACTIONS_TOKEN
+printf '\n'
+export GITHUB_ACTIONS_TOKEN
+
+pnpm smoke:dispatch --as-of 2026-07-14
+
+unset GITHUB_ACTIONS_TOKEN
 ```
 
 The smoke command accepts only `--as-of YYYY-MM-DD`. Its request is fixed to:
