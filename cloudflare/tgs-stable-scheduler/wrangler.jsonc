@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "tgs-stable-scheduler",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-14",
+  "triggers": {
+    "crons": []
+  },
+  "secrets": {
+    "required": ["GITHUB_ACTIONS_TOKEN"]
+  }
+}

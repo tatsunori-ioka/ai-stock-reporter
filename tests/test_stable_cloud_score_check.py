@@ -96,6 +96,8 @@ class ScoreCheckTests(unittest.TestCase):
         args = argparse.Namespace(
             as_of="",
             trigger_event="local",
+            trigger_origin="local_cli",
+            dispatch_key="",
             scheduled_cron="",
             schedule_timezone="",
             run_started_at="",
@@ -121,6 +123,8 @@ class ScoreCheckTests(unittest.TestCase):
         args = argparse.Namespace(
             as_of="",
             trigger_event="workflow_dispatch",
+            trigger_origin="manual_ui",
+            dispatch_key="",
             scheduled_cron="",
             schedule_timezone="",
             run_started_at="2026-07-09T12:00:00+00:00",
@@ -149,6 +153,8 @@ class ScoreCheckTests(unittest.TestCase):
         args = argparse.Namespace(
             as_of="",
             trigger_event="workflow_dispatch",
+            trigger_origin="manual_ui",
+            dispatch_key="",
             scheduled_cron="",
             schedule_timezone="",
             run_started_at="2026-07-09T12:00:00+00:00",
@@ -177,6 +183,8 @@ class ScoreCheckTests(unittest.TestCase):
         args = argparse.Namespace(
             as_of="",
             trigger_event="local",
+            trigger_origin="local_cli",
+            dispatch_key="",
             scheduled_cron="",
             schedule_timezone="",
             run_started_at="",
@@ -227,6 +235,38 @@ class ScoreCheckTests(unittest.TestCase):
         self.assertEqual("TGS_Run_Log", append.call_args.args[2])
         self.assertNotIn(upsert.call_args.args[2], forbidden)
         self.assertNotIn(append.call_args.args[2], forbidden)
+        self.assertNotIn("trigger_origin", score_check.RUN_LOG_COLUMNS)
+        self.assertNotIn("dispatch_key", score_check.RUN_LOG_COLUMNS)
+
+    def test_cloudflare_blank_dispatch_key_fails_before_external_access(self) -> None:
+        args = argparse.Namespace(
+            as_of="2026-07-14",
+            trigger_event="workflow_dispatch",
+            trigger_origin="cloudflare_cron",
+            dispatch_key="",
+            scheduled_cron="",
+            schedule_timezone="",
+            run_started_at="2026-07-14T08:00:00+00:00",
+            execute=True,
+            init_only=False,
+            verify_only=False,
+            out_dir=None,
+            metadata=None,
+            ledger_spreadsheet_id="ledger",
+            dashboard_spreadsheet_id="dashboard",
+            skip_dashboard=False,
+        )
+
+        with patch.object(score_check, "parse_args", return_value=args), patch.object(
+            score_check, "build_score_rows"
+        ) as market_data, patch.object(score_check, "build_sheets_service") as sheets, contextlib.redirect_stderr(
+            io.StringIO()
+        ):
+            result = score_check.main()
+
+        self.assertEqual(1, result)
+        market_data.assert_not_called()
+        sheets.assert_not_called()
 
 
 if __name__ == "__main__":

@@ -275,6 +275,16 @@ def parse_args() -> argparse.Namespace:
         default="local",
         help="Run trigger: schedule, workflow_dispatch, or local.",
     )
+    parser.add_argument(
+        "--trigger-origin",
+        default="local_cli",
+        help="Trigger origin: github_schedule, manual_ui, cloudflare_cron, or local_cli.",
+    )
+    parser.add_argument(
+        "--dispatch-key",
+        default="",
+        help="External scheduler identity. Required for cloudflare_cron.",
+    )
     parser.add_argument("--scheduled-cron", default="", help="Schedule event cron expression.")
     parser.add_argument("--schedule-timezone", default="", help="Schedule event IANA timezone.")
     parser.add_argument(
@@ -1046,6 +1056,8 @@ def main() -> int:
             run_started_at = datetime.now(timezone.utc).isoformat()
         run_context = resolve_run_context(
             trigger_event=args.trigger_event,
+            trigger_origin=args.trigger_origin,
+            dispatch_key=args.dispatch_key,
             as_of=args.as_of,
             scheduled_cron=args.scheduled_cron,
             schedule_timezone_name=args.schedule_timezone,

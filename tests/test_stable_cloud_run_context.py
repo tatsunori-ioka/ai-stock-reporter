@@ -5,6 +5,7 @@ from datetime import date, datetime
 
 from stable_cloud_run_context import (
     SCHEDULE_RESOLUTION_POLICY,
+    SOURCE_EXTERNAL_SCHEDULER,
     SOURCE_LOCAL_DEFAULT_JST,
     SOURCE_MANUAL_INPUT,
     SOURCE_SCHEDULED_CUTOFF,
@@ -22,6 +23,8 @@ class RunContextTests(unittest.TestCase):
             scheduled_cron=SUPPORTED_SCHEDULE_CRON,
             schedule_timezone_name="Asia/Tokyo",
             run_started_at=started_at,
+            trigger_origin="github_schedule",
+            dispatch_key="",
         )
 
     def test_schedule_same_day_start_uses_same_cutoff_date(self) -> None:
@@ -54,10 +57,52 @@ class RunContextTests(unittest.TestCase):
             scheduled_cron="",
             schedule_timezone_name="",
             run_started_at="2026-07-09T12:00:00+00:00",
+            trigger_origin="manual_ui",
+            dispatch_key="",
         )
 
         self.assertEqual(date(2026, 7, 9), context.requested_as_of)
         self.assertEqual(SOURCE_MANUAL_INPUT, context.requested_as_of_source)
+        self.assertEqual("manual_ui", context.trigger_origin)
+        self.assertEqual("", context.dispatch_key)
+
+    def test_cloudflare_dispatch_uses_external_scheduler_source(self) -> None:
+        context = resolve_run_context(
+            trigger_event="workflow_dispatch",
+            as_of="2026-07-14",
+            scheduled_cron="",
+            schedule_timezone_name="",
+            run_started_at="2026-07-14T08:00:00+00:00",
+            trigger_origin="cloudflare_cron",
+            dispatch_key="cloudflare_cron:2026-07-14T07:37:00.000Z",
+        )
+
+        self.assertEqual(date(2026, 7, 14), context.requested_as_of)
+        self.assertEqual(SOURCE_EXTERNAL_SCHEDULER, context.requested_as_of_source)
+
+    def test_cloudflare_dispatch_requires_dispatch_key(self) -> None:
+        with self.assertRaisesRegex(ValueError, "dispatch_key for cloudflare_cron"):
+            resolve_run_context(
+                trigger_event="workflow_dispatch",
+                as_of="2026-07-14",
+                scheduled_cron="",
+                schedule_timezone_name="",
+                run_started_at="2026-07-14T08:00:00+00:00",
+                trigger_origin="cloudflare_cron",
+                dispatch_key="",
+            )
+
+    def test_cloudflare_dispatch_date_must_match_key_jst_date(self) -> None:
+        with self.assertRaisesRegex(ValueError, "does not match requested as_of"):
+            resolve_run_context(
+                trigger_event="workflow_dispatch",
+                as_of="2026-07-15",
+                scheduled_cron="",
+                schedule_timezone_name="",
+                run_started_at="2026-07-14T08:00:00+00:00",
+                trigger_origin="cloudflare_cron",
+                dispatch_key="cloudflare_cron:2026-07-14T07:37:00.000Z",
+            )
 
     def test_manual_blank_date_is_rejected(self) -> None:
         with self.assertRaisesRegex(ValueError, "as_of is required"):
@@ -67,6 +112,8 @@ class RunContextTests(unittest.TestCase):
                 scheduled_cron="",
                 schedule_timezone_name="",
                 run_started_at="2026-07-09T12:00:00+00:00",
+                trigger_origin="manual_ui",
+                dispatch_key="",
             )
 
     def test_local_blank_date_uses_jst_start_date(self) -> None:
@@ -76,6 +123,8 @@ class RunContextTests(unittest.TestCase):
             scheduled_cron="",
             schedule_timezone_name="",
             run_started_at="2026-07-09T16:00:00+00:00",
+            trigger_origin="local_cli",
+            dispatch_key="",
         )
 
         self.assertEqual(date(2026, 7, 10), context.requested_as_of)
@@ -89,6 +138,8 @@ class RunContextTests(unittest.TestCase):
                 scheduled_cron="0 11 * * 1-5",
                 schedule_timezone_name="Asia/Tokyo",
                 run_started_at="2026-07-06T18:30:00+00:00",
+                trigger_origin="github_schedule",
+                dispatch_key="",
             )
 
     def test_invalid_timezone_is_rejected(self) -> None:
@@ -99,6 +150,8 @@ class RunContextTests(unittest.TestCase):
                 scheduled_cron=SUPPORTED_SCHEDULE_CRON,
                 schedule_timezone_name="Mars/Olympus",
                 run_started_at="2026-07-06T18:30:00+00:00",
+                trigger_origin="github_schedule",
+                dispatch_key="",
             )
 
     def test_naive_datetime_is_rejected(self) -> None:
@@ -117,6 +170,8 @@ class RunContextTests(unittest.TestCase):
                 scheduled_cron=SUPPORTED_SCHEDULE_CRON,
                 schedule_timezone_name="Asia/Tokyo",
                 run_started_at="",
+                trigger_origin="github_schedule",
+                dispatch_key="",
             )
 
     def test_unknown_trigger_event_is_rejected(self) -> None:
@@ -127,6 +182,8 @@ class RunContextTests(unittest.TestCase):
                 scheduled_cron="",
                 schedule_timezone_name="",
                 run_started_at="2026-07-09T12:00:00+00:00",
+                trigger_origin="manual_ui",
+                dispatch_key="",
             )
 
     def test_log_fields_include_required_context(self) -> None:
@@ -135,6 +192,8 @@ class RunContextTests(unittest.TestCase):
         self.assertEqual(
             {
                 "trigger_event",
+                "trigger_origin",
+                "dispatch_key",
                 "scheduled_cron",
                 "schedule_timezone",
                 "run_started_at_jst",

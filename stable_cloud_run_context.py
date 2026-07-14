@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -20,11 +21,23 @@ SUPPORTED_TRIGGER_EVENTS = {TRIGGER_SCHEDULE, TRIGGER_MANUAL, TRIGGER_LOCAL}
 SOURCE_MANUAL_INPUT = "manual_input"
 SOURCE_SCHEDULED_CUTOFF = "scheduled_cutoff"
 SOURCE_LOCAL_DEFAULT_JST = "local_default_jst"
+SOURCE_EXTERNAL_SCHEDULER = "external_scheduler"
+
+ORIGIN_GITHUB_SCHEDULE = "github_schedule"
+ORIGIN_MANUAL_UI = "manual_ui"
+ORIGIN_CLOUDFLARE_CRON = "cloudflare_cron"
+ORIGIN_LOCAL_CLI = "local_cli"
+
+CLOUDFLARE_DISPATCH_KEY = re.compile(
+    r"^cloudflare_cron:(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)$"
+)
 
 
 @dataclass(frozen=True)
 class RunContext:
     trigger_event: str
+    trigger_origin: str
+    dispatch_key: str
     scheduled_cron: str
     schedule_timezone: str
     run_started_at_jst: str
@@ -35,6 +48,8 @@ class RunContext:
     def log_fields(self, data_date: str = "", freshness_status: str = "") -> dict[str, str]:
         return {
             "trigger_event": self.trigger_event,
+            "trigger_origin": self.trigger_origin,
+            "dispatch_key": self.dispatch_key,
             "scheduled_cron": self.scheduled_cron,
             "schedule_timezone": self.schedule_timezone,
             "run_started_at_jst": self.run_started_at_jst,
@@ -83,6 +98,15 @@ def schedule_timezone(name: str) -> ZoneInfo:
         raise ValueError(f"Invalid schedule timezone: {name}.") from exc
 
 
+def parse_cloudflare_dispatch_key(value: str) -> datetime:
+    match = CLOUDFLARE_DISPATCH_KEY.fullmatch(value.strip())
+    if match is None:
+        raise ValueError(
+            "dispatch_key for cloudflare_cron must use cloudflare_cron:<ISO scheduledTime>."
+        )
+    return parse_aware_datetime(match.group(1))
+
+
 def latest_prior_cutoff(run_started_at: datetime, cron: str, timezone_name: str) -> tuple[date, datetime]:
     if run_started_at.tzinfo is None or run_started_at.utcoffset() is None:
         raise ValueError("run_started_at must be timezone-aware; naive datetime is not supported.")
@@ -110,6 +134,8 @@ def resolve_run_context(
     scheduled_cron: str,
     schedule_timezone_name: str,
     run_started_at: str,
+    trigger_origin: str,
+    dispatch_key: str,
 ) -> RunContext:
     if trigger_event not in SUPPORTED_TRIGGER_EVENTS:
         raise ValueError(f"Unsupported trigger_event: {trigger_event or '<empty>'}.")
@@ -117,8 +143,14 @@ def resolve_run_context(
     started_at = parse_aware_datetime(run_started_at)
     jst = schedule_timezone(JST_NAME)
     started_at_jst = started_at.astimezone(jst)
+    origin = trigger_origin.strip()
+    key = dispatch_key.strip()
 
     if trigger_event == TRIGGER_SCHEDULE:
+        if origin != ORIGIN_GITHUB_SCHEDULE:
+            raise ValueError("schedule events require trigger_origin=github_schedule.")
+        if key:
+            raise ValueError("schedule events do not accept dispatch_key.")
         if as_of.strip():
             raise ValueError("Scheduled runs do not accept an explicit as_of override.")
         requested_as_of, started_at_jst = latest_prior_cutoff(
@@ -131,11 +163,28 @@ def resolve_run_context(
         timezone_name = schedule_timezone_name
     elif trigger_event == TRIGGER_MANUAL:
         requested_as_of = parse_score_date(as_of)
-        source = SOURCE_MANUAL_INPUT
+        if origin == ORIGIN_MANUAL_UI:
+            source = SOURCE_MANUAL_INPUT
+        elif origin == ORIGIN_CLOUDFLARE_CRON:
+            scheduled_time = parse_cloudflare_dispatch_key(key)
+            scheduled_date = scheduled_time.astimezone(jst).date()
+            if scheduled_date != requested_as_of:
+                raise ValueError(
+                    "cloudflare_cron dispatch_key scheduledTime does not match requested as_of in JST."
+                )
+            source = SOURCE_EXTERNAL_SCHEDULER
+        else:
+            raise ValueError(
+                "workflow_dispatch requires trigger_origin=manual_ui or cloudflare_cron."
+            )
         policy = ""
         timezone_name = ""
         scheduled_cron = ""
     else:
+        if origin != ORIGIN_LOCAL_CLI:
+            raise ValueError("local events require trigger_origin=local_cli.")
+        if key:
+            raise ValueError("local events do not accept dispatch_key.")
         if as_of.strip():
             requested_as_of = parse_score_date(as_of)
             source = SOURCE_MANUAL_INPUT
@@ -148,6 +197,8 @@ def resolve_run_context(
 
     return RunContext(
         trigger_event=trigger_event,
+        trigger_origin=origin,
+        dispatch_key=key,
         scheduled_cron=scheduled_cron,
         schedule_timezone=timezone_name,
         run_started_at_jst=started_at_jst.isoformat(timespec="seconds"),
