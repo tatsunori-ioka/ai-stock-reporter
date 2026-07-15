@@ -3,6 +3,7 @@
   "name": "tgs-stable-scheduler",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-14",
+  "workers_dev": false,
   "triggers": {
     "crons": [
       "37 7 * * MON-FRI",

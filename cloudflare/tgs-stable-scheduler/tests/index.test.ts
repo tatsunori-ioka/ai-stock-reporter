@@ -299,10 +299,12 @@ describe("scheduled handler", () => {
 describe("deployed scheduler configuration", () => {
   it("configures exactly the two Stage 2a Cloudflare Cron triggers", () => {
     const parsed = JSON.parse(wranglerConfig) as {
+      workers_dev?: boolean;
       triggers?: { crons?: string[] };
     };
 
     expect(ACCEPTED_CRONS).toEqual([EARLY_CRON, LATE_CRON]);
+    expect(parsed.workers_dev).toBe(false);
     expect(parsed.triggers?.crons).toEqual([EARLY_CRON, LATE_CRON]);
   });
 

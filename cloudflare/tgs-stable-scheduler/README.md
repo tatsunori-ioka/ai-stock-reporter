@@ -15,6 +15,7 @@ Sheets or the Dashboard.
 - Git ref: `main`
 - Trigger origin: `cloudflare_cron`
 - Secret binding name: `GITHUB_ACTIONS_TOKEN`
+- Public HTTP endpoint: disabled with `workers_dev=false`
 
 The scheduled handler is hard-coded to `dry_run=true` and
 `skip_dashboard=true`. There is no setting, environment binding, or handler
@@ -24,7 +25,7 @@ input that can switch Stage 2a to execute mode. The dispatch key is
 The Worker calls `controller.noRetry()`, accepts exactly the two Cron
 expressions above, and directly awaits the GitHub dispatch. A non-200 GitHub
 response fails the Cron invocation. Only `scheduled()` is exported; there is no
-public HTTP handler.
+public HTTP handler or `workers.dev` route.
 
 ## Stage 2a State
 
