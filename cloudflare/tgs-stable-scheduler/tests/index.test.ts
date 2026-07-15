@@ -4,8 +4,10 @@ import {
 } from "cloudflare:test";
 import { describe, expect, it, vi } from "vitest";
 
+import workflowConfig from "../../../.github/workflows/tgs-stable-cloud-paper.yml?raw";
+import wranglerConfig from "../wrangler.jsonc?raw";
 import worker, {
-  EXPECTED_CRON,
+  ACCEPTED_CRONS,
   GITHUB_API_VERSION,
   asOfFromScheduledTime,
   buildDispatchPayload,
@@ -18,6 +20,10 @@ import worker, {
   type Env,
 } from "../src/index.js";
 
+const EARLY_CRON = "37 7 * * MON-FRI";
+const LATE_CRON = "7 8 * * MON-FRI";
+const EARLY_SCHEDULED_TIME = "2026-07-16T07:37:00.000Z";
+const LATE_SCHEDULED_TIME = "2026-07-16T08:07:00.000Z";
 const TOKEN = "unit-test-secret-token";
 const RUN_DETAILS = {
   workflow_run_id: 123456,
@@ -26,15 +32,11 @@ const RUN_DETAILS = {
 };
 
 function command(overrides: Partial<DispatchCommand> = {}): DispatchCommand {
-  const scheduledTime = "2026-07-14T07:37:00.000Z";
   return {
     token: TOKEN,
-    asOf: "2026-07-14",
-    dryRun: false,
-    skipDashboard: false,
-    triggerOrigin: "cloudflare_cron",
-    dispatchKey: `cloudflare_cron:${scheduledTime}`,
-    scheduledTime,
+    asOf: "2026-07-16",
+    dispatchKey: `cloudflare_cron:${EARLY_SCHEDULED_TIME}`,
+    scheduledTime: EARLY_SCHEDULED_TIME,
     ...overrides,
   };
 }
@@ -44,31 +46,39 @@ function successResponse(): Response {
 }
 
 describe("scheduled date and identity", () => {
-  it("derives the 2026-07-14 JST score date from scheduledTime", () => {
-    expect(asOfFromScheduledTime(Date.parse("2026-07-14T07:37:00.000Z"))).toBe("2026-07-14");
-  });
+  it.each([EARLY_SCHEDULED_TIME, LATE_SCHEDULED_TIME])(
+    "derives the 2026-07-16 JST score date from %s",
+    (scheduledTime) => {
+      expect(asOfFromScheduledTime(Date.parse(scheduledTime))).toBe("2026-07-16");
+    },
+  );
 
   it("does not use the actual delayed Worker start time", () => {
-    const now = vi.spyOn(Date, "now").mockReturnValue(Date.parse("2026-07-14T14:30:00.000Z"));
-    expect(asOfFromScheduledTime(Date.parse("2026-07-14T07:37:00.000Z"))).toBe("2026-07-14");
+    const now = vi.spyOn(Date, "now").mockReturnValue(Date.parse("2026-07-16T14:30:00.000Z"));
+    expect(asOfFromScheduledTime(Date.parse(EARLY_SCHEDULED_TIME))).toBe("2026-07-16");
     expect(now).not.toHaveBeenCalled();
     now.mockRestore();
   });
 
   it("keeps a delayed Friday event on Friday", () => {
-    expect(asOfFromScheduledTime(Date.parse("2026-07-17T07:37:00.000Z"))).toBe("2026-07-17");
+    expect(asOfFromScheduledTime(Date.parse("2026-07-17T08:07:00.000Z"))).toBe("2026-07-17");
   });
 
-  it("generates dispatch_key from the canonical ISO scheduledTime", () => {
-    expect(dispatchKeyFromScheduledTime(Date.parse("2026-07-14T07:37:00.000Z"))).toBe(
-      "cloudflare_cron:2026-07-14T07:37:00.000Z",
-    );
-  });
+  it.each([EARLY_SCHEDULED_TIME, LATE_SCHEDULED_TIME])(
+    "generates dispatch_key from %s",
+    (scheduledTime) => {
+      expect(dispatchKeyFromScheduledTime(Date.parse(scheduledTime))).toBe(
+        `cloudflare_cron:${scheduledTime}`,
+      );
+    },
+  );
 });
 
 describe("GitHub workflow dispatch", () => {
-  it("rejects a blank cloudflare dispatch_key before fetch", async () => {
-    const fetchImpl = vi.fn(async () => successResponse());
+  it("rejects a blank dispatch_key before fetch", async () => {
+    const fetchImpl = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) => successResponse(),
+    );
     const failure = dispatchGithubWorkflow(command({ dispatchKey: "" }), {
       fetchImpl,
       auditLogger: vi.fn(),
@@ -78,20 +88,7 @@ describe("GitHub workflow dispatch", () => {
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 
-  it("accepts a blank manual_ui dispatch_key", () => {
-    const payload = buildDispatchPayload(
-      command({
-        triggerOrigin: "manual_ui",
-        dispatchKey: "",
-        scheduledTime: "",
-      }),
-    );
-
-    expect(payload.inputs.trigger_origin).toBe("manual_ui");
-    expect(payload.inputs.dispatch_key).toBe("");
-  });
-
-  it("sends the fixed payload and explicit GitHub headers", async () => {
+  it("sends a dry-run-only payload and explicit GitHub headers", async () => {
     const fetchImpl = vi.fn(
       async (_input: RequestInfo | URL, _init?: RequestInit) => successResponse(),
     );
@@ -105,11 +102,11 @@ describe("GitHub workflow dispatch", () => {
     expect(payload).toEqual({
       ref: "main",
       inputs: {
-        as_of: "2026-07-14",
-        dry_run: false,
-        skip_dashboard: false,
+        as_of: "2026-07-16",
+        dry_run: true,
+        skip_dashboard: true,
         trigger_origin: "cloudflare_cron",
-        dispatch_key: "cloudflare_cron:2026-07-14T07:37:00.000Z",
+        dispatch_key: `cloudflare_cron:${EARLY_SCHEDULED_TIME}`,
       },
     });
     expect(init?.headers).toMatchObject({
@@ -118,6 +115,20 @@ describe("GitHub workflow dispatch", () => {
       "User-Agent": "tgs-stable-cloudflare-scheduler",
       "X-GitHub-Api-Version": GITHUB_API_VERSION,
     });
+  });
+
+  it("cannot generate an execute or Dashboard-writing payload", () => {
+    const forgedCommand = {
+      ...command(),
+      dryRun: false,
+      skipDashboard: false,
+      triggerOrigin: "manual_ui",
+    } as unknown as DispatchCommand;
+    const payload = buildDispatchPayload(forgedCommand);
+
+    expect(payload.inputs.dry_run).toBe(true);
+    expect(payload.inputs.skip_dashboard).toBe(true);
+    expect(payload.inputs.trigger_origin).toBe("cloudflare_cron");
   });
 
   it("returns and safely audits run details from a 200 response", async () => {
@@ -136,7 +147,7 @@ describe("GitHub workflow dispatch", () => {
       workflow_run_id: RUN_DETAILS.workflow_run_id,
       run_url: RUN_DETAILS.run_url,
       html_url: RUN_DETAILS.html_url,
-      dispatch_key: "cloudflare_cron:2026-07-14T07:37:00.000Z",
+      dispatch_key: `cloudflare_cron:${EARLY_SCHEDULED_TIME}`,
     });
     expect(logs.join("\n")).not.toContain(TOKEN);
   });
@@ -188,8 +199,8 @@ describe("GitHub workflow dispatch", () => {
 });
 
 describe("smoke policy", () => {
-  it("has no input capable of changing dry_run or skip_dashboard to false", () => {
-    const smoke = buildSmokeDispatchCommand("2026-07-14", TOKEN);
+  it("has no input capable of enabling execute or Dashboard writes", () => {
+    const smoke = buildSmokeDispatchCommand("2026-07-16", TOKEN);
     const payload = buildDispatchPayload(smoke);
 
     expect(Object.isFrozen(smoke)).toBe(true);
@@ -201,46 +212,70 @@ describe("smoke policy", () => {
 
   it("rejects smoke arguments that attempt to set dry_run=false", () => {
     expect(() =>
-      parseSmokeArguments(["--as-of", "2026-07-14", "--dry-run", "false"]),
+      parseSmokeArguments(["--as-of", "2026-07-16", "--dry-run", "false"]),
     ).toThrow("Usage");
   });
 });
 
 describe("scheduled handler", () => {
-  it("calls noRetry and directly awaits a successful dispatch", async () => {
+  it.each([
+    [EARLY_CRON, EARLY_SCHEDULED_TIME],
+    [LATE_CRON, LATE_SCHEDULED_TIME],
+  ])("accepts %s and directly awaits its fixed dry-run dispatch", async (cron, scheduledTime) => {
     const controller = createScheduledController({
-      cron: EXPECTED_CRON,
-      scheduledTime: new Date("2026-07-14T07:37:00.000Z"),
+      cron,
+      scheduledTime: new Date(scheduledTime),
     });
     const noRetry = vi.spyOn(controller, "noRetry");
-    const result = await handleScheduled(controller, { GITHUB_ACTIONS_TOKEN: TOKEN }, {
-      fetchImpl: vi.fn(async () => successResponse()),
-      auditLogger: vi.fn(),
-    });
+    const fetchImpl = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) => successResponse(),
+    );
 
+    const result = await handleScheduled(
+      controller,
+      { GITHUB_ACTIONS_TOKEN: TOKEN },
+      { fetchImpl, auditLogger: vi.fn() },
+    );
+
+    const [, init] = fetchImpl.mock.calls[0];
+    const payload = JSON.parse(String(init?.body));
     expect(noRetry).toHaveBeenCalledOnce();
     expect(result.workflowRunId).toBe(RUN_DETAILS.workflow_run_id);
+    expect(payload).toEqual({
+      ref: "main",
+      inputs: {
+        as_of: "2026-07-16",
+        dry_run: true,
+        skip_dashboard: true,
+        trigger_origin: "cloudflare_cron",
+        dispatch_key: `cloudflare_cron:${scheduledTime}`,
+      },
+    });
   });
 
   it("fails the scheduled handler when GitHub returns an error", async () => {
     const controller = createScheduledController({
-      cron: EXPECTED_CRON,
-      scheduledTime: new Date("2026-07-14T07:37:00.000Z"),
+      cron: EARLY_CRON,
+      scheduledTime: new Date(EARLY_SCHEDULED_TIME),
     });
     const noRetry = vi.spyOn(controller, "noRetry");
-    const failure = handleScheduled(controller, { GITHUB_ACTIONS_TOKEN: TOKEN }, {
-      fetchImpl: vi.fn(async () => new Response(null, { status: 503 })),
-      auditLogger: vi.fn(),
-    });
+    const failure = handleScheduled(
+      controller,
+      { GITHUB_ACTIONS_TOKEN: TOKEN },
+      {
+        fetchImpl: vi.fn(async () => new Response(null, { status: 503 })),
+        auditLogger: vi.fn(),
+      },
+    );
 
     await expect(failure).rejects.toThrow("HTTP 503");
     expect(noRetry).toHaveBeenCalledOnce();
   });
 
-  it("rejects an unexpected cron before dispatch", async () => {
+  it("rejects every cron outside the two accepted observations", async () => {
     const controller = createScheduledController({
       cron: "0 0 * * *",
-      scheduledTime: new Date("2026-07-14T07:37:00.000Z"),
+      scheduledTime: new Date(EARLY_SCHEDULED_TIME),
     });
     const noRetry = vi.spyOn(controller, "noRetry");
     const fetchImpl = vi.fn(async () => successResponse());
@@ -258,5 +293,21 @@ describe("scheduled handler", () => {
     const _env: Env = { GITHUB_ACTIONS_TOKEN: TOKEN };
     expect(createExecutionContext()).toBeDefined();
     expect(_env.GITHUB_ACTIONS_TOKEN).toBe(TOKEN);
+  });
+});
+
+describe("deployed scheduler configuration", () => {
+  it("configures exactly the two Stage 2a Cloudflare Cron triggers", () => {
+    const parsed = JSON.parse(wranglerConfig) as {
+      triggers?: { crons?: string[] };
+    };
+
+    expect(ACCEPTED_CRONS).toEqual([EARLY_CRON, LATE_CRON]);
+    expect(parsed.triggers?.crons).toEqual([EARLY_CRON, LATE_CRON]);
+  });
+
+  it("keeps the existing GitHub Actions schedule enabled", () => {
+    expect(workflowConfig).toContain('- cron: "17 20 * * 1-5"');
+    expect(workflowConfig).toContain('timezone: "Asia/Tokyo"');
   });
 });

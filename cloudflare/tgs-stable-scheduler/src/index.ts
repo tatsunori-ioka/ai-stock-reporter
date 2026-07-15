@@ -1,4 +1,7 @@
-export const EXPECTED_CRON = "37 7 * * MON-FRI";
+export const ACCEPTED_CRONS = Object.freeze([
+  "37 7 * * MON-FRI",
+  "7 8 * * MON-FRI",
+] as const);
 export const GITHUB_API_VERSION = "2026-03-10";
 export const GITHUB_OWNER = "tatsunori-ioka";
 export const GITHUB_REPO = "ai-stock-reporter";
@@ -12,6 +15,7 @@ const GITHUB_DISPATCH_URL =
 const USER_AGENT = "tgs-stable-cloudflare-scheduler";
 const JST_TIME_ZONE = "Asia/Tokyo";
 const SCORE_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const ACCEPTED_CRON_SET: ReadonlySet<string> = new Set(ACCEPTED_CRONS);
 
 export interface Env {
   GITHUB_ACTIONS_TOKEN: string;
@@ -20,9 +24,6 @@ export interface Env {
 export interface DispatchCommand {
   readonly token: string;
   readonly asOf: string;
-  readonly dryRun: boolean;
-  readonly skipDashboard: boolean;
-  readonly triggerOrigin: "cloudflare_cron" | "manual_ui";
   readonly dispatchKey: string;
   readonly scheduledTime: string;
 }
@@ -31,9 +32,9 @@ export interface DispatchPayload {
   readonly ref: "main";
   readonly inputs: {
     readonly as_of: string;
-    readonly dry_run: boolean;
-    readonly skip_dashboard: boolean;
-    readonly trigger_origin: "cloudflare_cron" | "manual_ui";
+    readonly dry_run: true;
+    readonly skip_dashboard: true;
+    readonly trigger_origin: typeof TRIGGER_ORIGIN;
     readonly dispatch_key: string;
   };
 }
@@ -94,27 +95,25 @@ export function dispatchKeyFromScheduledTime(value: number): string {
 
 export function buildDispatchPayload(command: DispatchCommand): DispatchPayload {
   assertScoreDate(command.asOf);
-  if (command.triggerOrigin === TRIGGER_ORIGIN) {
-    if (!command.dispatchKey) {
-      throw new Error("dispatch_key is required for cloudflare_cron.");
-    }
-    const expectedKey = `${TRIGGER_ORIGIN}:${command.scheduledTime}`;
-    if (command.dispatchKey !== expectedKey) {
-      throw new Error("dispatch_key must match the Cloudflare scheduledTime.");
-    }
-    const scheduledTime = Date.parse(command.scheduledTime);
-    if (Number.isNaN(scheduledTime) || asOfFromScheduledTime(scheduledTime) !== command.asOf) {
-      throw new Error("Cloudflare scheduledTime does not match as_of in Asia/Tokyo.");
-    }
+  if (!command.dispatchKey) {
+    throw new Error("dispatch_key is required for cloudflare_cron.");
+  }
+  const expectedKey = `${TRIGGER_ORIGIN}:${command.scheduledTime}`;
+  if (command.dispatchKey !== expectedKey) {
+    throw new Error("dispatch_key must match the Cloudflare scheduledTime.");
+  }
+  const scheduledTime = Date.parse(command.scheduledTime);
+  if (Number.isNaN(scheduledTime) || asOfFromScheduledTime(scheduledTime) !== command.asOf) {
+    throw new Error("Cloudflare scheduledTime does not match as_of in Asia/Tokyo.");
   }
 
   return {
     ref: GITHUB_REF,
     inputs: {
       as_of: command.asOf,
-      dry_run: command.dryRun,
-      skip_dashboard: command.skipDashboard,
-      trigger_origin: command.triggerOrigin,
+      dry_run: true,
+      skip_dashboard: true,
+      trigger_origin: TRIGGER_ORIGIN,
       dispatch_key: command.dispatchKey,
     },
   };
@@ -189,7 +188,7 @@ export async function dispatchGithubWorkflow(
     JSON.stringify({
       event: "github_workflow_dispatch_accepted",
       as_of: command.asOf,
-      trigger_origin: command.triggerOrigin,
+      trigger_origin: TRIGGER_ORIGIN,
       scheduledTime: command.scheduledTime,
       dispatch_key: command.dispatchKey,
       workflow_run_id: result.workflowRunId,
@@ -206,9 +205,6 @@ export function buildSmokeDispatchCommand(asOf: string, token: string): Dispatch
   return Object.freeze({
     token,
     asOf,
-    dryRun: true,
-    skipDashboard: true,
-    triggerOrigin: TRIGGER_ORIGIN,
     dispatchKey: `${TRIGGER_ORIGIN}:${scheduledTime}`,
     scheduledTime,
   });
@@ -228,7 +224,7 @@ export async function handleScheduled(
   dependencies: DispatchDependencies = {},
 ): Promise<DispatchResult> {
   controller.noRetry();
-  if (controller.cron !== EXPECTED_CRON) {
+  if (!ACCEPTED_CRON_SET.has(controller.cron)) {
     throw new Error(`Unsupported Cloudflare cron: ${controller.cron}.`);
   }
 
@@ -236,9 +232,6 @@ export async function handleScheduled(
   const command: DispatchCommand = {
     token: env.GITHUB_ACTIONS_TOKEN,
     asOf: asOfFromScheduledTime(controller.scheduledTime),
-    dryRun: false,
-    skipDashboard: false,
-    triggerOrigin: TRIGGER_ORIGIN,
     dispatchKey: dispatchKeyFromScheduledTime(controller.scheduledTime),
     scheduledTime,
   };

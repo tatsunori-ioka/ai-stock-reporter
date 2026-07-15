@@ -4,7 +4,10 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-07-14",
   "triggers": {
-    "crons": []
+    "crons": [
+      "37 7 * * MON-FRI",
+      "7 8 * * MON-FRI"
+    ]
   },
   "secrets": {
     "required": ["GITHUB_ACTIONS_TOKEN"]
