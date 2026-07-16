@@ -1,6 +1,5 @@
 export const ACCEPTED_CRONS = Object.freeze([
   "37 7 * * MON-FRI",
-  "7 8 * * MON-FRI",
 ] as const);
 export const GITHUB_API_VERSION = "2026-03-10";
 export const GITHUB_OWNER = "tatsunori-ioka";
@@ -28,16 +27,20 @@ export interface DispatchCommand {
   readonly scheduledTime: string;
 }
 
-export interface DispatchPayload {
+interface DispatchPayloadBase<DryRun extends boolean> {
   readonly ref: "main";
   readonly inputs: {
     readonly as_of: string;
-    readonly dry_run: true;
-    readonly skip_dashboard: true;
+    readonly dry_run: DryRun;
+    readonly skip_dashboard: DryRun;
     readonly trigger_origin: typeof TRIGGER_ORIGIN;
     readonly dispatch_key: string;
   };
 }
+
+export type ScheduledDispatchPayload = DispatchPayloadBase<false>;
+export type SmokeDispatchPayload = DispatchPayloadBase<true>;
+export type DispatchPayload = ScheduledDispatchPayload | SmokeDispatchPayload;
 
 export interface DispatchResult {
   readonly workflowRunId: number;
@@ -93,7 +96,7 @@ export function dispatchKeyFromScheduledTime(value: number): string {
   return `${TRIGGER_ORIGIN}:${scheduledTimeIso(value)}`;
 }
 
-export function buildDispatchPayload(command: DispatchCommand): DispatchPayload {
+function validateDispatchCommand(command: DispatchCommand): void {
   assertScoreDate(command.asOf);
   if (!command.dispatchKey) {
     throw new Error("dispatch_key is required for cloudflare_cron.");
@@ -106,6 +109,27 @@ export function buildDispatchPayload(command: DispatchCommand): DispatchPayload 
   if (Number.isNaN(scheduledTime) || asOfFromScheduledTime(scheduledTime) !== command.asOf) {
     throw new Error("Cloudflare scheduledTime does not match as_of in Asia/Tokyo.");
   }
+}
+
+export function buildScheduledDispatchPayload(
+  command: DispatchCommand,
+): ScheduledDispatchPayload {
+  validateDispatchCommand(command);
+
+  return {
+    ref: GITHUB_REF,
+    inputs: {
+      as_of: command.asOf,
+      dry_run: false,
+      skip_dashboard: false,
+      trigger_origin: TRIGGER_ORIGIN,
+      dispatch_key: command.dispatchKey,
+    },
+  };
+}
+
+export function buildSmokeDispatchPayload(command: DispatchCommand): SmokeDispatchPayload {
+  validateDispatchCommand(command);
 
   return {
     ref: GITHUB_REF,
@@ -146,11 +170,11 @@ function parseDispatchResult(value: unknown): DispatchResult {
   };
 }
 
-export async function dispatchGithubWorkflow(
+async function dispatchGithubWorkflow(
   command: DispatchCommand,
+  payload: DispatchPayload,
   dependencies: DispatchDependencies = {},
 ): Promise<DispatchResult> {
-  const payload = buildDispatchPayload(command);
   if (!command.token.trim()) {
     throw new Error("GITHUB_ACTIONS_TOKEN is required.");
   }
@@ -191,12 +215,36 @@ export async function dispatchGithubWorkflow(
       trigger_origin: TRIGGER_ORIGIN,
       scheduledTime: command.scheduledTime,
       dispatch_key: command.dispatchKey,
+      dry_run: payload.inputs.dry_run,
+      skip_dashboard: payload.inputs.skip_dashboard,
       workflow_run_id: result.workflowRunId,
       run_url: result.runUrl,
       html_url: result.htmlUrl,
     }),
   );
   return result;
+}
+
+export async function dispatchScheduledGithubWorkflow(
+  command: DispatchCommand,
+  dependencies: DispatchDependencies = {},
+): Promise<DispatchResult> {
+  return await dispatchGithubWorkflow(
+    command,
+    buildScheduledDispatchPayload(command),
+    dependencies,
+  );
+}
+
+export async function dispatchSmokeGithubWorkflow(
+  command: DispatchCommand,
+  dependencies: DispatchDependencies = {},
+): Promise<DispatchResult> {
+  return await dispatchGithubWorkflow(
+    command,
+    buildSmokeDispatchPayload(command),
+    dependencies,
+  );
 }
 
 export function buildSmokeDispatchCommand(asOf: string, token: string): DispatchCommand {
@@ -235,7 +283,7 @@ export async function handleScheduled(
     dispatchKey: dispatchKeyFromScheduledTime(controller.scheduledTime),
     scheduledTime,
   };
-  return await dispatchGithubWorkflow(command, dependencies);
+  return await dispatchScheduledGithubWorkflow(command, dependencies);
 }
 
 export default {
