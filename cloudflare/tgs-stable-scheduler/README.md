@@ -1,64 +1,71 @@
 # TGS Stable Cloudflare Scheduler
 
-Stage 2a is a dry-run-only shadow observation. It automatically compares the
-same-day market-data state at 16:37 JST and 17:07 JST without writing Google
-Sheets or the Dashboard.
+Stage 2b cuts the Phase1 production schedule over to Cloudflare. The formal
+automatic start time is 16:37 JST, Monday-Friday, and Cloudflare is the only
+automatic trigger.
 
-## Shadow Observation Contract
+## Adoption Evidence
 
-- Cron expressions:
-  - `37 7 * * MON-FRI` (07:37 UTC / 16:37 JST)
-  - `7 8 * * MON-FRI` (08:07 UTC / 17:07 JST)
+The 2026-07-16 shadow observations both completed successfully with
+`requested_as_of=2026-07-16`, `data_date=2026-07-16`,
+`freshness_status=current`, and 15 scored rows:
+
+- 16:37 JST: GitHub run `29480526880`
+- 17:07 JST: GitHub run `29482298471`
+
+Because both observations were current, the earlier 16:37 JST time was adopted.
+
+## Production Contract
+
+- Cron expression: `37 7 * * MON-FRI` (07:37 UTC / 16:37 JST)
 - Score date source: `controller.scheduledTime` converted to `Asia/Tokyo`
 - GitHub repository: `tatsunori-ioka/ai-stock-reporter`
 - Workflow: `tgs-stable-cloud-paper.yml`
 - Git ref: `main`
 - Trigger origin: `cloudflare_cron`
+- Dispatch key: `cloudflare_cron:<ISO scheduledTime>`
 - Secret binding name: `GITHUB_ACTIONS_TOKEN`
 - Public HTTP endpoint: disabled with `workers_dev=false`
 
-The scheduled handler is hard-coded to `dry_run=true` and
-`skip_dashboard=true`. There is no setting, environment binding, or handler
-input that can switch Stage 2a to execute mode. The dispatch key is
-`cloudflare_cron:<ISO scheduledTime>`.
+The scheduled handler is hard-coded to `dry_run=false` and
+`skip_dashboard=false`. Neither setting, environment binding, nor handler input
+can switch the scheduled path back to dry-run or suppress the Dashboard update.
+The Worker calls `controller.noRetry()`, validates the exact Cron, directly
+awaits the GitHub dispatch, and fails the Cron invocation when GitHub fails.
 
-The Worker calls `controller.noRetry()`, accepts exactly the two Cron
-expressions above, and directly awaits the GitHub dispatch. A non-200 GitHub
-response fails the Cron invocation. Only `scheduled()` is exported; there is no
-public HTTP handler or `workers.dev` route.
+Only `scheduled()` is exported. There is no public HTTP handler or
+`workers.dev` route.
 
-## Stage 2a State
+## GitHub Actions
 
-`wrangler.jsonc` defines the two shadow-observation Cron Triggers. This change
-does not deploy the Worker, register the production Secret, or activate either
-Cron in Cloudflare. Those operations require a separate deployment gate.
+The GitHub Actions `on.schedule` trigger is removed. `workflow_dispatch`
+remains available for manual dry-run and execute operations, while the existing
+run-context handling for `manual_ui`, `cloudflare_cron`, `dispatch_key`, and
+`external_scheduler` remains unchanged. Cloudflare is the only automatic
+invocation source. The existing Cloud Python `init-only` and `verify-only`
+paths are also unchanged.
 
-The existing GitHub Actions `on.schedule` remains enabled throughout Stage 2a.
-The two Cloudflare observations are dry runs, so they do not write
-`TGS_Run_Log`, `TGS_Daily_Score_Check`, the Dashboard, or any pending, position,
-trade-history, account, or daily-log tab.
+## Phase1 Write Scope
 
-After one business day of 16:37 and 17:07 results has been reviewed, select the
-initial production time. Enabling a formal execute path and coordinating the
-removal of the existing GitHub schedule belong to a separate Stage 2b PR.
+Stage 2b is a Phase1 execute run. It preserves the existing freshness guard,
+score calculation, signal conditions, Google Sheets columns, and update logic.
+Execute writes only the established Phase1 outputs:
 
-## Local Verification
+- `TGS_Daily_Score_Check`
+- `TGS_Run_Log`
+- Dashboard
 
-```bash
-pnpm install
-pnpm typecheck
-pnpm test
-pnpm audit
-pnpm wrangler deploy --dry-run
-```
+Pending registration, Cloud LINE notifications, position registration, trade
+history, account updates, daily-log updates, trading, broker APIs, order
+processing, and fill processing remain disabled. In particular,
+`pending_registration_enabled=false` and `real_trading_enabled=false` remain
+part of the run result.
 
-Tests use a fake token and mocked GitHub responses. They do not access GitHub,
-Google Sheets, LINE, a broker API, or any order path.
+## Diagnostic Smoke
 
-## Opt-In Dry-Run Smoke
-
-The diagnostic smoke command is also dry-run-only. Run it only with an
-authorized repository-scoped token supplied outside source control:
+The diagnostic smoke command remains independently fixed to `dry_run=true`,
+`skip_dashboard=true`, `ref=main`, and `trigger_origin=cloudflare_cron`. It has
+no option or environment setting that can enable execute mode.
 
 ```bash
 printf 'GitHub token: '
@@ -71,12 +78,32 @@ pnpm smoke:dispatch --as-of 2026-07-16
 unset GITHUB_ACTIONS_TOKEN
 ```
 
-The smoke command accepts only `--as-of YYYY-MM-DD`. Its request is fixed to:
+## Local Verification
 
-- `ref=main`
-- `dry_run=true`
-- `skip_dashboard=true`
-- `trigger_origin=cloudflare_cron`
-- `dispatch_key=cloudflare_cron:<as_of>T07:37:00.000Z`
+```bash
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm test
+pnpm audit
+pnpm wrangler deploy --dry-run
+```
 
-The token is never included in the payload, audit log, or surfaced exception.
+Tests use a fake token and mocked GitHub responses. They do not access GitHub,
+Google Sheets, LINE, a broker API, or any order path.
+
+## Rollback
+
+The Stage 2a rollback target is:
+
+- Deployment ID: `f9ab6f93-82fb-45ce-8a8d-8cee253e91a7`
+- Worker version: `29ce3bb3-9ff3-44e2-8f4f-13a5ead9a4f7`
+
+Rollback order:
+
+1. Run `pnpm wrangler rollback 29ce3bb3-9ff3-44e2-8f4f-13a5ead9a4f7 --name tgs-stable-scheduler --yes`.
+2. Restore the Stage 2a dry-run Cron pair, or apply `crons=[]` to stop Cloudflare scheduling.
+3. Merge a rollback PR that restores the prior GitHub `on.schedule` definition.
+4. Before restoring any automatic trigger, check whether that date already has a successful execute run and do not duplicate it.
+
+Worker version rollback does not restore Cron Triggers or the GitHub workflow;
+those two control planes must be restored explicitly.
