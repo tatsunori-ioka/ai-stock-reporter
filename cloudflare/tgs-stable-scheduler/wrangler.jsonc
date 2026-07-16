@@ -6,8 +6,7 @@
   "workers_dev": false,
   "triggers": {
     "crons": [
-      "37 7 * * MON-FRI",
-      "7 8 * * MON-FRI"
+      "37 7 * * MON-FRI"
     ]
   },
   "secrets": {

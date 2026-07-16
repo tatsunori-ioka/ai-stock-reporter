@@ -6,11 +6,6 @@ run-name: >-
   dispatch_key=${{ github.event_name == 'workflow_dispatch' && inputs.dispatch_key || 'none' }}
 
 on:
-  schedule:
-    # 20:17 JST, Monday-Friday. The offset avoids the top-of-hour queue peak.
-    # yfinance may lag shortly after the JP close, so this avoids treating stale data as no_signal.
-    - cron: "17 20 * * 1-5"
-      timezone: "Asia/Tokyo"
   workflow_dispatch:
     inputs:
       as_of:

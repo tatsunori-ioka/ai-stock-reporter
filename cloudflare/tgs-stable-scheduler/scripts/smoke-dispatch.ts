@@ -1,6 +1,6 @@
 import {
   buildSmokeDispatchCommand,
-  dispatchGithubWorkflow,
+  dispatchSmokeGithubWorkflow,
   parseSmokeArguments,
 } from "../src/index.js";
 
@@ -8,7 +8,7 @@ async function main(): Promise<void> {
   const asOf = parseSmokeArguments(process.argv.slice(2));
   const token = process.env.GITHUB_ACTIONS_TOKEN ?? "";
   const command = buildSmokeDispatchCommand(asOf, token);
-  const result = await dispatchGithubWorkflow(command);
+  const result = await dispatchSmokeGithubWorkflow(command);
   console.log(
     JSON.stringify({
       event: "smoke_dispatch_completed",

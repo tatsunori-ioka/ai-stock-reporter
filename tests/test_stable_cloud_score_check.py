@@ -3,10 +3,13 @@ from __future__ import annotations
 import argparse
 import contextlib
 import io
+import json
 import sys
+import tempfile
 import types
 import unittest
 from datetime import date
+from pathlib import Path
 from unittest.mock import patch
 
 
@@ -43,6 +46,9 @@ def summary(*, freshness: str = "current") -> score_check.ScoreSummary:
 
 
 class ScoreCheckTests(unittest.TestCase):
+    def test_matching_requested_as_of_and_data_date_is_current(self) -> None:
+        self.assertEqual("current", score_check.freshness_status(date(2026, 7, 9), date(2026, 7, 9)))
+
     def test_requested_as_of_data_date_mismatch_is_stale(self) -> None:
         self.assertEqual("stale", score_check.freshness_status(date(2026, 7, 9), date(2026, 7, 8)))
         self.assertEqual("stale", score_check.freshness_status(date(2026, 7, 9), date(2026, 7, 10)))
@@ -237,6 +243,40 @@ class ScoreCheckTests(unittest.TestCase):
         self.assertNotIn(append.call_args.args[2], forbidden)
         self.assertNotIn("trigger_origin", score_check.RUN_LOG_COLUMNS)
         self.assertNotIn("dispatch_key", score_check.RUN_LOG_COLUMNS)
+
+    def test_execute_artifact_keeps_pending_and_real_trading_disabled(self) -> None:
+        run_context = score_check.RunContext(
+            trigger_event="workflow_dispatch",
+            trigger_origin="cloudflare_cron",
+            dispatch_key="cloudflare_cron:2026-07-09T07:37:00.000Z",
+            scheduled_cron="",
+            schedule_timezone="",
+            run_started_at_jst="2026-07-09T16:37:00+09:00",
+            requested_as_of=date(2026, 7, 9),
+            requested_as_of_source="external_scheduler",
+            schedule_resolution_policy="",
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            args = argparse.Namespace(
+                out_dir=Path(directory),
+                execute=True,
+                ledger_spreadsheet_id="ledger",
+                dashboard_spreadsheet_id="dashboard",
+            )
+            output_dir = score_check.write_dry_run(
+                args,
+                [],
+                summary(),
+                run_context,
+                "2026-07-09 16:37:00",
+                "run-id",
+            )
+            payload = json.loads((output_dir / "payload.json").read_text(encoding="utf-8"))
+
+        self.assertEqual("execute", payload["mode"])
+        self.assertFalse(payload["rules"]["pending_registration_enabled"])
+        self.assertFalse(payload["rules"]["real_trading_enabled"])
 
     def test_cloudflare_blank_dispatch_key_fails_before_external_access(self) -> None:
         args = argparse.Namespace(
