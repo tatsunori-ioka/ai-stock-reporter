@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "model_id": "tgs_stable_v2_universe_lab",
+  "project": "TGS Stable Ver2.0 Universe Lab",
+  "contract_status": "frozen_for_v2_r0",
+  "repository_base_commit": "43d5dd5aa6be3b0638b5af83976e61a214bd9c37",
+  "production_rule_version": "stable-1.0",
+  "production_scope_note": "Current Cloud Phase 1 executes score checks only. The local paper lifecycle remains frozen reference code but is not enabled by this research.",
+  "universe": {
+    "id": "U15",
+    "count": 15,
+    "authoritative_source": "stable_cloud_score_check.py:45-61",
+    "tickers": [
+      "6273.T",
+      "6301.T",
+      "6367.T",
+      "7011.T",
+      "5801.T",
+      "5802.T",
+      "5803.T",
+      "8801.T",
+      "8802.T",
+      "8001.T",
+      "8002.T",
+      "8015.T",
+      "8031.T",
+      "8053.T",
+      "8058.T"
+    ],
+    "point_in_time": false,
+    "survivorship_bias": true,
+    "formal_candidate_eligible": false
+  },
+  "universe_proposals_sha256": {
+    "config/universe_u50_proposal.yaml": "9224a52701089aaa94c9db60ba2143b718b659930da68cdfdb1c610a15b8770d",
+    "config/universe_u100_proposal.yaml": "c83ea80595335d5085cf4df10a8c063ff6b626833b0ba7df355f791780fe89c6"
+  },
+  "score": {
+    "threshold": 90,
+    "maximum": 120,
+    "missing_boolean_policy": "false",
+    "weights": {
+      "weekly_above_200ma": 30,
+      "weekly_macd_gc": 30,
+      "weekly_macd_uptrend": 20,
+      "daily_rsi_40_65": 20,
+      "daily_volume_1_5x": 20
+    },
+    "signal_expected": "stable_score >= 90",
+    "formal_live_signal_note": "Cloud formal counts also require freshness_status=current.",
+    "reachable_bucket_note": "110 is structurally unreachable with the frozen weights and is retained as an explicit empty report bucket."
+  },
+  "indicators": {
+    "price_input": "unadjusted Close from yfinance auto_adjust=false",
+    "daily_rsi": {
+      "window": 14,
+      "method": "Wilder-style ewm(alpha=1/14, adjust=false, min_periods=14)",
+      "condition": "40 <= RSI <= 65"
+    },
+    "daily_volume": {
+      "moving_average": "30-session simple moving average including the current session",
+      "condition": "Volume >= 1.5 * volume_30ma"
+    },
+    "weekly": {
+      "resample": "W-FRI",
+      "aggregation": {
+        "Open": "first",
+        "High": "max",
+        "Low": "min",
+        "Close": "last",
+        "Volume": "sum"
+      },
+      "moving_average": "200-week simple moving average",
+      "macd": "EMA(12)-EMA(26), signal EMA(9), adjust=false with min_periods",
+      "macd_gc": "current MACD > signal and prior MACD <= prior signal",
+      "macd_uptrend": "MACD > signal",
+      "above_200ma": "weekly Close > weekly 200-week SMA",
+      "confirmation": "Friday-labelled values forward-fill to daily rows; a Monday-Thursday partial week cannot flow backward."
+    },
+    "research_warmup_policy": "Require all 200-week MA, weekly MACD/signal, daily RSI and volume MA inputs; exclude earlier rows from performance."
+  },
+  "data": {
+    "source": "Yahoo Finance via yfinance",
+    "interval": "1d",
+    "auto_adjust": false,
+    "ohlcv_used": ["Open", "High", "Low", "Close", "Volume"],
+    "adjusted_close_used": false,
+    "corporate_action_adjustment": "none in the frozen Ver1.0 calculation",
+    "complete_row_policy": "drop a row if any required OHLCV value is missing; treat Volume <= 0 or nonpositive OHLC as a non-trading/provider-placeholder row and exclude it before indicators, fills and holding-session counts"
+  },
+  "execution_overlay_status": {
+    "classification": "V2 research execution overlay, not byte-for-byte reproduction of the dormant Ver1 paper lifecycle",
+    "frozen_from_ver1": [
+      "long-only",
+      "next-session Open entry",
+      "one position per ticker",
+      "-10% stop",
+      "+30% take profit",
+      "60 observed trading sessions"
+    ],
+    "research_mandated_differences": [
+      "gap-through stop/take fills at Open rather than the threshold",
+      "explicit conservative/optimistic same-bar paths",
+      "commission and slippage scenarios",
+      "missing immediate next-session bars are unfilled rather than queued",
+      "separate no-selection equal-notional portfolio instead of the dormant 3m/500k/max-6 ledger"
+    ]
+  },
+  "trade_rules": {
+    "direction": "long_only_cash",
+    "signal_information_cutoff": "signal session close",
+    "entry": "next market session raw Open",
+    "same_day_close_fill_forbidden": true,
+    "duplicate_ticker_positions_forbidden": true,
+    "stop_loss_pct": -0.1,
+    "take_profit_pct": 0.3,
+    "maximum_holding_sessions": 60,
+    "holding_count": "entry session is session 1",
+    "gap_stop": "if Open <= stop, use Open before adverse exit slippage",
+    "gap_take_profit": "if Open >= take profit, use Open before adverse exit slippage",
+    "same_bar_both": {
+      "formal": "conservative_stop_first",
+      "sensitivity": "optimistic_take_profit_first"
+    },
+    "max_holding_exit": "60th observed ticker session Close",
+    "missing_next_market_session": "do not delay-fill; record unfilled signal",
+    "terminal_unresolved": "mark to final available Close, flag right-censored, exclude from closed-trade statistics"
+  },
+  "cost_scenarios": {
+    "zero": {
+      "commission_bps_per_side": 0,
+      "slippage_bps_per_side": 0
+    },
+    "basic": {
+      "commission_bps_per_side": 10,
+      "slippage_bps_per_side": 10
+    },
+    "strict": {
+      "commission_bps_per_side": 20,
+      "slippage_bps_per_side": 30
+    }
+  },
+  "portfolio": {
+    "primary_order": "independent one-signal trades first",
+    "secondary": "fixed equal-notional portfolio with every accepted independent trade",
+    "capital_rule": "initial capital equals maximum simultaneous unit positions; no leverage, no selection, no reinvestment",
+    "optimization": "forbidden"
+  },
+  "time_split": {
+    "method": "chronological trading-session count after common warm-up",
+    "development_fraction": 0.6,
+    "validation_fraction": 0.2,
+    "final_holdout_fraction": 0.2,
+    "boundary_policy": "split trade metrics include only signal cohorts whose exit_date is within the same split; cross-boundary trades are counted and excluded",
+    "holdout_optimization_forbidden": true
+  },
+  "production_sha256": {
+    "stable_cloud_score_check.py": "791e2404bc41aafcff0ab16d7774bb24579188055fbf36dc6c01ac49c7f9fc30",
+    "stable_cloud_run_context.py": "eee566324079b503d2726de834833f68ab44d80ca2964e2964fca5d9a15a17a6",
+    ".github/workflows/tgs-stable-cloud-paper.yml": "38c3a12025c185ef803a9778fd8a7dbe8f4f9b418d4141b0339d6d82a39afda9",
+    "cloudflare/tgs-stable-scheduler/src/index.ts": "7f92ec819fa45262a15c37d729b4c99930a19fa790932a58f825fdea5c6cab14",
+    "cloudflare/tgs-stable-scheduler/wrangler.jsonc": "c5ff0461a93c1be709395097e8aba50cbb528354431d1a9ea1fff2205c7e8258",
+    "cloudflare/tgs-stable-scheduler/package.json": "0d6af4866ceb3f07b7e68262012d2a1e7832ddae3e40b091e9ec9e262c866470",
+    "cloudflare/tgs-stable-scheduler/pnpm-lock.yaml": "853fa703511f31795d244f70b2fe7f461a9413929b5c7297b9a78632b223935c",
+    "requirements-cloud.txt": "670408b678991e89f3567732749cb09f5f25c77ad141854983a68ac333be45ea",
+    "tradingview_stable_watchlist.csv": "c0a5e59d266b9ecb2fd0cd219f683af72d0a8de8789388a5a6b7a976755f2cb1",
+    "stable_universe_metadata.csv": "e20458db8c78865b6927046f97396bc5945239de49537d24fb20376143e30ed1",
+    "generate_stable_watchlist.py": "dd55eaf82c2bef2ad51bc171dfbbe4024c5a1f080063945f6c9cb88c0f95ad82",
+    "stable_webhook_core.py": "92e0020de02485cb9ee2c5baf50b78e55a3b1aca91bbd7a6b632a2188379cc96",
+    "stable_paper_daily.py": "792bd218a7eee67dc288bff1d5570dc667f0229c223c365d5f38505ebd119a34",
+    "stable_add_pending.py": "f670a63f170bc4567b147d6081637d4190d2dd95224864e82b9e122228828339",
+    "stable_local_pending_server.py": "e9e0a4a26721363ebf2a55cb162649fc17f8ad48b74c77a908eb31eea33fde7e",
+    "main.py": "1ed48fd12c3d13ac2622b5f0d10bc594397371f7c7a7fc492fadf41a837d0712",
+    "com.tgs.stable.paper.daily.plist": "83a03e01cf7997f4b1369d45adf73bc9affdb0fabd752d9c772c749f4a120f6c",
+    "com.tgs.stable.pending.server.plist": "3f9bf2df9d74bca8c961d002bd4e09c0791bb4f6800ebc4bab3af3f71fdaa7d6",
+    "requirements.txt": "e8deecb1fa40d4ab3fe7fb5e8cf4bf27940f3b8fcdbd3b1a77ea7a5bd5509a75"
+  },
+  "prohibited": [
+    "modify Ver1.0 production files",
+    "Cloudflare deploy or configuration change",
+    "production workflow change",
+    "Google Sheets access or write",
+    "secret access or display",
+    "LINE or pending/position/trade ledger change",
+    "broker API or real trading",
+    "U50/U100 comparison before approval",
+    "score, threshold, stop, take-profit or holding-period optimization"
+  ]
+}

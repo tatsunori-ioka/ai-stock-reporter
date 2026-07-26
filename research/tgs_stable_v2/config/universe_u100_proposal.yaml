@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "universe_id": "U100",
+  "status": "proposal_frozen_before_u15_results",
+  "target_size": 100,
+  "comparison_backtest_authorized": false,
+  "selection_principle": "liquidity-ranked, point-in-time, return-blind",
+  "rebalance": {
+    "frequency": "annual",
+    "effective_session": "first JPX trading session in April",
+    "information_cutoff": "previous trading session close",
+    "constituents_held_until_next_rebalance": true
+  },
+  "eligibility": {
+    "exchange": ["Tokyo Stock Exchange Prime", "Tokyo Stock Exchange Standard"],
+    "security_type": ["common_stock"],
+    "minimum_listing_history_calendar_years": 5,
+    "minimum_unadjusted_close_jpy": 300,
+    "minimum_trailing_60_session_median_traded_value_jpy": 300000000,
+    "minimum_complete_ohlcv_fraction_trailing_252_sessions": 0.98,
+    "require_active_listing_on_selection_date": true,
+    "exclude_special_treatment_or_untradeable_issues": true
+  },
+  "ranking": {
+    "primary": "trailing_60_session_median_traded_value_jpy_desc",
+    "tie_breakers": ["ticker_asc"],
+    "forbidden_inputs": ["past_return", "TGS_score", "TGS_backtest_result", "future_market_cap"]
+  },
+  "concentration_constraints": {
+    "maximum_names_per_sector": 15,
+    "maximum_names_per_corporate_group": 2,
+    "classification_must_be_point_in_time": true
+  },
+  "required_before_execution": [
+    "dated listing and delisting intervals",
+    "dated sector classifications",
+    "dated corporate-group mapping",
+    "historical OHLCV and traded value",
+    "ticker lineage for code changes"
+  ],
+  "fallback_policy": "A current static snapshot may be tested only as survivorship-biased exploratory evidence and must not be called a Formal Candidate."
+}

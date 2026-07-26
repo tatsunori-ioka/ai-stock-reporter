@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "universe_id": "U15",
+  "status": "frozen_ver1_baseline",
+  "selection_as_of": "current Ver1.0 snapshot at base commit 43d5dd5aa6be3b0638b5af83976e61a214bd9c37",
+  "point_in_time": false,
+  "formal_candidate_eligible": false,
+  "bias_label": "survivorship-biased exploratory universe",
+  "tickers": [
+    {"ticker": "6273.T", "name": "SMC Corporation", "sector": "Machinery"},
+    {"ticker": "6301.T", "name": "Komatsu Ltd.", "sector": "Machinery"},
+    {"ticker": "6367.T", "name": "Daikin Industries, Ltd.", "sector": "Machinery"},
+    {"ticker": "7011.T", "name": "Mitsubishi Heavy Industries, Ltd.", "sector": "Machinery"},
+    {"ticker": "5801.T", "name": "The Furukawa Electric Co., Ltd.", "sector": "Nonferrous metals"},
+    {"ticker": "5802.T", "name": "Sumitomo Electric Industries, Ltd.", "sector": "Nonferrous metals"},
+    {"ticker": "5803.T", "name": "Fujikura Ltd.", "sector": "Nonferrous metals"},
+    {"ticker": "8801.T", "name": "Mitsui Fudosan Co., Ltd.", "sector": "Real estate"},
+    {"ticker": "8802.T", "name": "Mitsubishi Estate Co., Ltd.", "sector": "Real estate"},
+    {"ticker": "8001.T", "name": "Itochu Corp.", "sector": "Trading companies"},
+    {"ticker": "8002.T", "name": "Marubeni Corp.", "sector": "Trading companies"},
+    {"ticker": "8015.T", "name": "Toyota Tsusho Corp.", "sector": "Trading companies"},
+    {"ticker": "8031.T", "name": "Mitsui & Co., Ltd.", "sector": "Trading companies"},
+    {"ticker": "8053.T", "name": "Sumitomo Corp.", "sector": "Trading companies"},
+    {"ticker": "8058.T", "name": "Mitsubishi Corp.", "sector": "Trading companies"}
+  ]
+}
