@@ -1,0 +1,98 @@
+{
+  "base_commit": "43d5dd5aa6be3b0638b5af83976e61a214bd9c37",
+  "classification": "survivorship-biased exploratory evidence; not Formal Candidate",
+  "concentration": {
+    "top_sector_trade_share": 0.4307228915662651,
+    "top_ticker_trade_share": 0.08433734939759036
+  },
+  "cost_assumptions": {
+    "basic": {
+      "commission_bps_per_side": 10.0,
+      "round_trip_bps": 40.0,
+      "slippage_bps_per_side": 10.0
+    },
+    "strict": {
+      "commission_bps_per_side": 20.0,
+      "round_trip_bps": 100.0,
+      "slippage_bps_per_side": 30.0
+    },
+    "zero": {
+      "commission_bps_per_side": 0.0,
+      "round_trip_bps": 0.0,
+      "slippage_bps_per_side": 0.0
+    }
+  },
+  "formal_scenario": "basic + conservative",
+  "headline": {
+    "cagr": 0.03322050897217044,
+    "calmar_ratio": 0.1074849369733312,
+    "market_exposure": 0.37222640090259496,
+    "maximum_concurrent_positions": 14,
+    "maximum_drawdown": -0.30907129787323595,
+    "total_return": 1.034529739074169
+  },
+  "longest_no_signal_period": {
+    "calendar_days": 427,
+    "end": "2010-03-18",
+    "sessions": 286,
+    "start": "2009-01-16"
+  },
+  "model_id": "tgs_stable_v2_universe_lab",
+  "path_difference": {
+    "expectancy_delta": 0.0,
+    "total_return_delta": 0.0,
+    "trade_count_delta": 0
+  },
+  "period": {
+    "effective_end": "2026-07-24",
+    "effective_start": "2004-10-29",
+    "maximum_common_end": "2026-07-24",
+    "maximum_common_start": "2001-01-04",
+    "warmup_excluded": true,
+    "warmup_policy": "strict full indicator readiness including 200-week SMA"
+  },
+  "run_id": "0f6c05bff4831033",
+  "schema_version": 1,
+  "signal_metrics": {
+    "annual_signal_frequency": 131.41,
+    "raw_signal_count": 2856,
+    "raw_signals": 2856,
+    "signals_skipped_while_open": 2192,
+    "signals_unfilled_at_data_end": 0,
+    "signals_unfilled_missing_next_session": 0
+  },
+  "splits": {
+    "development": {
+      "end": "2017-10-31",
+      "sessions": 3190,
+      "start": "2004-10-29"
+    },
+    "final_holdout": {
+      "end": "2026-07-24",
+      "sessions": 1064,
+      "start": "2022-03-18",
+      "used_for_optimization": false
+    },
+    "validation": {
+      "end": "2022-03-17",
+      "sessions": 1064,
+      "start": "2017-11-01"
+    }
+  },
+  "trade_metrics": {
+    "average_holding_sessions": 41.704819277108435,
+    "average_loss": -0.09511931310264114,
+    "average_win": 0.14981015139954207,
+    "closed_trade_count": 664,
+    "expectancy_per_trade": 0.02181237401662404,
+    "max_consecutive_losses": 16,
+    "median_holding_sessions": 52.5,
+    "open_trade_count": 0,
+    "payoff_ratio": 1.5749709129825744,
+    "profit_factor": 1.4388062807362423,
+    "sum_net_returns": 14.483416347038364,
+    "trade_count": 664,
+    "win_rate": 0.47740963855421686
+  },
+  "u50_u100_comparison_run": false
+}
