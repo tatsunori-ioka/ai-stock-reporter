@@ -1,0 +1,4 @@
+# Licensed provider data must never be committed.
+data/
+raw/
+*.raw.json

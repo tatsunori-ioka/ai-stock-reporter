@@ -1,0 +1,253 @@
+{
+  "api_call_count": 10,
+  "api_version": "v2",
+  "audit_id": "tgs-stable-v2-data-reality-2026-07-26-52ead3fe27c6",
+  "base_commit": "52ead3fe27c67da60d8eede4bc38fd1b4311f8ce",
+  "capabilities": [
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:master_historical",
+        "official:personal_eq_master"
+      ],
+      "id": "point_in_time_active_issue_master",
+      "note": "Date-scoped snapshots were returned; the provider maps non-business dates to the next business-day snapshot.",
+      "status": "AVAILABLE"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:delisted_7829",
+        "official:jpx_delisting_notice_7829"
+      ],
+      "id": "delisted_issue_inclusion",
+      "note": "One code from an official JPX delisting notice was present in a pre-delisting master and absent from the latest master. This bounded example does not prove complete population coverage.",
+      "status": "PARTIAL"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:master_fields",
+        "official:personal_eq_master"
+      ],
+      "id": "listing_date",
+      "note": "No listing-date field is exposed. A first-presence boundary could be derived from dense dated snapshots from 2008 onward, but that acquisition and boundary method were not verified.",
+      "status": "PARTIAL"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:master_fields",
+        "official:personal_eq_master"
+      ],
+      "id": "delisting_date",
+      "note": "No delisting-date field is exposed. A last-presence boundary could be derived from dense dated snapshots, but completeness and exact effective-date semantics were not verified.",
+      "status": "PARTIAL"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:master_historical",
+        "official:personal_eq_master"
+      ],
+      "id": "five_year_listing_history_eligibility",
+      "note": "The frozen eligibility rule needs a reliable five-year listed history. No listing-date field exists, and the dense first-presence boundary method has not been verified.",
+      "status": "PARTIAL"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:master_fields",
+        "official:personal_eq_master"
+      ],
+      "id": "historical_market_classification",
+      "note": "Market code/name are effective-date snapshot attributes.",
+      "status": "AVAILABLE"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:master_fields",
+        "official:personal_eq_master"
+      ],
+      "id": "historical_sector_classification",
+      "note": "17- and 33-sector values are effective-date snapshot attributes.",
+      "status": "AVAILABLE"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:master_fields",
+        "official:personal_eq_master"
+      ],
+      "id": "security_product_category",
+      "note": "ProdCat was returned, but the documented domestic-stock category does not by itself prove ordinary/common share class.",
+      "status": "PARTIAL"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:master_fields",
+        "official:personal_eq_master"
+      ],
+      "id": "historical_market_regime_mapping",
+      "note": "Historical market codes are present, but a frozen mapping across First/Second Section, Mothers, JASDAQ, and the later Prime/Standard/Growth regime has not been specified.",
+      "status": "PARTIAL"
+    },
+    {
+      "critical_for_formal_u50_u100": false,
+      "evidence": [
+        "live_api:master_fields",
+        "official:personal_eq_master"
+      ],
+      "id": "trading_unit",
+      "note": "The personal V2 master exposes no trading-unit field.",
+      "status": "NOT_AVAILABLE"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:master_fields",
+        "official:pro_stock_detail_change_schema"
+      ],
+      "id": "ticker_lineage_or_stable_security_id",
+      "note": "The personal V2 master has no former-code mapping or permanent security identifier. Separate Pro corporate-action data exposes CodeBeforeChange but is not part of personal Premium.",
+      "status": "NOT_AVAILABLE"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:master_fields",
+        "local:frozen_u50_u100_proposals"
+      ],
+      "id": "historical_corporate_group_mapping",
+      "note": "The frozen proposals require point-in-time corporate-group concentration controls. The personal V2 master has no group identifier or dated group mapping.",
+      "status": "NOT_AVAILABLE"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:master_fields",
+        "local:frozen_u50_u100_proposals"
+      ],
+      "id": "special_treatment_or_untradeable_status",
+      "note": "The frozen eligibility contract excludes special-treatment or untradeable issues, but the probed master does not provide a dated eligibility/status field sufficient for that rule.",
+      "status": "NOT_AVAILABLE"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:daily_bars",
+        "official:personal_daily_bars"
+      ],
+      "id": "daily_ohlcv",
+      "note": "Raw daily OHLC and volume were returned for bounded samples.",
+      "status": "AVAILABLE"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:daily_bars",
+        "official:personal_daily_bars"
+      ],
+      "id": "traded_value",
+      "note": "Va (daily traded value) was returned.",
+      "status": "AVAILABLE"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "live_api:corporate_action_samples",
+        "official:personal_adjustment_logic"
+      ],
+      "id": "corporate_action_adjustment_factor",
+      "note": "All three official split/reverse-split examples matched and passed continuity checks. This does not establish comprehensive coverage of rights issues or other corporate actions.",
+      "status": "PARTIAL"
+    },
+    {
+      "critical_for_formal_u50_u100": false,
+      "evidence": [
+        "live_api:daily_bars",
+        "official:personal_daily_bars"
+      ],
+      "id": "raw_and_adjusted_ohlc",
+      "note": "Both raw and split-adjusted OHLC fields were returned.",
+      "status": "AVAILABLE"
+    },
+    {
+      "critical_for_formal_u50_u100": false,
+      "evidence": [
+        "official:personal_adjustment_logic",
+        "official:personal_data_periods"
+      ],
+      "id": "dividend_return_identification",
+      "note": "Daily adjusted prices exclude dividends. Premium provides a separate dividend dataset from 2013-02-20, but no ready-made total-return series for the full 2008-start price period.",
+      "status": "PARTIAL"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "official:personal_terms",
+        "live_api:response_hashes"
+      ],
+      "id": "reproducible_historical_snapshot",
+      "note": "Responses can be hashed locally, but persistent versioned storage is not given an explicit safe harbor. The terms impose deletion duties after specified cancellation paths and do not clearly authorize publishing raw, processed, or hash snapshots.",
+      "status": "SUPPORT_CONFIRMATION_REQUIRED"
+    },
+    {
+      "critical_for_formal_u50_u100": true,
+      "evidence": [
+        "official:personal_eq_master",
+        "live_api:master_fields"
+      ],
+      "id": "known_at_or_available_at_timestamp",
+      "note": "The master exposes an effective Date, not a versioned known-at or publication timestamp.",
+      "status": "NOT_AVAILABLE"
+    },
+    {
+      "critical_for_formal_u50_u100": false,
+      "evidence": [
+        "official:personal_data_periods",
+        "local:u15_summary_period"
+      ],
+      "id": "full_frozen_u15_period_coverage",
+      "note": "Personal Premium begins at 2008-05-07, while the frozen U15 effective period begins in 2004. A split/reverse-split-adjusted common-period exploratory rerun is technically possible, but an exact or comprehensive-action replacement is not.",
+      "status": "PARTIAL"
+    }
+  ],
+  "capability_verdict": "PRO_OR_ALTERNATIVE_REQUIRED",
+  "critical_failures": [
+    "delisted_issue_inclusion",
+    "listing_date",
+    "delisting_date",
+    "five_year_listing_history_eligibility",
+    "security_product_category",
+    "historical_market_regime_mapping",
+    "ticker_lineage_or_stable_security_id",
+    "historical_corporate_group_mapping",
+    "special_treatment_or_untradeable_status",
+    "corporate_action_adjustment_factor",
+    "reproducible_historical_snapshot",
+    "known_at_or_available_at_timestamp"
+  ],
+  "evidence_type": "official_documentation_and_live_api_probe",
+  "formal_u50_u100_authorized": false,
+  "formal_u50_u100_possible": false,
+  "formal_u50_u100_possible_with_current_personal_v2": false,
+  "premium_recommendation": "MAINTAIN_PENDING_SUPPORT_AND_APPROVED_ARCHIVAL_GATE",
+  "schema_version": "1.0",
+  "standard_downgrade_recommendation": "DO_NOT_DOWNGRADE_YET",
+  "u15_adjusted_rerun": {
+    "authorized_in_this_gate": false,
+    "classification": "EXPLORATORY_CAPABILITY_ONLY_NOT_FORMAL_OR_AUTHORIZED",
+    "comprehensive_common_period_rerun_possible": false,
+    "comprehensive_corporate_action_coverage_established": false,
+    "formal_capability_possible": false,
+    "formal_corporate_action_complete": false,
+    "full_frozen_period_possible": false,
+    "provider_earliest_date": "2008-05-07",
+    "split_reverse_split_adjusted_common_period_rerun_possible": true,
+    "verified_adjustment_scope": "SPLIT_AND_REVERSE_SPLIT_EXAMPLES_ONLY"
+  },
+  "u50_u100_backtest_executed": false
+}
