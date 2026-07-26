@@ -12,6 +12,34 @@ This is **survivorship-biased exploratory evidence**, not a Formal Candidate.
 The current 15-name snapshot was applied backward because no point-in-time
 issue master exists. No parameter was optimized, and U50/U100 were not run.
 
+## Post-run gate decision
+
+- Raw signal frequency: 131.41 events/year
+- Accepted entry frequency: 30.55 trades/year
+  (664 trades / approximately 21.73 years; formal basic + conservative scenario)
+- Longest no-signal period: 286 market sessions / 427 calendar days
+- Research engineering gate: **PASS**
+- U15 economic gate: **NOT PASSED**
+- Formal Candidate: **HOLD**
+- Real-money canary authorization: **none**
+
+The economic gate remains unpassed for the following reasons:
+
+- CAGR is 3.32%, maximum drawdown is -30.91%, and Calmar ratio is 0.107.
+- Even the zero-cost scenario produces only 3.76% CAGR, so trading cost alone
+  does not explain the low performance.
+- The validation cohort has profit factor 0.673 and expectancy -1.81%, while
+  the final holdout cohort has profit factor 2.592 and expectancy +6.19%.
+  This divergence indicates potentially strong regime dependence.
+- Score 120 did not outperform Score 90 or Score 100. Its profit factor is
+  0.994 and expectancy is -0.03%, versus profit factors 1.467 and 1.472 for
+  Score 90 and Score 100, respectively.
+- `6273.T` has exploratory profit factor 0.857 and expectancy -0.86%.
+- Raw unadjusted OHLCV retains potential corporate-action distortion.
+
+Passing the research engineering gate does not authorize a Formal Candidate,
+production promotion, or a real-money canary.
+
 ## Frozen setup
 
 - Data: yfinance raw daily OHLCV, `auto_adjust=False`
