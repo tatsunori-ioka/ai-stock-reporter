@@ -1,0 +1,339 @@
+{
+  "schema_version": "1.0",
+  "gate_id": "V2-R2B_ROOT_CAUSE_DIAGNOSTIC_AND_STOP_DECISION",
+  "model_id": "TGS_STABLE_V2_ROOT_CAUSE_DIAGNOSTIC",
+  "base_commit": "9dae034999aa33b3f0d059adc059d3c8dbe659c2",
+  "classification": "POST_HOC_ASSOCIATION_DIAGNOSTIC_ONLY",
+  "source_gate": "V2-R2A_PIT_LITE_UNIVERSE_COMPARISON",
+  "source_run_id": "v2-r2a-20260727-d3b8ed0-integrity1",
+  "universes": [
+    "U15_ADJUSTED_STATIC",
+    "U50_PIT_LITE",
+    "U100_PIT_LITE"
+  ],
+  "private_input": {
+    "root": "/Users/iokatatsunori/Library/Application Support/TGSStableV2/JQuantsPITLite",
+    "run_relative_path": "runs/v2-r2a-20260727-d3b8ed0-integrity1",
+    "manifest_relative_path": "manifests/v2-r2a-20260727-d3b8ed0-integrity1.json",
+    "manifest_sha256": "7212e777fb613a1ff0170c54298a21979019677c466800e6edd3f0e5f1ac6d7e",
+    "manifest_entry_count": 2357,
+    "cleanup_status": "NOT_EXECUTED",
+    "directory_mode": "0700",
+    "file_mode": "0600",
+    "category_bundle_sha256": {
+      "normalized": "ee9304f64d4781b2140187f70921c6b12983ca13c263bea146a52461b15fe989",
+      "universe_membership": "0253b715aebc279315a6a1d22c53eb329eb3448058b6f0b83cdfff7c36bb79dd",
+      "trade_ledger": "434f07d262b18fb711ca686fcad5acfcbdf0b9f5674e9ce5a4341ffbba4766b6"
+    },
+    "forbidden_after_fingerprint_gate": [
+      "raw",
+      "normalized/request_cache",
+      "normalized/rank_discovery.json",
+      "checkpoint/responses.jsonl"
+    ],
+    "allowed_analytical_categories": [
+      "normalized/calendar.json",
+      "normalized/masters",
+      "normalized/bars",
+      "universe_membership/annual_membership.json",
+      "trade_ledger/*-cost_basic-ledger.json",
+      "trade_ledger/*-cost_basic-curve.json"
+    ]
+  },
+  "upstream_research_sha256": {
+    "research/tgs_stable_v2/pit_lite/contracts/PIT_LITE_RESEARCH_CONTRACT.json": "139677d0393f28134859a07b8662c5e2a400f569b718135c49900b7681b5943f",
+    "research/tgs_stable_v2/pit_lite/results/data_fingerprints.json": "7b593f6cdc7391ef4a2658d80b849a23ed4a65f9137df8373b861fddbe11e933",
+    "research/tgs_stable_v2/pit_lite/results/metrics_summary.json": "802afde2f718d961a8e97a2a13860f5312bbae1d9af10699386eab40690c8970",
+    "research/tgs_stable_v2/pit_lite/results/split_metrics.csv": "21754af2f249eeaf9cff039f7da5096979d727c22978cbf18d71cc0a2e3a0069",
+    "research/tgs_stable_v2/pit_lite/results/score_bucket_metrics.csv": "bec7893f500b3c18dd793eab61e9b216aa58e48f79b47873f3aed146234aaadd",
+    "research/tgs_stable_v2/pit_lite/results/request_audit_summary.json": "40110264cc8823dc7883fd6ad9c8aa5f9f031afbe9334d88741cac9c4a4d7f13"
+  },
+  "source_fingerprints": {
+    "pit_lite_contract_sha256": "139677d0393f28134859a07b8662c5e2a400f569b718135c49900b7681b5943f",
+    "pit_lite_implementation_bundle_sha256": "2ad4253b3a4545b98fe12efe67f9e11e47269b9a59619263584547a3ae7d73e6"
+  },
+  "rules": {
+    "rule_version": "stable-1.0-frozen",
+    "score_threshold": 90,
+    "stop_loss_pct": -0.10,
+    "take_profit_pct": 0.30,
+    "maximum_holding_ticker_sessions": 60,
+    "entry": "next JPX market session Open",
+    "path": "conservative_stop_first",
+    "cost": "basic",
+    "commission_bps_per_side": 10.0,
+    "slippage_bps_per_side": 10.0,
+    "maximum_positions": 10,
+    "maximum_position_fraction": 0.10,
+    "priority": [
+      "stable_score_desc",
+      "signal_date_60_session_median_traded_value_desc",
+      "security_code_asc"
+    ],
+    "universe_reselection": false,
+    "new_rule_execution": false,
+    "parameter_search": false
+  },
+  "score_bitmask": {
+    "bit_order": [
+      "weekly_above_200ma",
+      "weekly_macd_gc",
+      "weekly_macd_uptrend",
+      "daily_rsi_40_65",
+      "daily_volume_1_5x"
+    ],
+    "bit_values": {
+      "weekly_above_200ma": 1,
+      "weekly_macd_gc": 2,
+      "weekly_macd_uptrend": 4,
+      "daily_rsi_40_65": 8,
+      "daily_volume_1_5x": 16
+    },
+    "score_weights": {
+      "weekly_above_200ma": 30,
+      "weekly_macd_gc": 30,
+      "weekly_macd_uptrend": 20,
+      "daily_rsi_40_65": 20,
+      "daily_volume_1_5x": 20
+    }
+  },
+  "split_policy": {
+    "basis": "same 3010 ordered JPX sessions as PR #10",
+    "development_fraction": 0.60,
+    "validation_fraction": 0.20,
+    "final_holdout_fraction": 0.20,
+    "trade_cohort": "signal_date",
+    "performance_requires_entry_and_exit_inside_split": true
+  },
+  "exit_diagnostic": {
+    "reason_groups": [
+      "stop_loss",
+      "stop_gap",
+      "take_profit",
+      "take_profit_gap",
+      "max_holding",
+      "data_end_or_haircut",
+      "other"
+    ],
+    "mfe_mae_window": "actual position lifetime only",
+    "mfe_mae_denominator": "entry fill price including entry commission",
+    "mfe_mae_exit_session_path_convention": "conservative executable path: gap exits use only the opening print; stop exits use the opening print and stop trigger; take-profit-only exits order the non-stop Low before the take trigger; prices after the frozen trigger are excluded",
+    "mfe_floor": 0.0,
+    "mae_ceiling": 0.0,
+    "entry_session_is_holding_session_one": true,
+    "horizons_ticker_sessions": [
+      10,
+      20,
+      40,
+      60
+    ],
+    "horizon_requires_position_still_open": true,
+    "post_exit_prices_for_horizon": false,
+    "profit_factor_is_descriptive_only": true
+  },
+  "capacity_diagnostic": {
+    "dispositions": [
+      "accepted",
+      "capacity_rejected",
+      "duplicate_rejected",
+      "missing_next_session",
+      "invalid_bar"
+    ],
+    "quality_comparison": "accepted versus capacity_rejected on capacity-binding sessions",
+    "quality_outcome": "one-shot frozen next-open/basic/conservative/max-60-session shadow outcome",
+    "duplicate_quality_comparison": false,
+    "new_priority": false
+  },
+  "drawdown_diagnostic": {
+    "episode_definition": "non-overlapping running-watermark peak to first recovery",
+    "ranking": "drawdown ascending then peak date then trough date",
+    "episode_count_per_universe": 5,
+    "attribution_window": "peak-exclusive through trough-inclusive",
+    "daily_position_pnl_must_reconcile_to_curve": true,
+    "regime_proxies": [
+      "active_member_weekly_above_200ma_share",
+      "active_member_macd_uptrend_share",
+      "cross_sectional_median_adjusted_return",
+      "cross_sectional_adjusted_return_population_std",
+      "signal_breadth",
+      "cash_utilization"
+    ],
+    "external_index": false
+  },
+  "regime_proxy_definitions": {
+    "active_member_denominator": "security-session rows with universe_member=true and a valid adjusted Close",
+    "active_member_weekly_above_200ma_share": "daily arithmetic mean of weekly_above_200ma over the active-member denominator",
+    "active_member_macd_uptrend_share": "daily arithmetic mean of weekly_macd_uptrend over the active-member denominator",
+    "cross_sectional_return": "one-ticker-session adjusted Close divided by its immediately preceding valid ticker-session adjusted Close minus one",
+    "cross_sectional_median_adjusted_return": "daily median of cross_sectional_return over active members with a finite return",
+    "cross_sectional_adjusted_return_population_std": "daily population standard deviation with ddof=0 over active members with a finite return",
+    "signal_breadth": "daily raw frozen entry-signal count divided by active-member count",
+    "cash_utilization": "frozen primary curve market value divided by equity",
+    "period_aggregation": "arithmetic mean of available daily proxy values inside the inclusive period",
+    "drawdown_window": "peak-exclusive through trough-inclusive",
+    "drawdown_ticker_and_sector_contribution": "anonymous gross-negative position-day PnL concentration plus net position-day PnL contribution; position-day totals must reconcile to the frozen equity curve",
+    "drawdown_score_and_exit_contribution": "gross-negative position-day PnL shares, with every position-day assigned to the trade's frozen final exit-reason group",
+    "capacity_event_date": "scheduled next-open entry session",
+    "signal_frequency": "raw signal count per 100 JPX sessions"
+  },
+  "diagnostic_hypothesis_estimands": {
+    "A_ADDED_SIGNAL_QUALITY": {
+      "left_arm": "ADDED_CODE frozen one-shot closed shadow outcomes inside each expanded universe",
+      "right_arm": "U15_STATIC_CODE frozen one-shot closed shadow outcomes inside the same expanded universe",
+      "estimand": "trade-weighted mean net-return difference, left minus right",
+      "actionable_direction": "negative"
+    },
+    "B_CAPACITY_PRIORITY": {
+      "left_arm": "capacity_rejected frozen one-shot closed shadow outcomes",
+      "right_arm": "accepted candidates on the same capacity-binding entry sessions",
+      "estimand": "trade-weighted mean net-return difference, left minus right",
+      "actionable_direction": "positive"
+    },
+    "C_HIGH_EXPOSURE": {
+      "high_exposure_definition": "frozen primary cash_utilization at signal session is at least 0.80",
+      "high_exposure_threshold": 0.8,
+      "left_arm": "high-exposure closed accepted trades",
+      "right_arm": "lower-exposure closed accepted trades",
+      "estimand": "trade-weighted mean net-return difference, left minus right",
+      "actionable_direction": "negative",
+      "drawdown_support_required": "expanded-universe maximum drawdown is worse than U15 adjusted in both validation and final_holdout"
+    },
+    "D_EXIT_ATTRIBUTION": {
+      "negative_exit_burden": "1 for stop_loss, stop_gap, or a negative max_holding outcome; otherwise 0",
+      "left_arm": "ADDED_CODE frozen one-shot closed shadow outcomes inside each expanded universe",
+      "right_arm": "U15_STATIC_CODE frozen one-shot closed shadow outcomes inside the same expanded universe",
+      "estimand": "trade-weighted mean negative-exit-burden difference, left minus right",
+      "actionable_direction": "positive",
+      "scope": "association only; no alternative exit is tested"
+    },
+    "E_SCORE_MONOTONICITY": {
+      "left_arm": "Score 120 closed accepted trades",
+      "right_arm": "pooled Score 90 and Score 100 closed accepted trades",
+      "estimand": "trade-weighted mean net-return difference, left minus right",
+      "actionable_direction": "negative"
+    },
+    "bootstrap": "resample the union of signal YYYY-MM clusters with replacement; retain every closed trade in each sampled cluster and recompute the trade-weighted arm means",
+    "leave_one_out": "repeat the same mean-difference estimand after excluding each ticker bucket and each sector bucket; all buckets must remain evaluable and preserve direction"
+  },
+  "cause_classification_policy": {
+    "one_actionable_hypothesis": "use that hypothesis letter A-E",
+    "two_or_more_actionable_hypotheses": "F_MULTIPLE_FACTORS; expose no more than the first two by pre-registered priority",
+    "no_actionable_hypothesis": "G_CLEAR_CAUSE_NOT_IDENTIFIED",
+    "insufficient_all_hypotheses": "G_CLEAR_CAUSE_NOT_IDENTIFIED with DATA_OR_SAMPLE_INSUFFICIENT"
+  },
+  "robust_hypothesis_policy": {
+    "post_hoc": true,
+    "causal_claim": false,
+    "final_holdout_is_unused_oos_for_future_rules": false,
+    "minimum_closed_trades_per_arm_per_split": 30,
+    "minimum_signal_month_clusters": 12,
+    "required_splits": [
+      "validation",
+      "final_holdout"
+    ],
+    "required_expanded_universes": [
+      "U50_PIT_LITE",
+      "U100_PIT_LITE"
+    ],
+    "single_ticker_leave_one_out_direction_required": true,
+    "single_sector_leave_one_out_direction_required": true,
+    "maximum_top_ticker_share": 0.25,
+    "maximum_top_sector_share": 0.50,
+    "cluster_bootstrap": {
+      "unit": "signal_date_yyyy_mm",
+      "replicates": 10000,
+      "seed": 20260727,
+      "confidence_level": 0.95,
+      "minimum_valid_replicate_fraction": 0.99,
+      "minimum_same_direction_fraction": 0.95
+    },
+    "hypothesis_priority": [
+      "A_ADDED_SIGNAL_QUALITY",
+      "B_CAPACITY_PRIORITY",
+      "C_HIGH_EXPOSURE",
+      "D_EXIT_ATTRIBUTION",
+      "E_SCORE_MONOTONICITY"
+    ],
+    "maximum_actionable_hypotheses": 2
+  },
+  "verdict_policy": {
+    "ACTIONABLE_DIAGNOSTIC_HYPOTHESIS": "at least one hypothesis satisfies every robust-hypothesis condition",
+    "NO_ACTIONABLE_DIAGNOSTIC_HYPOTHESIS": "at least one candidate is fully evaluable and none passes",
+    "DATA_OR_SAMPLE_INSUFFICIENT": "all candidate hypotheses are unevaluable because required data or samples are insufficient"
+  },
+  "runtime_policy": {
+    "diagnostic_network_calls": 0,
+    "provider_api_calls": 0,
+    "api_key_reads": 0,
+    "private_writes": 0,
+    "banned_python_imports": [
+      "requests",
+      "httpx",
+      "urllib.request",
+      "pit_lite.api",
+      "pit_lite.acquisition"
+    ],
+    "control_plane_exception": "git fetch/push and GitHub Draft-PR publication explicitly required by the gate are outside diagnostic runtime counters"
+  },
+  "repository_output_policy": {
+    "allowed_results": [
+      "score_combination_metrics.csv",
+      "exit_reason_metrics.csv",
+      "capacity_attribution.csv",
+      "drawdown_episode_summary.csv",
+      "regime_summary.csv",
+      "diagnostic_verdict.json",
+      "private_input_fingerprints.json"
+    ],
+    "forbidden_content": [
+      "raw OHLCV",
+      "exact security identifier",
+      "complete universe membership",
+      "exact trade ledger",
+      "exact entry or exit price",
+      "reconstructible licensed data",
+      "API credential",
+      "private file body"
+    ]
+  },
+  "authorizations": {
+    "root_cause_diagnostic_execution": true,
+    "new_rule_execution": false,
+    "parameter_optimization": false,
+    "formal_candidate_promotion": false,
+    "formal_u50_u100": "NOT_AUTHORIZED",
+    "real_money_canary": "none",
+    "purchase_or_plan_change": false,
+    "private_data_cleanup": "NOT_EXECUTED",
+    "production_change": false
+  },
+  "production_sha256": {
+    "stable_cloud_score_check.py": "791e2404bc41aafcff0ab16d7774bb24579188055fbf36dc6c01ac49c7f9fc30",
+    "stable_cloud_run_context.py": "eee566324079b503d2726de834833f68ab44d80ca2964e2964fca5d9a15a17a6",
+    ".github/workflows/tgs-stable-cloud-paper.yml": "38c3a12025c185ef803a9778fd8a7dbe8f4f9b418d4141b0339d6d82a39afda9",
+    "cloudflare/tgs-stable-scheduler/src/index.ts": "7f92ec819fa45262a15c37d729b4c99930a19fa790932a58f825fdea5c6cab14",
+    "cloudflare/tgs-stable-scheduler/wrangler.jsonc": "c5ff0461a93c1be709395097e8aba50cbb528354431d1a9ea1fff2205c7e8258",
+    "cloudflare/tgs-stable-scheduler/package.json": "0d6af4866ceb3f07b7e68262012d2a1e7832ddae3e40b091e9ec9e262c866470",
+    "cloudflare/tgs-stable-scheduler/pnpm-lock.yaml": "853fa703511f31795d244f70b2fe7f461a9413929b5c7297b9a78632b223935c",
+    "requirements-cloud.txt": "670408b678991e89f3567732749cb09f5f25c77ad141854983a68ac333be45ea",
+    "tradingview_stable_watchlist.csv": "c0a5e59d266b9ecb2fd0cd219f683af72d0a8de8789388a5a6b7a976755f2cb1",
+    "stable_universe_metadata.csv": "e20458db8c78865b6927046f97396bc5945239de49537d24fb20376143e30ed1",
+    "generate_stable_watchlist.py": "dd55eaf82c2bef2ad51bc171dfbbe4024c5a1f080063945f6c9cb88c0f95ad82",
+    "stable_webhook_core.py": "92e0020de02485cb9ee2c5baf50b78e55a3b1aca91bbd7a6b632a2188379cc96",
+    "stable_paper_daily.py": "792bd218a7eee67dc288bff1d5570dc667f0229c223c365d5f38505ebd119a34",
+    "stable_add_pending.py": "f670a63f170bc4567b147d6081637d4190d2dd95224864e82b9e122228828339",
+    "stable_local_pending_server.py": "e9e0a4a26721363ebf2a55cb162649fc17f8ad48b74c77a908eb31eea33fde7e",
+    "main.py": "1ed48fd12c3d13ac2622b5f0d10bc594397371f7c7a7fc492fadf41a837d0712",
+    "com.tgs.stable.paper.daily.plist": "83a03e01cf7997f4b1369d45adf73bc9affdb0fabd752d9c772c749f4a120f6c",
+    "com.tgs.stable.pending.server.plist": "3f9bf2df9d74bca8c961d002bd4e09c0791bb4f6800ebc4bab3af3f71fdaa7d6",
+    "requirements.txt": "e8deecb1fa40d4ab3fe7fb5e8cf4bf27940f3b8fcdbd3b1a77ea7a5bd5509a75"
+  },
+  "pit_protected_inputs_sha256": {
+    "research/tgs_stable_v2/contracts/ver1_baseline_contract.json": "dfc77908dc087acaf9a16fcb4fc669320b3af2641ba8e42ffd65fa89bf73bf64",
+    "research/tgs_stable_v2/config/universe_u15.yaml": "b5b03091742aeab479ccd0410fe43fe2f6b8afe3b1b0c91664593b09e3563657",
+    "research/tgs_stable_v2/config/universe_u50_proposal.yaml": "9224a52701089aaa94c9db60ba2143b718b659930da68cdfdb1c610a15b8770d",
+    "research/tgs_stable_v2/config/universe_u100_proposal.yaml": "c83ea80595335d5085cf4df10a8c063ff6b626833b0ba7df355f791780fe89c6",
+    "research/tgs_stable_v2/data_source_options/JQUANTS_SUPPORT_CLARIFICATION_2026_07.md": "a12c44213e51ad2a76e13c213adb66629e997fa9c9b470c6511baf2a9e73d4bf",
+    "research/tgs_stable_v2/data_source_options/data_source_options_matrix.json": "499be862ed2b381f6bf504d7e5a8d5bed709609452eaebd93f1ce47c971b81aa"
+  }
+}
