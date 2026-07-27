@@ -132,6 +132,24 @@ Selection years are 2014–2026 (13 annual selections).
 
 An `EXPLORATORY_PROMISE_PASS` here would still have no promotion effect. The undefined “drawdown not significantly worse than U15” condition was frozen before results as `MANUAL_THRESHOLD_REQUIRED_FAIL_CLOSED`.
 
+## Strategic universe-expansion decision
+
+**NOT PASSED**
+
+This strategic decision is separate from, and does not change, the frozen mechanical exploratory economic-gate result of `MIXED` (U50 6/11; U100 6/11).
+
+- U50 CAGR is 4.51%, below the adjusted U15 CAGR of 6.49%.
+- U100 CAGR is 6.15% and also does not exceed adjusted U15.
+- U50 maximum drawdown is -44.67%, approximately 7.12 percentage points worse than adjusted U15.
+- U100 maximum drawdown is -48.54%, approximately 10.99 percentage points worse than adjusted U15.
+- U50 and U100 both have profit factor below 1.30.
+- U50/U100 improve signal frequency and sector diversification, but they do not improve economic performance or risk-adjusted results.
+- Mean cash utilization rises materially from 57.37% for adjusted U15 to 87.79% for U50 and 93.34% for U100, while drawdowns deepen materially.
+- Score 120 does not outperform Score 90/100 on profit factor or expectancy in adjusted U15, U50, or U100. Score monotonicity is not established.
+- Expanding the universe mechanically from 15 to 50 or 100 names did not solve the principal TGS performance problem.
+- The higher raw-U15 result remains a corporate-action-distortion diagnostic and is not used for the primary decision.
+- Adjusted U15 itself contains survivorship bias, so its relative advantage does not prove that 15 names are optimal.
+
 ## Data and method limitations
 
 - The complete delisted-issue population is not guaranteed.
@@ -146,10 +164,17 @@ An `EXPLORATORY_PROMISE_PASS` here would still have no promotion effect. The und
 
 ## Authorization state
 
-- Formal U50/U100: not authorized
+- Research engineering gate: PASS
+- PIT-lite comparison completed: PASS
+- Universe expansion objective: NOT PASSED
 - Formal Candidate: HOLD
+- Formal U50/U100: NOT AUTHORIZED
+- Formal U50/U100: not authorized in operational terms.
 - Real-money canary: none
-- Premium recommendation: maintain through approved exploration; cleanup remains NOT_EXECUTED
+- Purchase recommendation: DO_NOT_BUY
+- Ver1.0 Cloud monitoring may continue for observation only.
+- New formal signals must not be connected to real-money trading.
+- Premium plan and cleanup status are unchanged by this decision; cleanup remains NOT_EXECUTED.
 
 ## Canonical aggregate artifacts
 
