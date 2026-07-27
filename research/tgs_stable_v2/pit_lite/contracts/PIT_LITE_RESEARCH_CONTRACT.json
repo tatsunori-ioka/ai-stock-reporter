@@ -1,0 +1,293 @@
+{
+  "schema_version": "1.0",
+  "gate_id": "V2-R2A_PIT_LITE_UNIVERSE_COMPARISON",
+  "model_id": "TGS_STABLE_V2_PIT_LITE",
+  "base_commit": "d3b8ed0ec09d6d7fc70aeca5144f8bb6962c4073",
+  "classification": "PIT_LITE_EXPLORATORY_ONLY_NOT_FORMAL_CANDIDATE",
+  "authorizations": {
+    "pit_lite_u15_u50_u100_execution": true,
+    "formal_u50_u100_execution": false,
+    "formal_candidate_promotion": false,
+    "real_money_canary": "none",
+    "purchase_or_plan_change": false,
+    "production_change": false,
+    "private_data_cleanup_in_this_gate": false
+  },
+  "protected_inputs_sha256": {
+    "research/tgs_stable_v2/contracts/ver1_baseline_contract.json": "dfc77908dc087acaf9a16fcb4fc669320b3af2641ba8e42ffd65fa89bf73bf64",
+    "research/tgs_stable_v2/config/universe_u15.yaml": "b5b03091742aeab479ccd0410fe43fe2f6b8afe3b1b0c91664593b09e3563657",
+    "research/tgs_stable_v2/config/universe_u50_proposal.yaml": "9224a52701089aaa94c9db60ba2143b718b659930da68cdfdb1c610a15b8770d",
+    "research/tgs_stable_v2/config/universe_u100_proposal.yaml": "c83ea80595335d5085cf4df10a8c063ff6b626833b0ba7df355f791780fe89c6",
+    "research/tgs_stable_v2/data_source_options/JQUANTS_SUPPORT_CLARIFICATION_2026_07.md": "a12c44213e51ad2a76e13c213adb66629e997fa9c9b470c6511baf2a9e73d4bf",
+    "research/tgs_stable_v2/data_source_options/data_source_options_matrix.json": "499be862ed2b381f6bf504d7e5a8d5bed709609452eaebd93f1ce47c971b81aa"
+  },
+  "production_sha256": {
+    "stable_cloud_score_check.py": "791e2404bc41aafcff0ab16d7774bb24579188055fbf36dc6c01ac49c7f9fc30",
+    "stable_cloud_run_context.py": "eee566324079b503d2726de834833f68ab44d80ca2964e2964fca5d9a15a17a6",
+    ".github/workflows/tgs-stable-cloud-paper.yml": "38c3a12025c185ef803a9778fd8a7dbe8f4f9b418d4141b0339d6d82a39afda9",
+    "cloudflare/tgs-stable-scheduler/src/index.ts": "7f92ec819fa45262a15c37d729b4c99930a19fa790932a58f825fdea5c6cab14",
+    "cloudflare/tgs-stable-scheduler/wrangler.jsonc": "c5ff0461a93c1be709395097e8aba50cbb528354431d1a9ea1fff2205c7e8258",
+    "cloudflare/tgs-stable-scheduler/package.json": "0d6af4866ceb3f07b7e68262012d2a1e7832ddae3e40b091e9ec9e262c866470",
+    "cloudflare/tgs-stable-scheduler/pnpm-lock.yaml": "853fa703511f31795d244f70b2fe7f461a9413929b5c7297b9a78632b223935c",
+    "requirements-cloud.txt": "670408b678991e89f3567732749cb09f5f25c77ad141854983a68ac333be45ea",
+    "tradingview_stable_watchlist.csv": "c0a5e59d266b9ecb2fd0cd219f683af72d0a8de8789388a5a6b7a976755f2cb1",
+    "stable_universe_metadata.csv": "e20458db8c78865b6927046f97396bc5945239de49537d24fb20376143e30ed1",
+    "generate_stable_watchlist.py": "dd55eaf82c2bef2ad51bc171dfbbe4024c5a1f080063945f6c9cb88c0f95ad82",
+    "stable_webhook_core.py": "92e0020de02485cb9ee2c5baf50b78e55a3b1aca91bbd7a6b632a2188379cc96",
+    "stable_paper_daily.py": "792bd218a7eee67dc288bff1d5570dc667f0229c223c365d5f38505ebd119a34",
+    "stable_add_pending.py": "f670a63f170bc4567b147d6081637d4190d2dd95224864e82b9e122228828339",
+    "stable_local_pending_server.py": "e9e0a4a26721363ebf2a55cb162649fc17f8ad48b74c77a908eb31eea33fde7e",
+    "main.py": "1ed48fd12c3d13ac2622b5f0d10bc594397371f7c7a7fc492fadf41a837d0712",
+    "com.tgs.stable.paper.daily.plist": "83a03e01cf7997f4b1369d45adf73bc9affdb0fabd752d9c772c749f4a120f6c",
+    "com.tgs.stable.pending.server.plist": "3f9bf2df9d74bca8c961d002bd4e09c0791bb4f6800ebc4bab3af3f71fdaa7d6",
+    "requirements.txt": "e8deecb1fa40d4ab3fe7fb5e8cf4bf27940f3b8fcdbd3b1a77ea7a5bd5509a75"
+  },
+  "license_boundary": {
+    "source": "J-Quants Personal Premium V2",
+    "use": "private personal research while subscription is active",
+    "private_storage": "AVAILABLE_WHILE_SUBSCRIPTION_ACTIVE",
+    "aggregate_storage": "AVAILABLE_WITH_PRIVATE_USE_BOUNDARY",
+    "downgrade": "DELETION_REQUIRED",
+    "cancellation": "DELETE_ALL_LICENSED_AND_RECONSTRUCTIBLE_DATA",
+    "repository_raw_data": false,
+    "repository_reconstructible_data": false,
+    "cleanup_status": "NOT_EXECUTED"
+  },
+  "private_storage": {
+    "root": "/Users/iokatatsunori/Library/Application Support/TGSStableV2/JQuantsPITLite",
+    "root_mode": "0700",
+    "directory_mode": "0700",
+    "file_mode": "0600",
+    "filevault_required": true,
+    "per_run_id": true,
+    "retained_categories": [
+      "raw_responses",
+      "normalized_bars",
+      "annual_membership",
+      "exact_trade_ledger",
+      "checkpoint",
+      "deletion_manifest"
+    ]
+  },
+  "api": {
+    "base_url": "https://api.jquants.com/v2",
+    "authentication_environment_variable": "JQUANTS_API_KEY",
+    "authentication_header": "x-api-key",
+    "allowed_methods": ["GET"],
+    "allowed_endpoints": [
+      "/markets/calendar",
+      "/equities/master",
+      "/equities/bars/daily"
+    ],
+    "hard_attempt_limit": 3000,
+    "retry_http_statuses": [429, "500-599"],
+    "maximum_retries_per_page": 2,
+    "backoff_seconds": [1.0, 2.0],
+    "single_threaded": true,
+    "minimum_request_interval_seconds": 1.0,
+    "checkpoint_resume_required": true,
+    "attempt_counted_before_dispatch": true,
+    "maximum_response_bytes": 16777216,
+    "rank_window_sessions_per_chunk": 4,
+    "rank_window_page_cap": 2,
+    "rank_window_fallback": {
+      "trigger": "first range-without-code request rejected with non-retryable HTTP 400, 413 or 422, or exceeds the local response-size cap",
+      "method": "one all-market request per JPX session",
+      "page_cap": 1,
+      "maximum_retries_per_page": 0,
+      "estimated_expected_attempts": 1310,
+      "planned_worst_case_attempts": 2373
+    },
+    "candidate_history_page_cap": 1,
+    "candidate_frontier_cap": 500,
+    "estimated_expected_attempts": 724,
+    "planned_worst_case_attempts": 2757
+  },
+  "period": {
+    "provider_earliest_date": "2008-05-07",
+    "frozen_end_date": "2026-07-24",
+    "selection_years": [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
+    "effective_start": "first common JPX session on which every compared universe has complete indicator warm-up",
+    "split": {
+      "method": "chronological_common_valid_sessions",
+      "development": 0.6,
+      "validation": 0.2,
+      "final_holdout": 0.2,
+      "optimization": false,
+      "trade_cohort_basis": "signal_date",
+      "cross_boundary_trades": "excluded_from_split_trade_metrics"
+    }
+  },
+  "universes": {
+    "U15_ADJUSTED_STATIC": {
+      "membership": "frozen current 15",
+      "price_basis": "J-Quants AdjO/AdjH/AdjL/AdjC/AdjVo",
+      "purpose": "survivorship-biased adjusted static comparator; the current 15 names are applied backward through history"
+    },
+    "U15_RAW_COMMON_PERIOD": {
+      "membership": "same frozen current 15",
+      "price_basis": "J-Quants O/H/L/C/Vo",
+      "purpose": "raw corporate-action-distortion diagnostic only"
+    },
+    "U50_PIT_LITE": {
+      "target_size": 50,
+      "minimum_median_traded_value_jpy": 1000000000,
+      "maximum_names_per_sector": 8
+    },
+    "U100_PIT_LITE": {
+      "target_size": 100,
+      "minimum_median_traded_value_jpy": 300000000,
+      "maximum_names_per_sector": 15
+    }
+  },
+  "proposal_execution_override": {
+    "scope": "PIT-lite exploratory U50/U100 only",
+    "proposal_files_are_unchanged": true,
+    "supersedes_proposal_comparison_backtest_authorized_false_for_this_gate_only": true,
+    "formal_execution_remains_false": true
+  },
+  "selection": {
+    "frequency": "annual",
+    "effective_session": "first JPX trading session in April",
+    "information_cutoff": "previous JPX trading session close",
+    "membership_fixed_until_next_selection": true,
+    "product_category": "domestic_equity",
+    "product_category_code": "011",
+    "product_category_source": "https://jpx-jquants.com/ja/spec/eq-master/product-category",
+    "included_market_codes": {
+      "0101": "TSE First Section",
+      "0102": "TSE Second Section",
+      "0106": "JASDAQ Standard",
+      "0111": "Prime",
+      "0112": "Standard"
+    },
+    "excluded_market_codes": ["0104", "0105", "0107", "0109", "0113"],
+    "sector_taxonomy": "S33 effective-date master value",
+    "minimum_complete_ohlcv_fraction": 0.98,
+    "completeness_window_sessions": 252,
+    "minimum_observed_bar_history_calendar_years": 5,
+    "minimum_raw_close_jpy": 300,
+    "liquidity_measure": "median of provider Va over prior 60 JPX sessions",
+    "ranking": ["liquidity_desc", "code_asc"],
+    "forbidden_ranking_inputs": ["past_return", "TGS_score", "backtest_result"],
+    "tradeability_proxy": "positive raw OHLCV plus completeness only",
+    "undersized_universe_policy": "report shortfall; never relax",
+    "composition_repository_output": "count, concentration and canonical SHA-256 only"
+  },
+  "proposal_deviations": {
+    "delisted_issue_population": "complete delisted-issue population is not guaranteed",
+    "listing_history": "first observed daily bar is a proxy, not listing date",
+    "corporate_group_history": "unavailable; no substitute and no group cap applied",
+    "special_treatment_history": "unavailable; no substitute beyond the frozen tradeability proxy",
+    "ticker_lineage": "unavailable; codes are not stitched",
+    "known_at_timestamp": "unavailable; selection uses effective-date snapshots and prior-session cutoff",
+    "corporate_actions": "adjusted series is provider split/reverse-split adjustment and excludes dividends"
+  },
+  "tgs": {
+    "score_weights": {
+      "weekly_above_200ma": 30,
+      "weekly_macd_gc": 30,
+      "weekly_macd_uptrend": 20,
+      "daily_rsi_40_65": 20,
+      "daily_volume_1_5x": 20
+    },
+    "threshold": 90,
+    "entry": "next JPX market session Open",
+    "direction": "long_only",
+    "stop_loss_pct": -0.1,
+    "take_profit_pct": 0.3,
+    "maximum_holding_ticker_sessions": 60,
+    "duplicate_ticker_position": false,
+    "close_fill": false,
+    "lookahead": false,
+    "dividends": false,
+    "gap_fill": "Open",
+    "missing_next_session": "no entry",
+    "same_day_path_primary": "conservative_stop_first",
+    "same_day_path_sensitivity": "optimistic_take_first"
+  },
+  "portfolio": {
+    "diagnostics": [
+      "independent_trades",
+      "fixed_equal_notional_capacity_normalized",
+      "JPY10m_10_slot_fractional_capital_proxy"
+    ],
+    "primary": "basic_cost_conservative_path_JPY10m_10_slot_fractional_capital_proxy",
+    "initial_capital_jpy": 10000000,
+    "maximum_concurrent_positions": 10,
+    "maximum_position_fraction_of_open_equity": 0.1,
+    "fractional_shares": true,
+    "round_lot_proof": false,
+    "leverage": false,
+    "shorting": false,
+    "entry_priority": ["score_desc", "signal_date_60_session_median_Va_desc", "code_asc"],
+    "positions_survive_universe_removal": true,
+    "session_order": "at Open, existing-position gap exits are applied, then ranked Open entries use available slots and cash; intraday/Close exits occur afterward and cannot retroactively fund Open entries; entry-day stop/take is enabled"
+  },
+  "costs_bps_per_side": {
+    "zero": {"commission": 0, "slippage": 0},
+    "basic": {"commission": 10, "slippage": 10},
+    "strict": {"commission": 20, "slippage": 30}
+  },
+  "data_end": {
+    "premature_end_suspicion_count": true,
+    "primary": "last adjusted close with 20 percent haircut",
+    "secondary": "last adjusted close without haircut",
+    "normal_frozen_end_open_positions": "last adjusted close without haircut"
+  },
+  "economic_gate": {
+    "scope": "U50_PIT_LITE and U100_PIT_LITE primary portfolio",
+    "criteria": {
+      "cagr_minimum": 0.1,
+      "maximum_drawdown_floor": -0.3,
+      "profit_factor_minimum": 1.3,
+      "validation_expectancy_positive": true,
+      "validation_profit_factor_above": 1.0,
+      "holdout_expectancy_positive": true,
+      "holdout_profit_factor_above": 1.0,
+      "cagr_advantage_over_u15_adjusted_minimum": 0.05,
+      "maximum_drawdown_vs_u15": "MANUAL_THRESHOLD_REQUIRED_FAIL_CLOSED",
+      "top_ticker_trade_share_maximum": 0.15,
+      "top_sector_trade_share_maximum": 0.35
+    },
+    "verdicts": ["EXPLORATORY_PROMISE_PASS", "MIXED", "NOT_PASSED"],
+    "effect": "no Formal Candidate, canary, purchase or production authorization"
+  },
+  "aggregate_output_policy": {
+    "allowed_repository_results": [
+      "metrics_summary.json",
+      "yearly_metrics.csv",
+      "split_metrics.csv",
+      "score_bucket_metrics.csv",
+      "cost_sensitivity.csv",
+      "concentration_metrics.csv",
+      "universe_annual_counts.csv",
+      "data_fingerprints.json",
+      "request_audit_summary.json"
+    ],
+    "forbidden_repository_content": [
+      "raw provider rows",
+      "normalized per-security bars",
+      "exact membership",
+      "ticker or security identifiers",
+      "company names",
+      "exact trade ledger",
+      "signal, entry or exit dates and prices",
+      "request response bodies",
+      "credentials"
+    ]
+  },
+  "prohibited_actions": [
+    "production code changes",
+    "Cloudflare changes",
+    "production GitHub Actions changes",
+    "Google Sheets changes",
+    "Secrets changes",
+    "LINE changes",
+    "pending or trading changes",
+    "broker integration",
+    "merge",
+    "licensed-data cleanup execution",
+    "subscription downgrade or cancellation"
+  ]
+}

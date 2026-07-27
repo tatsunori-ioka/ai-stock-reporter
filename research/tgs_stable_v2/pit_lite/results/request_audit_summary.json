@@ -1,0 +1,35 @@
+{
+  "absolute_gate_attempt_limit": 3000,
+  "attempts_used": 1028,
+  "base_commit": "d3b8ed0ec09d6d7fc70aeca5144f8bb6962c4073",
+  "cache_hits": 0,
+  "classification": "PIT_LITE_EXPLORATORY_ONLY_NOT_FORMAL_CANDIDATE",
+  "credential_recorded": false,
+  "endpoint_attempt_counts": {
+    "/equities/bars/daily": 1014,
+    "/equities/master": 13,
+    "/markets/calendar": 1
+  },
+  "estimated_expected_attempts": 1310,
+  "external_prior_attempts": 156,
+  "filevault_active_at_comparison": true,
+  "filevault_gate_passed_before_acquisition": true,
+  "gate_attempts_used": 1184,
+  "gate_id": "V2-R2A_PIT_LITE_UNIVERSE_COMPARISON",
+  "http_status_counts": {
+    "200": 1027,
+    "400": 1
+  },
+  "implicit_retries": 0,
+  "model_id": "TGS_STABLE_V2_PIT_LITE",
+  "planned_worst_case_attempts": 2373,
+  "private_directory_mode_0700": true,
+  "private_file_mode_0600": true,
+  "private_root_outside_repository": true,
+  "rank_method": "single_session_no_retry",
+  "raw_licensed_data_committed": false,
+  "run_id": "v2-r2a-20260727-d3b8ed0-integrity1",
+  "run_remaining_attempt_limit": 2844,
+  "schema_version": "1.0",
+  "single_threaded": true
+}
