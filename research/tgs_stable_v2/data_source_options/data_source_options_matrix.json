@@ -1,0 +1,1581 @@
+{
+  "schema_version": "1.0",
+  "gate_id": "V2-R1C_DATA_SOURCE_OPTIONS",
+  "as_of": "2026-07-27",
+  "base_commit": "4f59764cfef49f7a9c0781469d30912e7f7826b0",
+  "evidence_policy": {
+    "allowed": [
+      "official_public_provider_material",
+      "official_public_exchange_material",
+      "previously_frozen_local_gate_decision_as_context_only"
+    ],
+    "not_performed": [
+      "account_login",
+      "api_access",
+      "sample_or_raw_data_download",
+      "sales_inquiry",
+      "quote_request",
+      "trial",
+      "purchase",
+      "contract",
+      "u50_u100_backtest"
+    ],
+    "unknown_capability_label": "SUPPORT_CONFIRMATION_REQUIRED",
+    "unknown_price_label": "QUOTE_REQUIRED"
+  },
+  "status_vocabulary": {
+    "AVAILABLE": "Official public material directly documents the capability within the stated scope.",
+    "PARTIAL": "Related capability is documented, but period, population, semantics, or completeness is insufficient.",
+    "NOT_AVAILABLE": "The official material or frozen prior gate identifies the capability as absent.",
+    "SUPPORT_CONFIRMATION_REQUIRED": "Public material does not establish the requirement.",
+    "QUOTE_REQUIRED": "No applicable public price was found and no quote was requested.",
+    "NOT_APPLICABLE": "The comparison item does not apply to the option as sold."
+  },
+  "comparison_fields": [
+    "point_in_time_active_issue_universe",
+    "delisted_issues",
+    "listing_delisting_dates",
+    "ticker_lineage_stable_security_id",
+    "historical_market_industry",
+    "historical_trading_unit",
+    "corporate_group_history",
+    "suspension_special_designation_history",
+    "comprehensive_corporate_actions",
+    "raw_adjusted_ohlcv",
+    "trading_value",
+    "known_at_publication_timestamp",
+    "version_freeze_long_term_retention",
+    "aggregate_hash_storage_rights",
+    "individual_contract",
+    "sole_proprietor_contract",
+    "small_corporation_contract",
+    "price",
+    "minimum_term",
+    "redistribution_derived_results"
+  ],
+  "options": [
+    {
+      "id": "JQ_PERSONAL",
+      "name": "J-Quants Personal Premium",
+      "category": "individual_official_exchange_api",
+      "delivery": [
+        "REST_API"
+      ],
+      "source_ids": [
+        "jq_personal_overview",
+        "jq_personal_master",
+        "jq_personal_bars",
+        "jq_personal_adjustment",
+        "jq_personal_periods",
+        "jq_personal_terms"
+      ],
+      "capabilities": {
+        "point_in_time_active_issue_universe": {
+          "status": "AVAILABLE",
+          "note": "Date-scoped listed-issue snapshots are documented from the service start on 2008-05-07."
+        },
+        "delisted_issues": {
+          "status": "PARTIAL",
+          "note": "Historical snapshots can represent issues that later delisted, but complete population coverage is not publicly guaranteed."
+        },
+        "listing_delisting_dates": {
+          "status": "PARTIAL",
+          "note": "No direct interval fields; boundaries would have to be inferred from snapshots."
+        },
+        "ticker_lineage_stable_security_id": {
+          "status": "NOT_AVAILABLE",
+          "note": "No former-code lineage or permanent security identifier is documented."
+        },
+        "historical_market_industry": {
+          "status": "AVAILABLE",
+          "note": "Effective market and 17/33-sector fields are documented; a frozen old/new regime mapping is still required."
+        },
+        "historical_trading_unit": {
+          "status": "NOT_AVAILABLE",
+          "note": "The listed-issue master does not document a trading-unit field."
+        },
+        "corporate_group_history": {
+          "status": "NOT_AVAILABLE",
+          "note": "No dated group mapping is documented."
+        },
+        "suspension_special_designation_history": {
+          "status": "NOT_AVAILABLE",
+          "note": "The complete frozen special-treatment and untradeable-status rule cannot be implemented from the documented master."
+        },
+        "comprehensive_corporate_actions": {
+          "status": "PARTIAL",
+          "note": "Adjustment logic and dividend facts do not establish a comprehensive event/revision history."
+        },
+        "raw_adjusted_ohlcv": {
+          "status": "AVAILABLE",
+          "note": "Raw and adjusted OHLC/volume fields are documented from 2008-05-07, subject to documented adjustment exclusions."
+        },
+        "trading_value": {
+          "status": "AVAILABLE",
+          "note": "Daily trading value is documented."
+        },
+        "known_at_publication_timestamp": {
+          "status": "NOT_AVAILABLE",
+          "note": "Effective dates are not a versioned publication timestamp."
+        },
+        "version_freeze_long_term_retention": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Published terms include cancellation/deletion duties and no explicit reproducible-archive safe harbor."
+        },
+        "aggregate_hash_storage_rights": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public aggregate and hash publication rights are not explicit."
+        }
+      },
+      "commercial": {
+        "individual_contract": {
+          "status": "AVAILABLE",
+          "note": "Noncommercial personal own use."
+        },
+        "sole_proprietor_contract": {
+          "status": "NOT_AVAILABLE",
+          "note": "The documented personal service does not authorize a commercial business use case."
+        },
+        "small_corporation_contract": {
+          "status": "NOT_AVAILABLE",
+          "note": "The personal service is not for corporate use."
+        },
+        "price": {
+          "status": "AVAILABLE",
+          "currency": "JPY",
+          "amount": 16500,
+          "period": "month",
+          "tax": "included",
+          "note": "Premium public list price."
+        },
+        "minimum_term": {
+          "status": "AVAILABLE",
+          "value": "monthly_billing_cancel_at_period_end"
+        },
+        "redistribution_derived_results": {
+          "status": "PARTIAL",
+          "note": "Raw Internet or third-party distribution is not authorized; derived-result publication is SUPPORT_CONFIRMATION_REQUIRED."
+        }
+      },
+      "formal_assessment": {
+        "status": "NOT_POSSIBLE_ALONE",
+        "current_possible": false,
+        "reason": "Frozen V2-R1B capability gaps remain."
+      }
+    },
+    {
+      "id": "JQ_PRO",
+      "name": "J-Quants Pro Listed Issue + Stock Prices + Corporate Action",
+      "category": "corporate_official_exchange_bundle",
+      "delivery": [
+        "REST_API",
+        "SFTP",
+        "SNOWFLAKE"
+      ],
+      "source_ids": [
+        "jq_pro_listed_issue",
+        "jq_pro_prices",
+        "jq_pro_corporate_actions",
+        "jq_pro_pricing",
+        "jq_pro_license",
+        "jq_pro_other_notes",
+        "jq_pro_external_distribution",
+        "jq_pro_security_change",
+        "jq_pro_delisting"
+      ],
+      "capabilities": {
+        "point_in_time_active_issue_universe": {
+          "status": "AVAILABLE",
+          "note": "Historical Listed Issue Information is documented from 2008-05-07."
+        },
+        "delisted_issues": {
+          "status": "PARTIAL",
+          "note": "Delisting events are documented, but non-dividend corporate-action history begins 2015-05-08."
+        },
+        "listing_delisting_dates": {
+          "status": "PARTIAL",
+          "note": "Delisting and security-master change events are explicit; full listing intervals back to 2008 are not."
+        },
+        "ticker_lineage_stable_security_id": {
+          "status": "PARTIAL",
+          "note": "CodeBeforeChange supports lineage, but a permanent security ID is not documented."
+        },
+        "historical_market_industry": {
+          "status": "AVAILABLE",
+          "note": "Effective listed-issue attributes and dated master changes are documented within published history."
+        },
+        "historical_trading_unit": {
+          "status": "PARTIAL",
+          "note": "Trading-unit changes are documented inside the shorter corporate-action history window."
+        },
+        "corporate_group_history": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "No public dated ultimate-parent/group contract was found."
+        },
+        "suspension_special_designation_history": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "No public complete replayable exclusion-state dataset was found."
+        },
+        "comprehensive_corporate_actions": {
+          "status": "PARTIAL",
+          "note": "Broad taxonomy is public; cash dividends start 2013-02-20 and other events 2015-05-08."
+        },
+        "raw_adjusted_ohlcv": {
+          "status": "AVAILABLE",
+          "note": "Raw/adjusted OHLC and volume are documented from 2008-05-07."
+        },
+        "trading_value": {
+          "status": "AVAILABLE",
+          "note": "Daily trading value is documented."
+        },
+        "known_at_publication_timestamp": {
+          "status": "PARTIAL",
+          "note": "Announcement dates/times and update schedules exist, but a complete versioned availability contract is not public."
+        },
+        "version_freeze_long_term_retention": {
+          "status": "PARTIAL",
+          "note": "The public license permits continued internal use after ordinary termination, while full snapshot/version rights remain unconfirmed."
+        },
+        "aggregate_hash_storage_rights": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Repository aggregates and fingerprints are not explicitly authorized."
+        }
+      },
+      "commercial": {
+        "individual_contract": {
+          "status": "NOT_AVAILABLE",
+          "note": "The public license limits customers to legal entities."
+        },
+        "sole_proprietor_contract": {
+          "status": "NOT_AVAILABLE",
+          "note": "A natural-person sole proprietor is not a legal entity."
+        },
+        "small_corporation_contract": {
+          "status": "AVAILABLE",
+          "note": "A legal entity is eligible in principle, subject to provider acceptance."
+        },
+        "price": {
+          "status": "AVAILABLE",
+          "currency": "JPY",
+          "amount": 500000,
+          "period": "month",
+          "tax": "excluded",
+          "scope": "single_entity_public_subtotal",
+          "components": {
+            "listed_issue": 50000,
+            "stock_prices": 150000,
+            "corporate_actions": 300000
+          },
+          "minimum_public_12_month_subtotal": 6000000,
+          "minimum_public_12_month_subtotal_is_arithmetic_inference": true,
+          "note": "The JPY 6,000,000 subtotal is an arithmetic inference from the public JPY 500,000 monthly subtotal and the published one-year minimum. Other datasets, historical scope, and rights can add cost."
+        },
+        "minimum_term": {
+          "status": "AVAILABLE",
+          "value": "1_year",
+          "note": "Appendix 1-3 publishes a one-year minimum usage period for Listed Issue Information, Stock Prices, and Corporate Action Data."
+        },
+        "redistribution_derived_results": {
+          "status": "PARTIAL",
+          "note": "External-use mechanisms exist; the intended edited/processed outputs are SUPPORT_CONFIRMATION_REQUIRED and JPXI reserves classification."
+        }
+      },
+      "formal_assessment": {
+        "status": "CONDITIONAL_HYBRID_CANDIDATE",
+        "current_possible": false,
+        "reason": "Group/status history, full-period intervals and lineage, known-at semantics, and research-output rights remain unresolved."
+      }
+    },
+    {
+      "id": "JPX_DIRECT",
+      "name": "JPX direct Master File + O/H/L/C Price + Corporate Action",
+      "category": "official_exchange_direct_feed_bundle",
+      "delivery": [
+        "WEB_CSV",
+        "FTP",
+        "SFTP"
+      ],
+      "source_ids": [
+        "jpx_master",
+        "jpx_corporate_actions",
+        "jpx_historical",
+        "jpx_reference_fees"
+      ],
+      "capabilities": {
+        "point_in_time_active_issue_universe": {
+          "status": "PARTIAL",
+          "note": "The next-business-day all-exchange domestic master is public; historical snapshot entitlement is not."
+        },
+        "delisted_issues": {
+          "status": "PARTIAL",
+          "note": "Security-master changes include delisting, but complete historical depth is not public."
+        },
+        "listing_delisting_dates": {
+          "status": "PARTIAL",
+          "note": "Event/effective dates exist; a full interval archive is not public."
+        },
+        "ticker_lineage_stable_security_id": {
+          "status": "PARTIAL",
+          "note": "Current local code/ISIN and security-master changes exist; complete dated lineage needs confirmation."
+        },
+        "historical_market_industry": {
+          "status": "PARTIAL",
+          "note": "Current exchange section is public; full dated history is not."
+        },
+        "historical_trading_unit": {
+          "status": "PARTIAL",
+          "note": "Security-master changes cover relevant changes, but historical depth needs confirmation."
+        },
+        "corporate_group_history": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "No dated group dataset was found in the public bundle description."
+        },
+        "suspension_special_designation_history": {
+          "status": "PARTIAL",
+          "note": "Listing status is in the master; complete dated special-state history is not public."
+        },
+        "comprehensive_corporate_actions": {
+          "status": "PARTIAL",
+          "note": "Broad golden-source event set; searchable Web history is limited for most event types."
+        },
+        "raw_adjusted_ohlcv": {
+          "status": "PARTIAL",
+          "note": "Direct daily raw O/H/L/C is public; an adjusted history/factor contract is not."
+        },
+        "trading_value": {
+          "status": "AVAILABLE",
+          "note": "Trading value is included in the O/H/L/C service."
+        },
+        "known_at_publication_timestamp": {
+          "status": "PARTIAL",
+          "note": "Corporate actions are generally delivered promptly after disclosure, but full replayable versions are not public."
+        },
+        "version_freeze_long_term_retention": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Long-term archive and termination rights are not public."
+        },
+        "aggregate_hash_storage_rights": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Repository aggregate/hash rights need written confirmation."
+        }
+      },
+      "commercial": {
+        "individual_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public user examples do not settle individual acceptance."
+        },
+        "sole_proprietor_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public materials do not settle this contract type."
+        },
+        "small_corporation_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "A JPXI single-entity contract exists, but public materials do not confirm small-company acceptance."
+        },
+        "price": {
+          "status": "AVAILABLE",
+          "currency": "JPY",
+          "amount": 284000,
+          "period": "month",
+          "tax": "excluded",
+          "scope": "indicative_non_financial_single_entity_current_feed_subtotal",
+          "components": {
+            "master_file": 50000,
+            "ohlc": 84000,
+            "corporate_actions_other_business_type": 150000
+          },
+          "financial_institution_subtotal": 384000,
+          "note": "Historical backfill, delivery, and output rights are excluded."
+        },
+        "minimum_term": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "value": null
+        },
+        "redistribution_derived_results": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Usage tiers are public; repository outputs and post-termination retention are not settled."
+        }
+      },
+      "formal_assessment": {
+        "status": "CONDITIONAL_HYBRID_CANDIDATE",
+        "current_possible": false,
+        "reason": "The public current-feed bundle does not establish full historical point-in-time backfill or archive rights."
+      }
+    },
+    {
+      "id": "JPX_DATACUBE",
+      "name": "J-Quants DataCube",
+      "category": "official_exchange_one_off_files",
+      "delivery": [
+        "DOWNLOADABLE_FILES"
+      ],
+      "source_ids": [
+        "jpx_datacube_overview",
+        "jpx_datacube_prices",
+        "jpx_datacube_terms",
+        "jpx_datacube_spec"
+      ],
+      "capabilities": {
+        "point_in_time_active_issue_universe": {
+          "status": "PARTIAL",
+          "note": "Month-bounded files can reconstruct traded issues, but are not a formal eligible-universe master."
+        },
+        "delisted_issues": {
+          "status": "AVAILABLE",
+          "note": "Purchased historical files contain issues traded in the purchased period."
+        },
+        "listing_delisting_dates": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Exact listing intervals are not established by the public catalog."
+        },
+        "ticker_lineage_stable_security_id": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Monthly security-code data exists, but a full lineage contract is not public."
+        },
+        "historical_market_industry": {
+          "status": "PARTIAL",
+          "note": "Period files preserve market context; formal classification history is not established."
+        },
+        "historical_trading_unit": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Security-code files may contain unit attributes; effective-history semantics require confirmation."
+        },
+        "corporate_group_history": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "No group history is documented in the compared files."
+        },
+        "suspension_special_designation_history": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "No replayable special-state history is documented."
+        },
+        "comprehensive_corporate_actions": {
+          "status": "NOT_AVAILABLE",
+          "note": "DataCube price files are not a comprehensive event service."
+        },
+        "raw_adjusted_ohlcv": {
+          "status": "PARTIAL",
+          "note": "Official historical O/H/L/C and volume are public; adjusted series is not established."
+        },
+        "trading_value": {
+          "status": "AVAILABLE",
+          "note": "Trading value is documented."
+        },
+        "known_at_publication_timestamp": {
+          "status": "NOT_AVAILABLE",
+          "note": "Purchased period files do not provide a historical availability timestamp contract."
+        },
+        "version_freeze_long_term_retention": {
+          "status": "PARTIAL",
+          "note": "Purchased files are technically fixed; legal retention and termination treatment need confirmation."
+        },
+        "aggregate_hash_storage_rights": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Publication of aggregate/hash artifacts needs clearance."
+        }
+      },
+      "commercial": {
+        "individual_contract": {
+          "status": "AVAILABLE",
+          "note": "An individual/academic price class is public and limited to non-business/private use."
+        },
+        "sole_proprietor_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "The applicable self-use or individual category is not explicit."
+        },
+        "small_corporation_contract": {
+          "status": "AVAILABLE",
+          "note": "Corporate self-use is public."
+        },
+        "price": {
+          "status": "AVAILABLE",
+          "currency": "JPY",
+          "tax": "included",
+          "examples": {
+            "post_2012_all_stock_ohlc_individual_academic_per_market_month": 990,
+            "post_2012_all_stock_ohlc_self_use_per_market_month": 26400,
+            "pre_2012_all_stock_ohlc_individual_academic_per_market_year": 11880,
+            "pre_2012_all_stock_ohlc_self_use_per_market_year": 316800
+          },
+          "note": "One-off file pricing; metadata products are separate."
+        },
+        "minimum_term": {
+          "status": "NOT_APPLICABLE",
+          "value": "one_off_file_purchase"
+        },
+        "redistribution_derived_results": {
+          "status": "PARTIAL",
+          "note": "Self-use, external-distribution, and individual/academic classes exist; intended public derived artifacts are SUPPORT_CONFIRMATION_REQUIRED."
+        }
+      },
+      "formal_assessment": {
+        "status": "NOT_POSSIBLE_ALONE",
+        "current_possible": false,
+        "reason": "Strong price history does not supply the missing eligibility and security-state plane."
+      }
+    },
+    {
+      "id": "QUICK",
+      "name": "QUICK Data Files/APIs bundle",
+      "category": "domestic_vendor_bundle",
+      "delivery": [
+        "SFTP_FILES",
+        "WEB_API"
+      ],
+      "source_ids": [
+        "quick_data_services",
+        "quick_apis",
+        "quick_master",
+        "quick_scheduled_actions",
+        "quick_regulatory"
+      ],
+      "capabilities": {
+        "point_in_time_active_issue_universe": {
+          "status": "PARTIAL",
+          "note": "Daily stock master is explicit, but published history starts 2015-02."
+        },
+        "delisted_issues": {
+          "status": "AVAILABLE",
+          "note": "Delisting events and master dates are public from the 2014/2015 history windows."
+        },
+        "listing_delisting_dates": {
+          "status": "AVAILABLE",
+          "note": "Master fields include new-listing and delisting dates from 2015-02; earlier history needs confirmation."
+        },
+        "ticker_lineage_stable_security_id": {
+          "status": "PARTIAL",
+          "note": "ISIN and change events are public; a permanent cross-event issuer/security contract is not."
+        },
+        "historical_market_industry": {
+          "status": "AVAILABLE",
+          "note": "Exchange, section, listing classification and industry are documented from 2015-02."
+        },
+        "historical_trading_unit": {
+          "status": "AVAILABLE",
+          "note": "Trading unit is in the master and unit changes are in the action file from the published history window."
+        },
+        "corporate_group_history": {
+          "status": "PARTIAL",
+          "note": "Company reorganizations are documented, but a dated ultimate-parent/group identifier is not."
+        },
+        "suspension_special_designation_history": {
+          "status": "AVAILABLE",
+          "note": "Regulatory/master fields include supervision/liquidation post, special caution, trading suspension, and restrictions from 2014-12."
+        },
+        "comprehensive_corporate_actions": {
+          "status": "PARTIAL",
+          "note": "Broad Japan-specific events are public from 2014-12; earlier completeness and revision history need confirmation."
+        },
+        "raw_adjusted_ohlcv": {
+          "status": "PARTIAL",
+          "note": "Historical bars are public; exact raw/adjusted/factor scope for the selected delivery is not."
+        },
+        "trading_value": {
+          "status": "AVAILABLE",
+          "note": "Trading-value data is public at product/API level; exact selected feed fields need confirmation."
+        },
+        "known_at_publication_timestamp": {
+          "status": "PARTIAL",
+          "note": "Delivery times are public; replayable arrival/revision timestamps are not."
+        },
+        "version_freeze_long_term_retention": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Archive and post-termination rights are not public."
+        },
+        "aggregate_hash_storage_rights": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Research output and hash-publication rights are not public."
+        }
+      },
+      "commercial": {
+        "individual_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "The data-feed pages target professional use but do not settle individual acceptance."
+        },
+        "sole_proprietor_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public materials do not settle this contract type."
+        },
+        "small_corporation_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public materials do not state a minimum company size or acceptance rule."
+        },
+        "price": {
+          "status": "QUOTE_REQUIRED",
+          "currency": "JPY",
+          "amount": null
+        },
+        "minimum_term": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "value": "monthly_service_public_but_minimum_not_public"
+        },
+        "redistribution_derived_results": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Secondary-use concepts are public, but the exact research-output permission is not."
+        }
+      },
+      "formal_assessment": {
+        "status": "CONDITIONAL_HYBRID_CANDIDATE",
+        "current_possible": false,
+        "reason": "Japan fields are strong, but public master/regulatory history starts only in 2014/2015 and license/known-at details are unresolved."
+      }
+    },
+    {
+      "id": "NIKKEI_NEEDS",
+      "name": "Nikkei NEEDS FinancialQUEST/BULK",
+      "category": "domestic_vendor_bundle",
+      "delivery": [
+        "BROWSER_DOWNLOAD",
+        "BULK_DELIVERY"
+      ],
+      "source_ids": [
+        "nikkei_needs_catalog",
+        "nikkei_financialquest",
+        "nikkei_bulk"
+      ],
+      "capabilities": {
+        "point_in_time_active_issue_universe": {
+          "status": "PARTIAL",
+          "note": "Domestic security attributes include next-business-day new listings, delistings, and changes; complete snapshot semantics are not public."
+        },
+        "delisted_issues": {
+          "status": "AVAILABLE",
+          "note": "Delisting events are documented at catalog level."
+        },
+        "listing_delisting_dates": {
+          "status": "PARTIAL",
+          "note": "Listing/delisting events exist; a complete interval contract was not found."
+        },
+        "ticker_lineage_stable_security_id": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "A permanent identifier and dated lineage contract are not public."
+        },
+        "historical_market_industry": {
+          "status": "PARTIAL",
+          "note": "Long company/security attribute history is public; exact TSE regime/33-sector as-of fields need confirmation."
+        },
+        "historical_trading_unit": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Exact dated unit coverage is not public."
+        },
+        "corporate_group_history": {
+          "status": "PARTIAL",
+          "note": "Company attributes include parent-company information; point-in-time group semantics need confirmation."
+        },
+        "suspension_special_designation_history": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Complete dated special-treatment and tradability states are not public."
+        },
+        "comprehensive_corporate_actions": {
+          "status": "PARTIAL",
+          "note": "Corporate-finance events from 1970 include splits, issues, mergers, company splits, and buybacks; full taxonomy/revisions need confirmation."
+        },
+        "raw_adjusted_ohlcv": {
+          "status": "AVAILABLE",
+          "note": "Daily prices and rights-adjusted prices are documented at catalog level."
+        },
+        "trading_value": {
+          "status": "AVAILABLE",
+          "note": "Trading value is documented from 1977 with listed equities."
+        },
+        "known_at_publication_timestamp": {
+          "status": "PARTIAL",
+          "note": "Next-business-day security changes are public; version/revision timestamps are not."
+        },
+        "version_freeze_long_term_retention": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Raw archive and termination rights are not public."
+        },
+        "aggregate_hash_storage_rights": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Repository aggregates and hashes require written confirmation."
+        }
+      },
+      "commercial": {
+        "individual_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public product pages do not establish individual availability."
+        },
+        "sole_proprietor_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public product pages do not establish sole-proprietor availability."
+        },
+        "small_corporation_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "The service is corporate-oriented, but public materials do not confirm small-company acceptance."
+        },
+        "price": {
+          "status": "QUOTE_REQUIRED",
+          "currency": "JPY",
+          "amount": null
+        },
+        "minimum_term": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "value": null
+        },
+        "redistribution_derived_results": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Delivery and analysis use are public; output and termination rights are not."
+        }
+      },
+      "formal_assessment": {
+        "status": "CONDITIONAL_HYBRID_CANDIDATE",
+        "current_possible": false,
+        "reason": "Long Japan price/action coverage is strong, but PIT eligible-universe, state history, stable ID, known-at, and license requirements remain unresolved."
+      }
+    },
+    {
+      "id": "TOYO_TREND3EPOT",
+      "name": "Toyo Keizai TREND3EPOT",
+      "category": "domestic_point_in_time_vendor",
+      "delivery": [
+        "FTP_RELATIONAL_UPDATES"
+      ],
+      "source_ids": [
+        "toyo_trend3epot",
+        "toyo_trend3epot_overview",
+        "toyo_affiliates",
+        "toyo_pricing_process"
+      ],
+      "capabilities": {
+        "point_in_time_active_issue_universe": {
+          "status": "AVAILABLE",
+          "note": "Official examples explicitly select companies listed at a chosen point in time."
+        },
+        "delisted_issues": {
+          "status": "AVAILABLE",
+          "note": "Official examples explicitly select delisted companies over a specified duration."
+        },
+        "listing_delisting_dates": {
+          "status": "PARTIAL",
+          "note": "Company information is generally historical from listing dates, with documented possible gaps."
+        },
+        "ticker_lineage_stable_security_id": {
+          "status": "PARTIAL",
+          "note": "Records have IDs and validity/update timestamps; permanent security-ID and code-lineage semantics need confirmation."
+        },
+        "historical_market_industry": {
+          "status": "AVAILABLE",
+          "note": "Point-in-time attributes, sector membership, and long 33-sector history are documented."
+        },
+        "historical_trading_unit": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "A complete dated trading-unit history is not established."
+        },
+        "corporate_group_history": {
+          "status": "PARTIAL",
+          "note": "A separate affiliates database documents parent/subsidiary relationships; historical effective dates and integration need confirmation."
+        },
+        "suspension_special_designation_history": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Complete supervision/liquidation/suspension history is not public."
+        },
+        "comprehensive_corporate_actions": {
+          "status": "PARTIAL",
+          "note": "Stock adjustment factors are available, but a comprehensive event/revision service is not established."
+        },
+        "raw_adjusted_ohlcv": {
+          "status": "AVAILABLE",
+          "note": "Long daily price history and point-in-time adjusted-price calculation are documented."
+        },
+        "trading_value": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "The compared public overview does not establish the exact daily trading-value field."
+        },
+        "known_at_publication_timestamp": {
+          "status": "PARTIAL",
+          "note": "Relational records have valid-start/end, insert, and last-update timestamps; exact vendor-publication and arrival semantics still need confirmation."
+        },
+        "version_freeze_long_term_retention": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "FTP/RDB delivery does not establish termination retention."
+        },
+        "aggregate_hash_storage_rights": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public aggregate/hash rights are not documented."
+        }
+      },
+      "commercial": {
+        "individual_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public materials do not establish individual availability."
+        },
+        "sole_proprietor_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public materials do not establish sole-proprietor availability."
+        },
+        "small_corporation_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public materials do not state a company-size or acceptance threshold."
+        },
+        "price": {
+          "status": "QUOTE_REQUIRED",
+          "currency": "JPY",
+          "amount": null
+        },
+        "minimum_term": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "value": null
+        },
+        "redistribution_derived_results": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Sales terms can constrain market data and no output/retention safe harbor is public."
+        }
+      },
+      "formal_assessment": {
+        "status": "LEADING_DOMESTIC_PIT_CONDITIONAL_CANDIDATE",
+        "current_possible": false,
+        "reason": "Explicit PIT design and long prices are strong; unit/status history, complete actions, permanent identity, and output rights remain unresolved."
+      }
+    },
+    {
+      "id": "LSEG",
+      "name": "LSEG DataScope/TSE/Corporate Actions/PermID bundle",
+      "category": "global_enterprise_vendor_bundle",
+      "delivery": [
+        "FILES",
+        "API",
+        "DATA_DELIVERY"
+      ],
+      "source_ids": [
+        "lseg_tse",
+        "lseg_datascope",
+        "lseg_corporate_actions",
+        "lseg_datascope_guide",
+        "lseg_permid",
+        "lseg_permid_terms"
+      ],
+      "capabilities": {
+        "point_in_time_active_issue_universe": {
+          "status": "PARTIAL",
+          "note": "DataScope covers active and retired instruments; a daily Japan eligible-universe snapshot contract is not public."
+        },
+        "delisted_issues": {
+          "status": "PARTIAL",
+          "note": "Retired instruments and delisted/relisted RIC maintenance are documented; Japan completeness needs confirmation."
+        },
+        "listing_delisting_dates": {
+          "status": "PARTIAL",
+          "note": "Maintenance dates exist; complete effective listing intervals need confirmation."
+        },
+        "ticker_lineage_stable_security_id": {
+          "status": "PARTIAL",
+          "note": "PermID is persistent and RIC maintenance exists; effective successor/predecessor lineage needs confirmation."
+        },
+        "historical_market_industry": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "TSE regime, 33-sector, and common-share effective history are not established publicly."
+        },
+        "historical_trading_unit": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Japan historical trading-unit coverage is not public."
+        },
+        "corporate_group_history": {
+          "status": "PARTIAL",
+          "note": "PermID links listings, issuers, subsidiaries, and parents; effective historical group membership is not public."
+        },
+        "suspension_special_designation_history": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Complete dated TSE special-status history is not public."
+        },
+        "comprehensive_corporate_actions": {
+          "status": "PARTIAL",
+          "note": "50+ equity event types, 25+ years and frequent updates are public; Japan completeness/revisions need confirmation."
+        },
+        "raw_adjusted_ohlcv": {
+          "status": "PARTIAL",
+          "note": "Long TSE history, raw delivery and factors are documented; a same-version raw/adjusted daily contract needs confirmation."
+        },
+        "trading_value": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Exact selected daily package fields need confirmation."
+        },
+        "known_at_publication_timestamp": {
+          "status": "PARTIAL",
+          "note": "Point-in-time pricing and update timing do not prove universe/security-master known-at history."
+        },
+        "version_freeze_long_term_retention": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Technical delivery does not establish contractual archive rights."
+        },
+        "aggregate_hash_storage_rights": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Commercial-field aggregate/hash publication rights are not public."
+        }
+      },
+      "commercial": {
+        "individual_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public enterprise pages do not settle individual acceptance."
+        },
+        "sole_proprietor_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public enterprise pages do not settle this contract type."
+        },
+        "small_corporation_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public pages do not state a minimum company size or acceptance rule."
+        },
+        "price": {
+          "status": "QUOTE_REQUIRED",
+          "currency": null,
+          "amount": null
+        },
+        "minimum_term": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "value": null
+        },
+        "redistribution_derived_results": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Dataset permissioning and third-party terms apply; intended outputs need written confirmation."
+        }
+      },
+      "formal_assessment": {
+        "status": "CONDITIONAL_FORMAL_CANDIDATE",
+        "current_possible": false,
+        "reason": "Japan eligibility/status/unit fields and snapshot/output rights remain unresolved."
+      }
+    },
+    {
+      "id": "BLOOMBERG",
+      "name": "Bloomberg Data License + PIT research + reference/pricing bundle",
+      "category": "global_enterprise_vendor_bundle",
+      "delivery": [
+        "BULK_FILES",
+        "CLOUD",
+        "API"
+      ],
+      "source_ids": [
+        "bloomberg_data_license",
+        "bloomberg_reference",
+        "bloomberg_cofi",
+        "bloomberg_research",
+        "openfigi",
+        "openfigi_terms"
+      ],
+      "capabilities": {
+        "point_in_time_active_issue_universe": {
+          "status": "PARTIAL",
+          "note": "PIT research documents investable-universe filtering, daily snapshots, and active/inactive public companies."
+        },
+        "delisted_issues": {
+          "status": "PARTIAL",
+          "note": "Active and inactive coverage is public; complete Japan population/period is not."
+        },
+        "listing_delisting_dates": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Exact effective listing intervals are not public."
+        },
+        "ticker_lineage_stable_security_id": {
+          "status": "PARTIAL",
+          "note": "FIGI is persistent and not reused; licensed historical lineage needs confirmation."
+        },
+        "historical_market_industry": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Historical TSE segment/sector/common-share eligibility is not established despite global classifications."
+        },
+        "historical_trading_unit": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Japan historical trading-unit coverage is not public."
+        },
+        "corporate_group_history": {
+          "status": "PARTIAL",
+          "note": "Corporate/capital-structure hierarchy is public; point-in-time group membership is not."
+        },
+        "suspension_special_designation_history": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Complete dated TSE special-state history is not public."
+        },
+        "comprehensive_corporate_actions": {
+          "status": "PARTIAL",
+          "note": "50+ event types and global analyst coverage are public; Japan completeness/revisions need confirmation."
+        },
+        "raw_adjusted_ohlcv": {
+          "status": "PARTIAL",
+          "note": "Historical and corporate-action-adjusted pricing are public; exact raw OHLCV/turnover package needs confirmation."
+        },
+        "trading_value": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Exact Japan daily package fields need confirmation."
+        },
+        "known_at_publication_timestamp": {
+          "status": "PARTIAL",
+          "note": "PIT history, timestamps, and daily snapshots are public; per-field Japan semantics need confirmation."
+        },
+        "version_freeze_long_term_retention": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Technical bulk/history delivery does not establish termination retention."
+        },
+        "aggregate_hash_storage_rights": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "OpenFIGI rights do not extend to commercial Data License fields."
+        }
+      },
+      "commercial": {
+        "individual_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public enterprise pages do not establish availability."
+        },
+        "sole_proprietor_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public enterprise pages do not establish availability."
+        },
+        "small_corporation_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public pages do not state a minimum company size or acceptance rule."
+        },
+        "price": {
+          "status": "QUOTE_REQUIRED",
+          "currency": null,
+          "amount": null
+        },
+        "minimum_term": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "value": null
+        },
+        "redistribution_derived_results": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "OpenFIGI public rights do not imply rights in commercial data or research outputs."
+        }
+      },
+      "formal_assessment": {
+        "status": "ENTERPRISE_PIT_CONDITIONAL_CANDIDATE",
+        "current_possible": false,
+        "reason": "Strong public PIT framing; Japan fields, exact known-at contract, retention, and output rights remain unresolved."
+      }
+    },
+    {
+      "id": "FACTSET",
+      "name": "FactSet Pricing & Reference + DMS + Global Prices/Returns/RBICS",
+      "category": "global_enterprise_vendor_bundle",
+      "delivery": [
+        "FEEDS",
+        "API",
+        "CLOUD"
+      ],
+      "source_ids": [
+        "factset_pricing_reference",
+        "factset_global_prices",
+        "factset_prices_returns",
+        "factset_dms",
+        "factset_entity",
+        "factset_rbics",
+        "factset_terms"
+      ],
+      "capabilities": {
+        "point_in_time_active_issue_universe": {
+          "status": "PARTIAL",
+          "note": "Active/inactive listings and entity/security relationships are public; daily Japan eligibility snapshots are not."
+        },
+        "delisted_issues": {
+          "status": "AVAILABLE",
+          "note": "Active and inactive instruments are explicit at global product level; Japan completeness still needs confirmation."
+        },
+        "listing_delisting_dates": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "A complete Japan effective interval contract is not public."
+        },
+        "ticker_lineage_stable_security_id": {
+          "status": "PARTIAL",
+          "note": "Stable FactSet IDs and current/historical mappings are public; effective listing lineage needs confirmation."
+        },
+        "historical_market_industry": {
+          "status": "PARTIAL",
+          "note": "RBICS and security-type history are public; TSE segment/33-sector history is not."
+        },
+        "historical_trading_unit": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Japan historical trading-unit coverage is not public."
+        },
+        "corporate_group_history": {
+          "status": "PARTIAL",
+          "note": "DMS relationships and hierarchies through time are public; required Japan group semantics/effective dates are not."
+        },
+        "suspension_special_designation_history": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Complete dated TSE special-state history is not public."
+        },
+        "comprehensive_corporate_actions": {
+          "status": "PARTIAL",
+          "note": "Unified actions and adjustment workflows are public; Japan event completeness/revisions need confirmation."
+        },
+        "raw_adjusted_ohlcv": {
+          "status": "AVAILABLE",
+          "note": "Unadjusted price/open/high/low/volume/VWAP/turnover and adjustment workflows are public at product level."
+        },
+        "trading_value": {
+          "status": "AVAILABLE",
+          "note": "Turnover is documented at product level."
+        },
+        "known_at_publication_timestamp": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "The security-master/corporate-action known-at contract is not public."
+        },
+        "version_freeze_long_term_retention": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Technical delivery does not establish contractual archive rights."
+        },
+        "aggregate_hash_storage_rights": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Commercial-field aggregate/hash publication rights are not public."
+        }
+      },
+      "commercial": {
+        "individual_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public enterprise pages do not establish availability."
+        },
+        "sole_proprietor_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public enterprise pages do not establish availability."
+        },
+        "small_corporation_contract": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Public pages do not state a minimum company size or acceptance rule."
+        },
+        "price": {
+          "status": "QUOTE_REQUIRED",
+          "currency": null,
+          "amount": null
+        },
+        "minimum_term": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "value": null
+        },
+        "redistribution_derived_results": {
+          "status": "SUPPORT_CONFIRMATION_REQUIRED",
+          "note": "Supplier-specific third-party terms can apply; intended outputs require written confirmation."
+        }
+      },
+      "formal_assessment": {
+        "status": "CONDITIONAL_FORMAL_CANDIDATE",
+        "current_possible": false,
+        "reason": "Prices, IDs and entity history are strong; PIT security-master known-at and Japan eligibility states remain unresolved."
+      }
+    },
+    {
+      "id": "DATA_GET2",
+      "name": "DATA-GET2 daily CSV and long-history archive",
+      "category": "individual_low_cost_alternative",
+      "delivery": [
+        "DOWNLOAD",
+        "ONE_OFF_ARCHIVE"
+      ],
+      "source_ids": [
+        "data_get2_service",
+        "data_get2_spec",
+        "data_get2_archive",
+        "data_get2_price",
+        "data_get2_terms"
+      ],
+      "capabilities": {
+        "point_in_time_active_issue_universe": {
+          "status": "NOT_AVAILABLE",
+          "note": "Current issue information is not a point-in-time universe archive."
+        },
+        "delisted_issues": {
+          "status": "PARTIAL",
+          "note": "Long-history price files include delisted issues; the archive's current issue file excludes them."
+        },
+        "listing_delisting_dates": {
+          "status": "NOT_AVAILABLE",
+          "note": "No formal interval file is documented."
+        },
+        "ticker_lineage_stable_security_id": {
+          "status": "NOT_AVAILABLE",
+          "note": "No stable ID or code lineage is documented."
+        },
+        "historical_market_industry": {
+          "status": "PARTIAL",
+          "note": "Current 33-sector code and exchange price history only."
+        },
+        "historical_trading_unit": {
+          "status": "PARTIAL",
+          "note": "Current unit shares are documented, not dated unit history."
+        },
+        "corporate_group_history": {
+          "status": "NOT_AVAILABLE",
+          "note": "No group history is documented."
+        },
+        "suspension_special_designation_history": {
+          "status": "NOT_AVAILABLE",
+          "note": "No special-state history is documented."
+        },
+        "comprehensive_corporate_actions": {
+          "status": "PARTIAL",
+          "note": "Split/consolidation file only."
+        },
+        "raw_adjusted_ohlcv": {
+          "status": "PARTIAL",
+          "note": "Raw daily O/H/L/C/volume is documented; adjusted series is not."
+        },
+        "trading_value": {
+          "status": "NOT_AVAILABLE",
+          "note": "Trading value is not in the cited daily specification."
+        },
+        "known_at_publication_timestamp": {
+          "status": "NOT_AVAILABLE",
+          "note": "Daily update time is not a historical publication-version timestamp."
+        },
+        "version_freeze_long_term_retention": {
+          "status": "PARTIAL",
+          "note": "The archive product is technically fixed; research-processing and output rights are restrictive."
+        },
+        "aggregate_hash_storage_rights": {
+          "status": "NOT_AVAILABLE",
+          "note": "Published terms prohibit independent processing/duplication and third-party provision without separate permission."
+        }
+      },
+      "commercial": {
+        "individual_contract": {
+          "status": "AVAILABLE",
+          "note": "The published contract is for individuals."
+        },
+        "sole_proprietor_contract": {
+          "status": "NOT_AVAILABLE",
+          "note": "Commercial use is prohibited by the cited terms."
+        },
+        "small_corporation_contract": {
+          "status": "NOT_AVAILABLE",
+          "note": "The cited terms define the user as an approved individual."
+        },
+        "price": {
+          "status": "AVAILABLE",
+          "currency": "JPY",
+          "tax": "included",
+          "examples": {
+            "daily_csv_per_month": 2200,
+            "long_history_archive_one_off": 16500
+          }
+        },
+        "minimum_term": {
+          "status": "AVAILABLE",
+          "value": "monthly_auto_renewal_or_one_off_archive"
+        },
+        "redistribution_derived_results": {
+          "status": "NOT_AVAILABLE",
+          "note": "Published terms prohibit commercial use, independent processing/duplication, and third-party provision."
+        }
+      },
+      "formal_assessment": {
+        "status": "NOT_POSSIBLE",
+        "current_possible": false,
+        "reason": "Missing data dimensions and incompatible published use terms."
+      }
+    }
+  ],
+  "rankings": {
+    "highest_documented_japan_specific_field_coverage": {
+      "option_id": "QUICK",
+      "status": "CONDITIONAL_ONLY",
+      "reason": "The public master, action, and regulatory descriptions cover the largest set of Japan-specific selection fields, but published history begins only in 2014/2015."
+    },
+    "strongest_enterprise_point_in_time_framing": {
+      "option_id": "BLOOMBERG",
+      "status": "CONDITIONAL_ONLY",
+      "reason": "Public materials directly combine investable-universe workflows, active/inactive companies, PIT history/timestamps, adjusted pricing, and connected reference data, without proving the Japan-specific field contract."
+    },
+    "strongest_domestic_point_in_time_design": {
+      "option_id": "TOYO_TREND3EPOT",
+      "status": "CONDITIONAL_ONLY",
+      "reason": "Public documentation explicitly supports listed/delisted company selection at a point in time and record validity/update timestamps."
+    },
+    "lowest_public_price": {
+      "option_id": "DATA_GET2",
+      "status": "NOT_FORMAL_ELIGIBLE",
+      "reason": "JPY 2,200/month or JPY 16,500 one-off is lowest, but capability and license requirements fail."
+    },
+    "lowest_public_price_official_exchange_files": {
+      "option_id": "JPX_DATACUBE",
+      "status": "NOT_FORMAL_ELIGIBLE_ALONE",
+      "reason": "Individual/academic O/H/L/C files start at JPY 990 per market month but do not solve the security-state plane."
+    },
+    "lowest_public_price_corporate_scope_inquiry": {
+      "option_id": "JPX_DIRECT",
+      "status": "CONDITIONAL_ONLY",
+      "reason": "A current-feed public subtotal begins at JPY 284,000/month excluding tax; historical and license scope are unresolved."
+    },
+    "individual_contract_options": [
+      "JQ_PERSONAL",
+      "JPX_DATACUBE",
+      "DATA_GET2"
+    ],
+    "individual_contract_formal_options": [],
+    "explicit_legal_entity_only_options": [
+      "JQ_PRO"
+    ],
+    "formal_u50_u100_conditional_candidates": [
+      "BLOOMBERG",
+      "TOYO_TREND3EPOT",
+      "LSEG",
+      "FACTSET",
+      "QUICK",
+      "NIKKEI_NEEDS",
+      "JQ_PRO",
+      "JPX_DIRECT"
+    ]
+  },
+  "gate_decision": {
+    "confirmed_option_meeting_all_requirements": null,
+    "formal_u50_u100_possible_from_public_evidence": false,
+    "formal_u50_u100_execution_authorization": "none",
+    "real_money_canary_authorization": "none",
+    "purchase_or_contract_authorization": "none",
+    "worth_paying_additional_cost_now": false,
+    "recommendation": "DO_NOT_BUY_YET",
+    "next_gate": "V2-R1D_WRITTEN_SCOPE_LICENSE_AND_SAMPLE_DICTIONARY_GATE"
+  },
+  "required_pre_contract_questions": [
+    "Can the provider deliver a complete daily point-in-time universe of eligible Japanese common shares, including later-delisted issues, for the full approved research period?",
+    "Are listing date, delisting date, stable security ID, former/current code lineage, market segment, industry, and trading unit available with effective dates and full history?",
+    "How are ordinary/common shares distinguished from preferred shares, foreign shares, ETFs, REITs, tracking stocks, and other products at each historical date?",
+    "Can the provider deliver dated parent/group relationships using a frozen definition suitable for concentration limits?",
+    "Can every historical supervision, liquidation, special-caution, trading-suspension, and otherwise untradeable state be replayed as of each selection date?",
+    "Which corporate actions are covered, from what date, and are announcement, effective, cancellation, correction, and vendor-publication timestamps retained?",
+    "Are raw and adjusted daily O/H/L/C, volume, trading value, and every adjustment factor available from the same frozen version?",
+    "Does each field have effective-at, known-at, first-publication, and last-revision timestamps, or an equivalent replayable vintage model?",
+    "May encrypted raw snapshots and data dictionaries be retained indefinitely for internal reproducibility after termination?",
+    "May non-reconstructive aggregates, counts, performance metrics, and SHA-256 fingerprints be committed to a private or public research repository?",
+    "What exact contract category applies to an individual, sole proprietor, and small Japanese corporation, and is there a minimum annual fee or term?",
+    "What are the total fees for the exact fields, full history, delivery method, one research user, historical backfill, and no raw redistribution?",
+    "What restrictions apply to derived backtest results, research reports, external publication, audits, and model outputs?",
+    "Will the provider supply a field dictionary and a tiny synthetic or legally reviewable sample covering a listing, delisting, code change, split, merger, trading-unit change, supervision designation, suspension, correction, and group change before commitment?"
+  ],
+  "sources": [
+    {
+      "id": "jq_personal_overview",
+      "url": "https://jpx-jquants.com/?lang=ja%2F"
+    },
+    {
+      "id": "jq_personal_master",
+      "url": "https://jpx-jquants.com/ja/spec/eq-master"
+    },
+    {
+      "id": "jq_personal_bars",
+      "url": "https://jpx-jquants.com/ja/spec/eq-bars-daily"
+    },
+    {
+      "id": "jq_personal_adjustment",
+      "url": "https://jpx-jquants.com/ja/spec/eq-bars-daily/adj"
+    },
+    {
+      "id": "jq_personal_periods",
+      "url": "https://jpx-jquants.com/ja/spec/data-spec"
+    },
+    {
+      "id": "jq_personal_terms",
+      "url": "https://jpx-jquants.com/ja/termsofservice"
+    },
+    {
+      "id": "jq_pro_listed_issue",
+      "url": "https://pro.jpx-jquants.com/datasets/4"
+    },
+    {
+      "id": "jq_pro_prices",
+      "url": "https://pro.jpx-jquants.com/datasets/9"
+    },
+    {
+      "id": "jq_pro_corporate_actions",
+      "url": "https://pro.jpx-jquants.com/datasets/14"
+    },
+    {
+      "id": "jq_pro_pricing",
+      "url": "https://pro.jpx-jquants.com/pdfs/appendix-1-2-pricing-and-usage-table-en.pdf"
+    },
+    {
+      "id": "jq_pro_license",
+      "url": "https://pro.jpx-jquants.com/pdfs/j-quants-pro-data-license-agreement-en.pdf"
+    },
+    {
+      "id": "jq_pro_security_change",
+      "url": "https://jpx.gitbook.io/j-quants-pro-ja/api-reference/corporate_action/change_of_stock_detail"
+    },
+    {
+      "id": "jq_pro_delisting",
+      "url": "https://jpx.gitbook.io/j-quants-pro-ja/api-reference/corporate_action/delisting"
+    },
+    {
+      "id": "jq_pro_other_notes",
+      "url": "https://pro.jpx-jquants.com/pdfs/appendix-1-3-other-notes-en.pdf"
+    },
+    {
+      "id": "jq_pro_external_distribution",
+      "url": "https://pro.jpx-jquants.com/pdfs/appendix-4-external-distribution-en.pdf"
+    },
+    {
+      "id": "jpx_master",
+      "url": "https://www.jpx.co.jp/english/markets/paid-info-equities/reference/08.html"
+    },
+    {
+      "id": "jpx_corporate_actions",
+      "url": "https://www.jpx.co.jp/english/markets/paid-info-listing/corporate-action/index.html"
+    },
+    {
+      "id": "jpx_historical",
+      "url": "https://www.jpx.co.jp/english/markets/paid-info-equities/historical/"
+    },
+    {
+      "id": "jpx_reference_fees",
+      "url": "https://www.jpx.co.jp/english/markets/paid-info-equities/reference/tvdivq00000024wc-att/e_fee_schedule_ref_data.pdf"
+    },
+    {
+      "id": "jpx_datacube_overview",
+      "url": "https://www.jpx.co.jp/markets/other-data-services/j-quants-datacube/index.html"
+    },
+    {
+      "id": "jpx_datacube_prices",
+      "url": "https://db-ec.jpx.co.jp/client_info/JPX_DLSITE/html/datacube_price.pdf"
+    },
+    {
+      "id": "jpx_datacube_terms",
+      "url": "https://db-ec.jpx.co.jp/client_info/JPX_DLSITE/html/kiyaku.pdf"
+    },
+    {
+      "id": "jpx_datacube_spec",
+      "url": "https://db-ec.jpx.co.jp/client_info/JPX_DLSITE/html/data_detail.pdf"
+    },
+    {
+      "id": "quick_data_services",
+      "url": "https://corporate.quick.co.jp/products/data/"
+    },
+    {
+      "id": "quick_apis",
+      "url": "https://corporate.quick.co.jp/products/quick-apis/"
+    },
+    {
+      "id": "quick_master",
+      "url": "https://corporate.quick.co.jp/data-factory/product/data013/"
+    },
+    {
+      "id": "quick_scheduled_actions",
+      "url": "https://corporate.quick.co.jp/data-factory/product/data014/"
+    },
+    {
+      "id": "quick_regulatory",
+      "url": "https://corporate.quick.co.jp/data-factory/product/data015/"
+    },
+    {
+      "id": "nikkei_needs_catalog",
+      "url": "https://needs.nikkei.co.jp/needs-data/"
+    },
+    {
+      "id": "nikkei_financialquest",
+      "url": "https://needs.nikkei.co.jp/services/financial-quest/"
+    },
+    {
+      "id": "nikkei_bulk",
+      "url": "https://needs.nikkei.co.jp/services/bulk/"
+    },
+    {
+      "id": "toyo_trend3epot",
+      "url": "https://biz.toyokeizai.net/en/data/service/detail/id=1204"
+    },
+    {
+      "id": "toyo_trend3epot_overview",
+      "url": "https://biz.toyokeizai.net/files/user/data_doc/pdf/TRENDE3EPOT_OVERVIEW.pdf"
+    },
+    {
+      "id": "toyo_affiliates",
+      "url": "https://biz.toyokeizai.net/en/data/service/detail/id=866"
+    },
+    {
+      "id": "toyo_pricing_process",
+      "url": "https://biz.toyokeizai.net/data/news/detail/id=3463"
+    },
+    {
+      "id": "lseg_tse",
+      "url": "https://www.lseg.com/en/data-analytics/financial-data/pricing-and-market-data/equities-market-data/tokyo-stock-exchange-data"
+    },
+    {
+      "id": "lseg_datascope",
+      "url": "https://www.lseg.com/en/data-analytics/products/datascope-select-data-delivery"
+    },
+    {
+      "id": "lseg_corporate_actions",
+      "url": "https://www.lseg.com/en/data-analytics/market-data/data-analytics-pricing/reference-data/corporate-actions"
+    },
+    {
+      "id": "lseg_datascope_guide",
+      "url": "https://developers.lseg.com/content/dam/devportal/api-families/datascope-select/datascope-select-rest-api/documentation/overview-and-concepts/dss_14_5_user_guide.pdf"
+    },
+    {
+      "id": "lseg_permid",
+      "url": "https://permid.org/faq"
+    },
+    {
+      "id": "lseg_permid_terms",
+      "url": "https://permid.org/terms"
+    },
+    {
+      "id": "bloomberg_data_license",
+      "url": "https://professional.bloomberg.com/products/data/data-management/data-license/"
+    },
+    {
+      "id": "bloomberg_reference",
+      "url": "https://professional.bloomberg.com/products/data/enterprise-catalog/reference/"
+    },
+    {
+      "id": "bloomberg_cofi",
+      "url": "https://professional.bloomberg.com/products/data/enterprise-catalog/cofi/"
+    },
+    {
+      "id": "bloomberg_research",
+      "url": "https://professional.bloomberg.com/products/data/enterprise-catalog/investment-research-data/"
+    },
+    {
+      "id": "openfigi",
+      "url": "https://www.openfigi.com/about/overview"
+    },
+    {
+      "id": "openfigi_terms",
+      "url": "https://www.openfigi.com/docs/terms-of-service"
+    },
+    {
+      "id": "factset_pricing_reference",
+      "url": "https://www.factset.com/marketplace/catalog/product/factset-pricing-and-reference-data"
+    },
+    {
+      "id": "factset_global_prices",
+      "url": "https://developer.factset.com/api-catalog/factset-global-prices-api"
+    },
+    {
+      "id": "factset_prices_returns",
+      "url": "https://www.factset.com/marketplace/catalog/product/factset-prices-and-returns-api"
+    },
+    {
+      "id": "factset_dms",
+      "url": "https://www.factset.com/marketplace/catalog/product/factset-data-management-solutions"
+    },
+    {
+      "id": "factset_entity",
+      "url": "https://developer.factset.com/api-catalog/factset-entity-api"
+    },
+    {
+      "id": "factset_rbics",
+      "url": "https://developer.factset.com/api-catalog/factset-rbics-api"
+    },
+    {
+      "id": "factset_terms",
+      "url": "https://www.factset.com/third-party-terms"
+    },
+    {
+      "id": "data_get2_service",
+      "url": "https://www.data-get2.jp/general/service.html"
+    },
+    {
+      "id": "data_get2_spec",
+      "url": "https://www.data-get2.jp/general/dl.html"
+    },
+    {
+      "id": "data_get2_archive",
+      "url": "https://www.data-get2.jp/general/cd.html"
+    },
+    {
+      "id": "data_get2_price",
+      "url": "https://www.data-get2.jp/general/price.html"
+    },
+    {
+      "id": "data_get2_terms",
+      "url": "https://www.data-get2.jp/kiyaku.html"
+    }
+  ]
+}
