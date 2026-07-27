@@ -6,10 +6,14 @@ Base commit: `4f59764cfef49f7a9c0781469d30912e7f7826b0`
 
 Gate: `V2-R1C_DATA_SOURCE_OPTIONS`
 
-Evidence boundary: official, publicly accessible provider and exchange
-materials only. No account login, API request, sample/raw-data download,
-sales inquiry, quote request, trial, purchase, contract, or U50/U100
-backtest was performed.
+Evidence boundary: the comparative review uses official, publicly accessible
+provider and exchange materials. The J-Quants Personal Premium V2 cells also
+use a written support clarification received in 2026-07. Only the
+non-verbatim research summary in
+`JQUANTS_SUPPORT_CLARIFICATION_2026_07.md` is retained; the original message,
+headers, names, addresses, and other personal data are not stored. This
+amendment performed no new provider contact, API access, raw-data acquisition,
+purchase, contract, plan change, or U50/U100 execution.
 
 ## Gate result
 
@@ -37,9 +41,16 @@ backtest was performed.
   for Formal U50/U100.
 - Explicit legal-entity-only candidate:
   J-Quants Pro.
-- Formal U50/U100 possible from public evidence today: `false`
+- Formal U50/U100 possible after the support clarification: `false`
 - Purchase recommendation now: `DO_NOT_BUY_YET`
-- U50/U100 execution authorization: `none`
+- Formal U50/U100 execution authorization: `none`
+- PIT-lite exploratory U50/U100 technically and usage-conditionally possible
+  while Premium remains active for private individual research: `true`
+- PIT-lite exploratory U50/U100 execution authorization: `none`
+- Premium recommendation: `MAINTAIN_UNTIL_EXPLORATION_COMPLETE`
+- Post-exploration action:
+  `CONFIRM_REQUIRED_DELETION_THEN_DECIDE_STANDARD_OR_CANCELLATION`
+- Real-money canary authorization: `none`
 
 No unweighted status count is treated as proof that a provider meets the
 contract. `AVAILABLE` receives credit only for its stated scope; `PARTIAL`
@@ -55,15 +66,29 @@ known-at semantics, retention rights, or derived-result rights.
 
 | Status | Meaning |
 | --- | --- |
-| `AVAILABLE` | The official public material directly documents the required capability within the stated period/scope. |
-| `PARTIAL` | Related capability is documented, but period, population, field semantics, or completeness is insufficient for the frozen contract. |
-| `NOT_AVAILABLE` | The official material or the frozen prior gate identifies the capability as absent. |
+| `AVAILABLE` | Allowed official evidence directly documents the required capability within the stated period/scope. |
+| `PARTIAL` | Allowed official evidence documents related capability, but period, population, field semantics, or completeness is insufficient for the frozen contract. |
+| `NOT_AVAILABLE` | Allowed official evidence or the frozen prior gate identifies the capability as absent. |
 | `SUPPORT_CONFIRMATION_REQUIRED` | The public material does not establish the requirement. No inference is made. |
 | `QUOTE_REQUIRED` | No applicable public price was found. No quote was requested. |
 | `NOT_APPLICABLE` | The comparison item does not apply to the option as sold. |
 
 `AVAILABLE` is not a license conclusion. Retention, publication, aggregate,
 hash, and redistribution rights are evaluated separately.
+
+Written-support clarification statuses used only for J-Quants Personal
+Premium V2:
+
+| Status | Meaning |
+| --- | --- |
+| `AVAILABLE_WHILE_SUBSCRIPTION_ACTIVE` | Authorized encrypted local storage is limited to the active Premium subscription and private personal analysis. |
+| `AVAILABLE_WITH_PRIVATE_USE_BOUNDARY` | The listed raw-free outputs may be retained and published, but continuous or repeated third-party provision is outside private use. |
+| `DELETION_REQUIRED` | Data outside the new plan, including copies and backups, must be deleted on downgrade. |
+| `DELETE_ALL_LICENSED_AND_RECONSTRUCTIBLE_DATA` | Licensed raw and reconstructible data, copies, and backups must be deleted after the paid period or withdrawal. |
+| `AVAILABLE_BY_KNOWN_CODE` | A known delisted code can be used to request its listed-period data. |
+| `POPULATION_COMPLETENESS_NOT_CONFIRMED` | No complete population of all delisted issues is guaranteed. |
+
+These statuses are not extrapolated to J-Quants Pro or any other provider.
 
 ## Compared options
 
@@ -85,7 +110,7 @@ hash, and redistribution rights are evaluated separately.
 
 | Option | Point-in-time active issue universe | Delisted issues | Listing / delisting dates | Ticker lineage / stable security ID |
 | --- | --- | --- | --- | --- |
-| `JQ_PERSONAL` | `AVAILABLE` — date-scoped listed-issue snapshots, earliest service date 2008-05-07 | `PARTIAL` — historical snapshots can contain later-delisted issues, but completeness is not publicly guaranteed | `PARTIAL` — no direct interval fields; boundaries would have to be inferred from snapshots | `NOT_AVAILABLE` — the Personal master does not publish former-code lineage or a permanent ID |
+| `JQ_PERSONAL` | `AVAILABLE` — date-scoped listed-issue snapshots, earliest service date 2008-05-07 | `PARTIAL` — `AVAILABLE_BY_KNOWN_CODE`; listed-period data can be requested when the code is known, but `POPULATION_COMPLETENESS_NOT_CONFIRMED` | `PARTIAL` overall because snapshot boundaries can be inferred, but the dedicated listing/delisting-date history API is `NOT_AVAILABLE` | `NOT_AVAILABLE` — written clarification confirms no dedicated code-change history or permanent security ID |
 | `JQ_PRO` | `AVAILABLE` — historical Listed Issue Information from 2008-05-07 | `PARTIAL` — delisting events are documented, but non-dividend corporate-action history begins 2015-05-08 | `PARTIAL` — delisting and security-master change events are documented; full listing intervals back to 2008 are not | `PARTIAL` — `CodeBeforeChange` supports code lineage, but a permanent security ID is not documented |
 | `JPX_DIRECT` | `PARTIAL` — next-business-day all-exchange domestic issue master; historical snapshot entitlement is not public | `PARTIAL` — corporate-action/security-master changes include delisting, but searchable public history is limited | `PARTIAL` — event/effective dates exist, but full historical interval availability is not public | `PARTIAL` — current local code/ISIN plus master changes; complete dated lineage needs confirmation |
 | `JPX_DATACUBE` | `PARTIAL` — month-bounded market files can reconstruct traded issues, but this is not a formal eligible-universe master | `AVAILABLE` for purchased historical price files containing issues traded during each period | `SUPPORT_CONFIRMATION_REQUIRED` | `SUPPORT_CONFIRMATION_REQUIRED` |
@@ -101,7 +126,7 @@ hash, and redistribution rights are evaluated separately.
 
 | Option | Historical market / industry | Historical trading unit | Corporate-group history | Suspension / supervision / liquidation and similar history |
 | --- | --- | --- | --- | --- |
-| `JQ_PERSONAL` | `AVAILABLE` for effective market and 17/33-sector snapshot values; old/new regime mapping still must be frozen | `NOT_AVAILABLE` | `NOT_AVAILABLE` | `NOT_AVAILABLE` for the complete frozen exclusion rule |
+| `JQ_PERSONAL` | `AVAILABLE` for effective market and 17/33-sector snapshot values; old/new regime mapping still must be frozen | `NOT_AVAILABLE` — written clarification confirms no dedicated trading-unit history API | `NOT_AVAILABLE` | `NOT_AVAILABLE` — written clarification confirms no dedicated suspension, supervision, liquidation, or equivalent history API |
 | `JQ_PRO` | `AVAILABLE` for effective listed-issue values and dated security-master changes within published history | `PARTIAL` — unit-change events are documented from the corporate-action history window | `SUPPORT_CONFIRMATION_REQUIRED` | `SUPPORT_CONFIRMATION_REQUIRED` |
 | `JPX_DIRECT` | `PARTIAL` — current master contains exchange section; full dated history is not public | `PARTIAL` through security-master change data; historical depth needs confirmation | `SUPPORT_CONFIRMATION_REQUIRED` | `PARTIAL` — listing status is in the master, but a complete dated archive of all exclusion states is not public |
 | `JPX_DATACUBE` | `PARTIAL` — period files preserve traded-market context, but formal classification history is not established | `SUPPORT_CONFIRMATION_REQUIRED` | `SUPPORT_CONFIRMATION_REQUIRED` | `SUPPORT_CONFIRMATION_REQUIRED` |
@@ -117,7 +142,7 @@ hash, and redistribution rights are evaluated separately.
 
 | Option | Comprehensive corporate actions | Raw / adjusted OHLCV | Trading value | Known-at / publication timestamp |
 | --- | --- | --- | --- | --- |
-| `JQ_PERSONAL` | `PARTIAL` — split/reverse-split/rights adjustment logic and separate dividend facts do not establish comprehensive events | `AVAILABLE` fields from 2008-05-07, subject to documented adjustment exclusions | `AVAILABLE` | `NOT_AVAILABLE` — effective date is not a versioned publication timestamp |
+| `JQ_PERSONAL` | `PARTIAL` — split and reverse-split effects are partially observable through `AdjFactor`; a comprehensive corporate-action history API is `NOT_AVAILABLE` | `AVAILABLE` fields from 2008-05-07, subject to documented adjustment exclusions | `AVAILABLE` | `NOT_AVAILABLE` — effective date is not a versioned publication timestamp |
 | `JQ_PRO` | `PARTIAL` — broad event taxonomy, but cash-dividend history starts 2013-02-20 and other events 2015-05-08 | `AVAILABLE` raw/adjusted OHLC and volume from 2008-05-07 | `AVAILABLE` | `PARTIAL` — event announcement dates/times and update schedules exist, but no complete versioned availability contract is public |
 | `JPX_DIRECT` | `PARTIAL` — broad golden-source event set; searchable Web history is two years for most events and ten years for security-master changes | `PARTIAL` — direct daily raw O/H/L/C is available; an adjusted history/factor contract is not public | `AVAILABLE` in direct O/H/L/C service | `PARTIAL` — corporate actions are generally delivered promptly after disclosure, but a replayable full version history is not public |
 | `JPX_DATACUBE` | `NOT_AVAILABLE` as a comprehensive event service | `PARTIAL` — official historical O/H/L/C and volume files; adjusted series is not documented in the cited catalog | `AVAILABLE` | `NOT_AVAILABLE` |
@@ -133,7 +158,7 @@ hash, and redistribution rights are evaluated separately.
 
 | Option | Version freeze / long-term retention | Store aggregate results / hashes | Redistribution / derived-result restrictions |
 | --- | --- | --- | --- |
-| `JQ_PERSONAL` | `SUPPORT_CONFIRMATION_REQUIRED` with published cancellation/deletion duties | `SUPPORT_CONFIRMATION_REQUIRED` | `PARTIAL` — raw Internet/third-party distribution is not authorized; derived-result publication is `SUPPORT_CONFIRMATION_REQUIRED` |
+| `JQ_PERSONAL` | `PARTIAL` overall; `AVAILABLE_WHILE_SUBSCRIPTION_ACTIVE` for encrypted local storage of authorized data with acquisition date/conditions for private personal analysis. This is not post-cancellation retention | `AVAILABLE_WITH_PRIVATE_USE_BOUNDARY` for CAGR, maximum DD, win rate, PF, counts/period/missing counts, non-reconstructive SHA-256, methods, code, and raw-free backtest aggregates | `PARTIAL`; the listed raw-free outputs may be retained and published within `AVAILABLE_WITH_PRIVATE_USE_BOUNDARY`, but continuous or repeated third-party provision/distribution is outside private use |
 | `JQ_PRO` | `PARTIAL` — obtained information may continue for internal use after ordinary termination, but formal snapshot/version rights remain unconfirmed | `SUPPORT_CONFIRMATION_REQUIRED` | `PARTIAL` — external-use mechanisms exist; the intended edited/processed outputs are `SUPPORT_CONFIRMATION_REQUIRED` and JPXI reserves classification |
 | `JPX_DIRECT` | `SUPPORT_CONFIRMATION_REQUIRED` | `SUPPORT_CONFIRMATION_REQUIRED` | `SUPPORT_CONFIRMATION_REQUIRED` — usage tiers are public, but repository outputs and termination retention are not settled |
 | `JPX_DATACUBE` | `PARTIAL` technically because purchased files are fixed; legal retention and termination treatment still require confirmation | `SUPPORT_CONFIRMATION_REQUIRED` | `PARTIAL` — self-use/external/individual-academic classes exist; intended derived artifacts are `SUPPORT_CONFIRMATION_REQUIRED` |
@@ -144,6 +169,18 @@ hash, and redistribution rights are evaluated separately.
 | `BLOOMBERG` | `SUPPORT_CONFIRMATION_REQUIRED` | `SUPPORT_CONFIRMATION_REQUIRED` | `SUPPORT_CONFIRMATION_REQUIRED` — OpenFIGI rights do not imply rights in commercial Data License fields |
 | `FACTSET` | `SUPPORT_CONFIRMATION_REQUIRED` | `SUPPORT_CONFIRMATION_REQUIRED` | `SUPPORT_CONFIRMATION_REQUIRED` — supplier-specific terms can apply |
 | `DATA_GET2` | `PARTIAL` for the physical/archive product only | `NOT_AVAILABLE` under the published individual terms without a separate written permission | `NOT_AVAILABLE` — published terms prohibit commercial use, independent processing/duplication, and third-party provision |
+
+### J-Quants Personal Premium lifecycle duties
+
+- Premium to Standard: `DELETION_REQUIRED`. Data outside the Standard plan,
+  together with its copies and backups, must be deleted and cannot be used
+  after the change.
+- End of the paid period or membership withdrawal:
+  `DELETE_ALL_LICENSED_AND_RECONSTRUCTIBLE_DATA`. Licensed raw data,
+  reconstructible processed data, copies, and backups must be deleted.
+- Raw-free aggregates and backtest results, non-reconstructive hashes,
+  analysis methods, and program code are outside that cancellation deletion
+  set.
 
 ## E. Contract availability, price, and minimum term
 
@@ -170,7 +207,7 @@ total.
 
 | Option | Current Formal status | Why it stops |
 | --- | --- | --- |
-| `JQ_PERSONAL` | `NOT_POSSIBLE_ALONE` | Frozen V2-R1B capability gaps remain |
+| `JQ_PERSONAL` | `NOT_POSSIBLE_ALONE` | Written clarification permits bounded PIT-lite private exploration but does not provide a complete delisted population, direct listing/delisting history, code lineage/permanent ID, trading-unit history, special-status history, or comprehensive corporate-action history |
 | `JQ_PRO` | `CONDITIONAL_HYBRID_CANDIDATE` | Corporate group, special-status history, full-period lineage/listing intervals, complete known-at semantics, and research rights remain unresolved |
 | `JPX_DIRECT` | `CONDITIONAL_HYBRID_CANDIDATE` | Current-feed prices do not establish historical point-in-time backfill or full archive rights |
 | `JPX_DATACUBE` | `NOT_POSSIBLE_ALONE` | Strong price history, but not the missing eligibility/security-state plane |
@@ -187,10 +224,19 @@ No row is a Formal Candidate approval. `formal_u50_u100_possible` remains
 field, period, version, and license requirement against sample
 documentation/data under an approved trial or contract.
 
-## Official source register
+The support clarification changes PIT-lite exploratory readiness only.
+It does not change Formal U50/U100 status, execution authorization, or
+real-money canary authorization. PIT-lite execution also requires separate
+explicit approval.
 
-All links were publicly accessible without using a provider account during
-this desk review.
+## Evidence register
+
+The comparative source links below were publicly accessible without using a
+provider account during this desk review. J-Quants Personal Premium V2 also
+uses an official written support clarification received in 2026-07. Repository
+evidence is limited to the non-verbatim summary in
+`JQUANTS_SUPPORT_CLARIFICATION_2026_07.md`; the original message and all
+personal/contact information are not retained.
 
 ### J-Quants and JPX
 
@@ -333,10 +379,19 @@ this desk review.
 
 ## Non-actions confirmed
 
-- New contract: none
+- Written support clarification stored as a non-verbatim summary: yes
+- Original email or personal/contact data stored: no
+- Existing Premium recommendation: maintain until the separately approved
+  exploratory phase is complete
+- New contract, purchase, or plan change: none
 - Quote approval or quote request: none
+- New provider contact in this amendment: none
 - Provider API access: none
 - Raw or sample data acquired: none
+- Formal U50/U100 possible: false
+- PIT-lite exploratory U50/U100 possible while Premium is active: true
+- PIT-lite exploratory U50/U100 execution authorization: none
 - U50/U100 backtest: not executed
+- Real-money canary authorization: none
 - Production, Cloudflare, GitHub Actions production workflow, Google Sheets,
   Secrets, LINE, pending, and trading path changes: none

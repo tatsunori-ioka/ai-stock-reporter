@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "gate_id": "V2-R1C_DATA_SOURCE_OPTIONS",
   "as_of": "2026-07-27",
   "base_commit": "4f59764cfef49f7a9c0781469d30912e7f7826b0",
@@ -7,30 +7,58 @@
     "allowed": [
       "official_public_provider_material",
       "official_public_exchange_material",
+      "official_written_provider_support_clarification_summary",
       "previously_frozen_local_gate_decision_as_context_only"
     ],
     "not_performed": [
-      "account_login",
-      "api_access",
-      "sample_or_raw_data_download",
-      "sales_inquiry",
-      "quote_request",
-      "trial",
-      "purchase",
-      "contract",
-      "u50_u100_backtest"
+      "new_provider_contact_in_this_amendment",
+      "account_login_in_this_amendment",
+      "api_access_in_this_amendment",
+      "sample_or_raw_data_download_in_this_amendment",
+      "quote_request_or_approval_in_this_amendment",
+      "trial_in_this_amendment",
+      "purchase_or_new_contract_in_this_amendment",
+      "plan_change_in_this_amendment",
+      "u50_u100_backtest_in_this_amendment"
     ],
     "unknown_capability_label": "SUPPORT_CONFIRMATION_REQUIRED",
     "unknown_price_label": "QUOTE_REQUIRED"
   },
   "status_vocabulary": {
-    "AVAILABLE": "Official public material directly documents the capability within the stated scope.",
-    "PARTIAL": "Related capability is documented, but period, population, semantics, or completeness is insufficient.",
-    "NOT_AVAILABLE": "The official material or frozen prior gate identifies the capability as absent.",
+    "AVAILABLE": "Allowed official evidence directly documents the capability within the stated scope.",
+    "PARTIAL": "Allowed official evidence documents related capability, but period, population, semantics, or completeness is insufficient.",
+    "NOT_AVAILABLE": "Allowed official evidence or a frozen prior gate identifies the capability as absent.",
     "SUPPORT_CONFIRMATION_REQUIRED": "Public material does not establish the requirement.",
     "QUOTE_REQUIRED": "No applicable public price was found and no quote was requested.",
     "NOT_APPLICABLE": "The comparison item does not apply to the option as sold."
   },
+  "support_clarification_status_vocabulary": {
+    "AVAILABLE_WHILE_SUBSCRIPTION_ACTIVE": "Encrypted local storage for private personal analysis is available only while the Premium subscription is active.",
+    "AVAILABLE_WITH_PRIVATE_USE_BOUNDARY": "The enumerated raw-free outputs may be retained and published, but continuous or repeated third-party provision is outside private use.",
+    "DELETION_REQUIRED": "Out-of-plan licensed data, copies, and backups must be deleted on downgrade.",
+    "DELETE_ALL_LICENSED_AND_RECONSTRUCTIBLE_DATA": "Licensed raw and reconstructible data, copies, and backups must be deleted after the paid period or membership withdrawal.",
+    "AVAILABLE_BY_KNOWN_CODE": "Listed-period data can be requested when a delisted issue code is already known.",
+    "POPULATION_COMPLETENESS_NOT_CONFIRMED": "A complete population of all delisted issues is not guaranteed."
+  },
+  "support_clarifications": [
+    {
+      "id": "jq_personal_premium_v2_2026_07",
+      "received_month": "2026-07",
+      "scope": "JQ_PERSONAL_PREMIUM_V2",
+      "applies_to_option_id": "JQ_PERSONAL",
+      "evidence_type": "official_written_provider_support_clarification_summary",
+      "summary_artifact": "JQUANTS_SUPPORT_CLARIFICATION_2026_07.md",
+      "repository_handling": {
+        "summary_only": true,
+        "verbatim_message_retained": false,
+        "message_headers_retained": false,
+        "personal_identifiers_retained": false,
+        "sender_or_contact_details_retained": false
+      },
+      "raw_data_acquired": false,
+      "u50_u100_executed": false
+    }
+  ],
   "comparison_fields": [
     "point_in_time_active_issue_universe",
     "delisted_issues",
@@ -69,6 +97,9 @@
         "jq_personal_periods",
         "jq_personal_terms"
       ],
+      "support_clarification_ids": [
+        "jq_personal_premium_v2_2026_07"
+      ],
       "capabilities": {
         "point_in_time_active_issue_universe": {
           "status": "AVAILABLE",
@@ -76,15 +107,21 @@
         },
         "delisted_issues": {
           "status": "PARTIAL",
-          "note": "Historical snapshots can represent issues that later delisted, but complete population coverage is not publicly guaranteed."
+          "clarification_statuses": [
+            "AVAILABLE_BY_KNOWN_CODE",
+            "POPULATION_COMPLETENESS_NOT_CONFIRMED"
+          ],
+          "note": "Listed-period data can be requested when a delisted issue code is already known, but a complete population of all delisted issues is not confirmed."
         },
         "listing_delisting_dates": {
           "status": "PARTIAL",
-          "note": "No direct interval fields; boundaries would have to be inferred from snapshots."
+          "dedicated_history_api_status": "NOT_AVAILABLE",
+          "note": "No dedicated listing/delisting-date history API is available; snapshot boundaries can only be inferred and do not form a Formal interval history."
         },
         "ticker_lineage_stable_security_id": {
           "status": "NOT_AVAILABLE",
-          "note": "No former-code lineage or permanent security identifier is documented."
+          "dedicated_history_api_status": "NOT_AVAILABLE",
+          "note": "Written clarification confirms no dedicated code-change history or permanent security identifier."
         },
         "historical_market_industry": {
           "status": "AVAILABLE",
@@ -92,7 +129,8 @@
         },
         "historical_trading_unit": {
           "status": "NOT_AVAILABLE",
-          "note": "The listed-issue master does not document a trading-unit field."
+          "dedicated_history_api_status": "NOT_AVAILABLE",
+          "note": "Written clarification confirms no dedicated trading-unit history API."
         },
         "corporate_group_history": {
           "status": "NOT_AVAILABLE",
@@ -100,11 +138,15 @@
         },
         "suspension_special_designation_history": {
           "status": "NOT_AVAILABLE",
-          "note": "The complete frozen special-treatment and untradeable-status rule cannot be implemented from the documented master."
+          "dedicated_history_api_status": "NOT_AVAILABLE",
+          "note": "Written clarification confirms no dedicated trading-suspension, supervision, liquidation, or equivalent status history API."
         },
         "comprehensive_corporate_actions": {
           "status": "PARTIAL",
-          "note": "Adjustment logic and dividend facts do not establish a comprehensive event/revision history."
+          "dedicated_history_api_status": "NOT_AVAILABLE",
+          "split_consolidation_status": "PARTIAL",
+          "split_consolidation_mechanism": "AdjFactor",
+          "note": "Split and reverse-split effects are partially observable through AdjFactor, but no comprehensive corporate-action history API is available."
         },
         "raw_adjusted_ohlcv": {
           "status": "AVAILABLE",
@@ -119,12 +161,36 @@
           "note": "Effective dates are not a versioned publication timestamp."
         },
         "version_freeze_long_term_retention": {
-          "status": "SUPPORT_CONFIRMATION_REQUIRED",
-          "note": "Published terms include cancellation/deletion duties and no explicit reproducible-archive safe harbor."
+          "status": "PARTIAL",
+          "clarification_status": "AVAILABLE_WHILE_SUBSCRIPTION_ACTIVE",
+          "note": "Authorized data may be stored in an encrypted local environment with acquisition date and conditions for private personal analysis while Premium is active. This does not permit post-downgrade or post-cancellation licensed-data retention."
         },
         "aggregate_hash_storage_rights": {
-          "status": "SUPPORT_CONFIRMATION_REQUIRED",
-          "note": "Public aggregate and hash publication rights are not explicit."
+          "status": "AVAILABLE",
+          "clarification_status": "AVAILABLE_WITH_PRIVATE_USE_BOUNDARY",
+          "allowed_artifacts": [
+            "cagr",
+            "maximum_drawdown",
+            "win_rate",
+            "profit_factor",
+            "counts_period_and_missing_counts",
+            "non_reconstructive_sha256",
+            "analysis_method",
+            "program_code",
+            "raw_free_backtest_aggregate_results"
+          ],
+          "note": "The enumerated raw-free outputs may be retained and published within the private-use boundary; continuous or repeated third-party provision is outside private use."
+        }
+      },
+      "dedicated_history_api_scope": {
+        "listing_delisting_dates": "NOT_AVAILABLE",
+        "ticker_lineage_stable_security_id": "NOT_AVAILABLE",
+        "historical_trading_unit": "NOT_AVAILABLE",
+        "suspension_special_designation_history": "NOT_AVAILABLE",
+        "comprehensive_corporate_actions": "NOT_AVAILABLE",
+        "split_consolidation_adjustment_factor": {
+          "status": "PARTIAL",
+          "mechanism": "AdjFactor"
         }
       },
       "commercial": {
@@ -154,13 +220,71 @@
         },
         "redistribution_derived_results": {
           "status": "PARTIAL",
-          "note": "Raw Internet or third-party distribution is not authorized; derived-result publication is SUPPORT_CONFIRMATION_REQUIRED."
+          "clarification_status": "AVAILABLE_WITH_PRIVATE_USE_BOUNDARY",
+          "note": "The enumerated non-reconstructive outputs may be retained and published within private use. Continuous or repeated third-party provision or distribution is outside private use; raw or reconstructible data remains excluded."
+        }
+      },
+      "license_lifecycle": {
+        "encrypted_local_storage": {
+          "status": "AVAILABLE_WHILE_SUBSCRIPTION_ACTIVE",
+          "encrypted_local": true,
+          "record_acquisition_date_and_conditions": true,
+          "purpose": "private_personal_analysis"
+        },
+        "aggregate_result_storage_and_publication": {
+          "status": "AVAILABLE_WITH_PRIVATE_USE_BOUNDARY",
+          "allowed_artifacts": [
+            "cagr",
+            "maximum_drawdown",
+            "win_rate",
+            "profit_factor",
+            "counts_period_and_missing_counts",
+            "non_reconstructive_sha256",
+            "analysis_method",
+            "program_code",
+            "raw_free_backtest_aggregate_results"
+          ],
+          "continuous_or_repeated_third_party_provision_allowed": false
+        },
+        "premium_to_standard": {
+          "status": "DELETION_REQUIRED",
+          "delete": [
+            "licensed_data_outside_new_plan",
+            "copies",
+            "backups"
+          ],
+          "use_after_change": false
+        },
+        "paid_cancellation_or_membership_withdrawal": {
+          "status": "DELETE_ALL_LICENSED_AND_RECONSTRUCTIBLE_DATA",
+          "trigger": "billing_period_end_or_membership_withdrawal",
+          "delete": [
+            "licensed_raw_data",
+            "reconstructible_processed_data",
+            "copies",
+            "backups"
+          ],
+          "retained_exclusions": [
+            "raw_free_aggregate_results",
+            "raw_free_backtest_results",
+            "non_reconstructive_hashes",
+            "analysis_methods",
+            "program_code"
+          ]
         }
       },
       "formal_assessment": {
         "status": "NOT_POSSIBLE_ALONE",
         "current_possible": false,
-        "reason": "Frozen V2-R1B capability gaps remain."
+        "reason": "Written clarification permits bounded PIT-lite private exploration but does not supply the complete population and dedicated histories required for Formal U50/U100."
+      },
+      "pit_lite_exploratory_assessment": {
+        "technically_possible": true,
+        "usage_conditions_possible_for_private_personal_research_while_premium_active": true,
+        "execution_authorization": "none",
+        "requires_separate_explicit_approval": true,
+        "formal_equivalent": false,
+        "executed": false
       }
     },
     {
@@ -1303,6 +1427,11 @@
     "explicit_legal_entity_only_options": [
       "JQ_PRO"
     ],
+    "pit_lite_exploratory_option": {
+      "option_id": "JQ_PERSONAL",
+      "status": "POSSIBLE_SEPARATE_APPROVAL_REQUIRED",
+      "reason": "Active Premium permits bounded private encrypted storage and raw-free outputs, but missing histories prevent Formal status and execution remains unauthorized."
+    },
     "formal_u50_u100_conditional_candidates": [
       "BLOOMBERG",
       "TOYO_TREND3EPOT",
@@ -1317,7 +1446,14 @@
   "gate_decision": {
     "confirmed_option_meeting_all_requirements": null,
     "formal_u50_u100_possible_from_public_evidence": false,
+    "formal_u50_u100_possible_after_support_clarification": false,
+    "formal_u50_u100_possible": false,
     "formal_u50_u100_execution_authorization": "none",
+    "pit_lite_exploratory_u50_u100_possible_while_premium_active": true,
+    "pit_lite_exploratory_u50_u100_execution_authorization": "none",
+    "pit_lite_separate_explicit_approval_required": true,
+    "premium_recommendation": "MAINTAIN_UNTIL_EXPLORATION_COMPLETE",
+    "post_exploration_action": "CONFIRM_REQUIRED_DELETION_THEN_DECIDE_STANDARD_OR_CANCELLATION",
     "real_money_canary_authorization": "none",
     "purchase_or_contract_authorization": "none",
     "worth_paying_additional_cost_now": false,

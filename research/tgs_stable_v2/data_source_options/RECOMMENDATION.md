@@ -4,27 +4,44 @@ Decision date: 2026-07-27
 
 Base commit: `4f59764cfef49f7a9c0781469d30912e7f7826b0`
 
-Decision: `DO_NOT_BUY_YET`
+Additional-source purchase decision: `DO_NOT_BUY_YET`
 
-Formal U50/U100 possible from current public evidence: `false`
+Formal U50/U100 possible after the support clarification: `false`
 
-U50/U100 execution authorization: `none`
+Formal U50/U100 execution authorization: `none`
+
+PIT-lite exploratory U50/U100 possible under active Premium/private research:
+`true`
+
+PIT-lite exploratory U50/U100 execution authorization: `none`
+
+Premium recommendation: `MAINTAIN_UNTIL_EXPLORATION_COMPLETE`
+
+Post-exploration action:
+`CONFIRM_REQUIRED_DELETION_THEN_DECIDE_STANDARD_OR_CANCELLATION`
 
 Real-money canary authorization: `none`
 
 ## Executive decision
 
-No compared service can be approved from public documentation alone as the
-Formal U50/U100 data source. Every plausible enterprise option still has at
-least one unresolved critical item: Japan-specific eligibility state,
-full-period listing/code history, corporate-group history, replayable
-known-at timestamps, long-term raw retention, or permission to preserve and
-publish non-reconstructive results and hashes.
+No compared service can be approved as the Formal U50/U100 data source.
+Every plausible option still has at least one unresolved critical item:
+Japan-specific eligibility state, full-period listing/code history,
+corporate-group history, replayable known-at timestamps, long-term raw
+retention, or an adequate combination of those requirements.
 
-Do not purchase, subscribe, request a trial, connect an API, or run U50/U100
-yet. The next gate should be a written scope-and-license gate using the same
-field checklist for a small, ranked set of providers. A quote is useful only
-after the provider answers the capability and rights questions in writing.
+The written J-Quants Personal Premium V2 clarification resolves encrypted
+local storage while the subscription is active and the treatment of specified
+non-reconstructive outputs within a private-use boundary. It does not resolve
+the missing Formal data dimensions.
+
+Do not purchase another source, change the plan, connect the API, acquire raw
+data, or run PIT-lite or Formal U50/U100 without separate explicit approval.
+Maintain the existing Premium subscription through any separately approved
+exploratory phase. After exploration, confirm the required deletion and only
+then decide whether to change to Standard or cancel. The separate
+enterprise-source gate remains a written scope-and-license review before any
+quote approval.
 
 ## Findings by requested decision
 
@@ -119,6 +136,38 @@ but not sufficient alone. DataCube can provide official purchased files but
 not the complete missing state plane. DATA-GET2 fails both capability and
 published-use requirements.
 
+Personal Premium can technically and usage-conditionally support a PIT-lite
+exploratory U50/U100 during the active subscription for private individual
+research. Execution remains unauthorized until a separate explicit approval.
+
+### J-Quants Personal written clarification
+
+The 2026-07 support clarification is stored only as a non-verbatim research
+summary in `JQUANTS_SUPPORT_CLARIFICATION_2026_07.md`. The email body,
+headers, names, addresses, and other personal information are not retained.
+
+- Encrypted local storage:
+  `AVAILABLE_WHILE_SUBSCRIPTION_ACTIVE`. Authorized data may be stored with
+  its acquisition date and conditions for private personal analysis while
+  Premium remains active.
+- Aggregate storage and publication:
+  `AVAILABLE_WITH_PRIVATE_USE_BOUNDARY`. CAGR, maximum drawdown, win rate,
+  PF, counts/period/missing counts, non-reconstructive SHA-256, methods, code,
+  and raw-free backtest aggregates may be retained and published. Continuous
+  or repeated third-party provision or distribution is outside private use.
+- Premium to Standard: `DELETION_REQUIRED`. Data outside the new plan,
+  copies, and backups must be deleted and cannot be used after the change.
+- Paid cancellation or withdrawal:
+  `DELETE_ALL_LICENSED_AND_RECONSTRUCTIBLE_DATA` after the billed period ends
+  or upon membership withdrawal. Raw-free aggregates/results,
+  non-reconstructive hashes, methods, and code are outside this deletion set.
+- Delisted issues: `AVAILABLE_BY_KNOWN_CODE`, while
+  `POPULATION_COMPLETENESS_NOT_CONFIRMED`.
+- Dedicated history APIs for listing/delisting dates, code lineage/permanent
+  ID, trading units, special statuses, and comprehensive corporate actions:
+  `NOT_AVAILABLE`. Splits and reverse splits remain `PARTIAL` through
+  `AdjFactor`.
+
 Individual and personal-use availability must not be treated as sole
 proprietor business-use permission.
 
@@ -206,12 +255,18 @@ Japanese-equities package:
     merger, trading-unit change, supervision designation, suspension,
     correction, and corporate-group change before commitment?
 
+For J-Quants Personal Premium, the 2026-07 clarification answers the bounded
+active-subscription retention, raw-free aggregate publication, and
+downgrade/cancellation deletion portions of questions 9, 10, and 13. Those
+questions remain required for J-Quants Pro, other providers, and any Formal
+contract; the Personal answer must not be extrapolated.
+
 The first request should be a capability/licensing questionnaire, not a
 purchase request. Do not approve a quote that answers only price.
 
 ## Is additional spend worthwhile now?
 
-`NO`
+`NO_NEW_SPEND`
 
 The expected value of paying now is negative because:
 
@@ -224,6 +279,11 @@ The expected value of paying now is negative because:
   cost is incurred; and
 - U15 did not pass its economic gate, so the threshold for additional data
   spend should be evidence-driven.
+
+Maintaining the existing Personal Premium subscription through a separately
+approved PIT-lite exploration is recommended, but it is not approval to buy
+a new Formal source, upgrade a plan, connect the API now, or execute a
+backtest now.
 
 Additional spend becomes worth evaluating only after at least one provider
 returns a complete field/period/license response and a separate gate freezes:
@@ -238,9 +298,15 @@ returns a complete field/period/license response and a separate gate freezes:
 
 ## Recommended next gate
 
-`V2-R1D_WRITTEN_SCOPE_LICENSE_AND_SAMPLE_DICTIONARY_GATE`
+Two independent approvals remain:
 
-Suggested order:
+1. PIT-lite exploratory execution requires a separate explicit approval while
+   Premium is active. After the approved exploration completes, verify the
+   required deletion and then decide whether to change to Standard or cancel.
+2. Formal-source work continues through
+   `V2-R1D_WRITTEN_SCOPE_LICENSE_AND_SAMPLE_DICTIONARY_GATE`.
+
+Suggested Formal-source order:
 
 1. Send the same non-binding questionnaire to Toyo Keizai, QUICK, J-Quants
    Pro/JPXI, and Bloomberg. No quote approval or trial at this step.
@@ -250,14 +316,21 @@ Suggested order:
 4. Ask for price only for packages that pass the critical field and license
    crosswalk.
 5. Return for separate approval before any contract, trial, API connection,
-   sample/raw-data acquisition, or U50/U100 execution.
+   sample/raw-data acquisition, or Formal U50/U100 execution.
 
 ## Gate controls
 
-- New contract or subscription: none
+- Written clarification summarized: yes
+- Original email or personal/contact data retained: no
+- Existing Premium recommendation: maintain until exploration is complete
+- New contract, purchase, or plan change: none
 - Quote requested or approved: none
+- New provider contact in this amendment: none
 - Provider API access: none
 - Raw/sample data acquired: none
+- Formal U50/U100 possible: false
+- PIT-lite exploratory U50/U100 possible while Premium is active: true
+- PIT-lite exploratory U50/U100 execution authorization: none
 - U50/U100 backtest: not executed
 - Formal Candidate promotion: none
 - Real-money canary authorization: none
@@ -266,5 +339,6 @@ Suggested order:
   LINE, pending, and trading changes: none
 
 The detailed evidence matrix and official URLs are in
-`DATA_SOURCE_OPTIONS_MATRIX.md`; the machine-readable decision is in
-`data_source_options_matrix.json`.
+`DATA_SOURCE_OPTIONS_MATRIX.md`; the sanitized support summary is in
+`JQUANTS_SUPPORT_CLARIFICATION_2026_07.md`; the machine-readable decision is
+in `data_source_options_matrix.json`.
