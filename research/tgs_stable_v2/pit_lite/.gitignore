@@ -1,0 +1,35 @@
+# Licensed or reconstructible provider material is never repository material.
+private/
+data/
+raw/
+normalized/
+universe_membership/
+trade_ledger/
+checkpoint/
+runs/
+*.raw.json
+*.jsonl
+*.ndjson
+*.parquet
+*.feather
+*.arrow
+*.pkl
+*.sqlite
+*.sqlite3
+*.db
+*.gz
+*.zip
+.env
+.env.*
+
+# Generated repository output is deny-by-default and explicitly allowlisted.
+results/*
+!results/metrics_summary.json
+!results/yearly_metrics.csv
+!results/split_metrics.csv
+!results/score_bucket_metrics.csv
+!results/cost_sensitivity.csv
+!results/concentration_metrics.csv
+!results/universe_annual_counts.csv
+!results/data_fingerprints.json
+!results/request_audit_summary.json

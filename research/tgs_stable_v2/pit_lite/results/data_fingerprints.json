@@ -1,0 +1,20 @@
+{
+  "aggregate_score_bucket_row_count": 16,
+  "aggregate_split_metric_row_count": 12,
+  "aggregate_universe_year_row_count": 52,
+  "aggregate_year_metric_row_count": 52,
+  "base_commit": "d3b8ed0ec09d6d7fc70aeca5144f8bb6962c4073",
+  "classification": "PIT_LITE_EXPLORATORY_ONLY_NOT_FORMAL_CANDIDATE",
+  "contract_sha256": "139677d0393f28134859a07b8662c5e2a400f569b718135c49900b7681b5943f",
+  "gate_id": "V2-R2A_PIT_LITE_UNIVERSE_COMPARISON",
+  "implementation_bundle_sha256": "2ad4253b3a4545b98fe12efe67f9e11e47269b9a59619263584547a3ae7d73e6",
+  "model_id": "TGS_STABLE_V2_PIT_LITE",
+  "private_ledger_category_bundle_sha256": "434f07d262b18fb711ca686fcad5acfcbdf0b9f5674e9ce5a4341ffbba4766b6",
+  "private_membership_category_bundle_sha256": "0253b715aebc279315a6a1d22c53eb329eb3448058b6f0b83cdfff7c36bb79dd",
+  "private_normalized_category_bundle_sha256": "ee9304f64d4781b2140187f70921c6b12983ca13c263bea146a52461b15fe989",
+  "production_sha_expected_count": 19,
+  "production_sha_match_count": 19,
+  "raw_licensed_data_committed": false,
+  "run_id": "v2-r2a-20260727-d3b8ed0-integrity1",
+  "schema_version": "1.0"
+}
