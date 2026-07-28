@@ -1,0 +1,121 @@
+{
+  "aggregate_diagnostic_input_sha256": "9949620bf026d11aec18869be8dfbcc76d66631c31b0c4c31b22324a2702c6b3",
+  "api_key_reads": 0,
+  "base_commit": "9dae034999aa33b3f0d059adc059d3c8dbe659c2",
+  "classification": "POST_HOC_ASSOCIATION_DIAGNOSTIC_ONLY",
+  "frozen_primary_replay": {
+    "U100_PIT_LITE": {
+      "aggregate_replay_sha256": "5ad2ab4814641e012e5b2908fb2871e5d947916493fabc8aa1224e0bc51af58a",
+      "counters": {
+        "accepted_entries": 712,
+        "capacity_rejections": 8858,
+        "duplicate_rejections": 2245,
+        "invalid_bar_rejections": 0,
+        "missing_next_session_rejections": 1,
+        "premature_data_end_suspicions": 0,
+        "raw_signals": 11816
+      },
+      "curve_rows": 3011,
+      "ledger_rows": 712,
+      "match": true
+    },
+    "U15_ADJUSTED_STATIC": {
+      "aggregate_replay_sha256": "d42ea7035f70c21446c2d2845e17264ffe49ee3ebc18b261c190960c7e11c901",
+      "counters": {
+        "accepted_entries": 402,
+        "capacity_rejections": 40,
+        "duplicate_rejections": 1355,
+        "invalid_bar_rejections": 0,
+        "missing_next_session_rejections": 0,
+        "premature_data_end_suspicions": 0,
+        "raw_signals": 1797
+      },
+      "curve_rows": 3011,
+      "ledger_rows": 402,
+      "match": true
+    },
+    "U50_PIT_LITE": {
+      "aggregate_replay_sha256": "461ed321d1283c06dc7394d84f720d997c9564f91802e678a1e60e5e86c87af5",
+      "counters": {
+        "accepted_entries": 655,
+        "capacity_rejections": 3193,
+        "duplicate_rejections": 1977,
+        "invalid_bar_rejections": 0,
+        "missing_next_session_rejections": 0,
+        "premature_data_end_suspicions": 0,
+        "raw_signals": 5825
+      },
+      "curve_rows": 3011,
+      "ledger_rows": 655,
+      "match": true
+    }
+  },
+  "gate_id": "V2-R2B_ROOT_CAUSE_DIAGNOSTIC_AND_STOP_DECISION",
+  "model_id": "TGS_STABLE_V2_ROOT_CAUSE_DIAGNOSTIC",
+  "network_calls": 0,
+  "position_daily_pnl_reconciliation": {
+    "U100_PIT_LITE": {
+      "match": true,
+      "maximum_absolute_reconciliation_error_jpy": 6.300979293882847e-09,
+      "tolerance_jpy": 0.002086606758742198
+    },
+    "U15_ADJUSTED_STATIC": {
+      "match": true,
+      "maximum_absolute_reconciliation_error_jpy": 5.005858838558197e-09,
+      "tolerance_jpy": 0.0025867101172349282
+    },
+    "U50_PIT_LITE": {
+      "match": true,
+      "maximum_absolute_reconciliation_error_jpy": 4.103640094399452e-09,
+      "tolerance_jpy": 0.0017341425617023313
+    }
+  },
+  "private_input_fingerprint": {
+    "api_key_reads": 0,
+    "base_commit": "9dae034999aa33b3f0d059adc059d3c8dbe659c2",
+    "category_bundles": {
+      "normalized": {
+        "file_count": 1275,
+        "match": true,
+        "sha256": "ee9304f64d4781b2140187f70921c6b12983ca13c263bea146a52461b15fe989"
+      },
+      "trade_ledger": {
+        "file_count": 48,
+        "match": true,
+        "sha256": "434f07d262b18fb711ca686fcad5acfcbdf0b9f5674e9ce5a4341ffbba4766b6"
+      },
+      "universe_membership": {
+        "file_count": 2,
+        "match": true,
+        "sha256": "0253b715aebc279315a6a1d22c53eb329eb3448058b6f0b83cdfff7c36bb79dd"
+      }
+    },
+    "classification": "POST_HOC_ASSOCIATION_DIAGNOSTIC_ONLY",
+    "cleanup_status": "NOT_EXECUTED",
+    "filevault_active": true,
+    "gate_id": "V2-R2B_ROOT_CAUSE_DIAGNOSTIC_AND_STOP_DECISION",
+    "manifest_entry_count": 2357,
+    "manifest_exact_coverage": true,
+    "manifest_hashes_and_sizes_match": true,
+    "manifest_sha256": "7212e777fb613a1ff0170c54298a21979019677c466800e6edd3f0e5f1ac6d7e",
+    "model_id": "TGS_STABLE_V2_ROOT_CAUSE_DIAGNOSTIC",
+    "network_calls": 0,
+    "pit_lite_implementation_bundle_sha256": "2ad4253b3a4545b98fe12efe67f9e11e47269b9a59619263584547a3ae7d73e6",
+    "private_directory_mode_0700": true,
+    "private_file_mode_0600": true,
+    "private_owner_match": true,
+    "private_writes": 0,
+    "production_sha_match": "19/19",
+    "protected_input_sha_match": "6/6",
+    "provider_api_calls": 0,
+    "raw_licensed_data_committed": false,
+    "schema_version": "1.0",
+    "source_run_id": "v2-r2a-20260727-d3b8ed0-integrity1",
+    "upstream_research_sha_match": "6/6"
+  },
+  "private_writes": 0,
+  "provider_api_calls": 0,
+  "raw_licensed_data_committed": false,
+  "schema_version": "1.0",
+  "source_run_id": "v2-r2a-20260727-d3b8ed0-integrity1"
+}
